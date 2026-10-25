@@ -215,6 +215,10 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .sb.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
 .sb.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
 .sb.empty{background:var(--bad-soft);border-color:var(--bad)}
+.sb.live-ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
+.sb.live-bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.sb.live-ok:focus{outline-color:var(--ok)} .sb.live-bad:focus{outline-color:var(--bad)}
+.sb.fixed{background:#FFF1D6;border-color:#C7902A;color:#8A5A0B}
 .ginf{font-size:.72rem;color:var(--muted);font-style:italic;margin-right:3px}
 .fix{font-weight:700;color:var(--ok);margin-right:3px}
 .srow{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:11px 14px;width:100%;font-weight:400}
@@ -291,7 +295,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 14:20</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 14:40</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1348,7 +1352,7 @@ function parseStory(st){
 Object.assign(VERB_EN,{haber:"there to be (había = there was/were)",mirar:"to look at",parecer:"to seem",llevar:"to wear; to carry, take",entrar:"to go in, enter",probar:"to try, taste","oír":"to hear",levantar:"levantarse: to get up","reír":"reírse: to laugh",decidir:"to decide",echar:"echar de menos: to miss",pasear:"to walk, stroll",detener:"to stop, arrest",pasar:"to spend (time); to pass",romper:"to break",subir:"to go up, climb",aplaudir:"to clap",desayunar:"to have breakfast",aprender:"to learn",encontrar:"to find",marcar:"to score",pitar:"to blow the whistle",gritar:"to shout",morir:"to die",cantar:"to sing"});
 Object.assign(WORD_EN,{hermana:"sister",gente:"people",museo:"museum",cuadros:"paintings",tienda:"shop",pueblo:"village, town",barco:"boat",pescar:"to fish",mojados:"wet",chocolate:"hot chocolate",caliente:"hot",entrevista:"interview",nervioso:"nervous",empresa:"company",directora:"director (f)",traje:"suit",azul:"blue",seria:"serious",puesto:"job, position",paisaje:"landscape, view",señor:"man, gentleman",mayor:"older",antiguo:"old",famoso:"famous",vida:"life",vela:"candle",ruido:"noise","extraño":"strange",gato:"cat",chica:"girl","rápido":"fast",nuevos:"new",arroz:"rice",supermercado:"supermarket",cerrado:"closed",divertida:"fun",bajita:"short",pelo:"hair",blanco:"white",delantal:"apron",equipo:"team",gol:"goal",goles:"goals","árbitro":"referee","alegría":"joy",nadie:"nobody",parques:"parks",lleno:"full",camarera:"waitress",bolso:"handbag",suerte:"luck","policía":"police officer",esquina:"corner","tíos":"uncle and aunt","jardín":"garden","río":"river","cómics":"comics",brazo:"arm",sala:"room, venue",gente:"people",escenario:"stage",medianoche:"midnight","malecón":"seafront promenade",ceviche:"ceviche",experiencia:"experience",prima:"cousin (f)",ceremonia:"ceremony",iglesia:"church",novia:"bride; girlfriend",vestido:"dress",emocionada:"emotional, moved",novios:"bride and groom",vals:"waltz",invitados:"guests","tío":"uncle",discurso:"speech",invierno:"winter",collar:"collar",comida:"food",carteles:"posters","niña":"girl",regalos:"presents",carta:"menu; letter",propina:"tip",camarero:"waiter",planes:"plans",rueda:"wheel",pinchada:"flat (tyre)","difíciles":"difficult",perfectos:"perfect",nevera:"fridge",invitaciones:"invitations","salón":"living room",luces:"lights",apagadas:"switched off",chaqueta:"jacket",escaparate:"shop window",dependienta:"shop assistant (f)",papel:"paper",guantes:"gloves","depósito":"(fuel) tank",gracias:"thanks",bibliotecaria:"librarian (f)",vacaciones:"holidays",plantas:"plants",cajón:"drawer",enseguida:"straight away",calma:"calm",muchísimo:"a great deal",dentro:"inside",fuera:"outside"});
 STORIES.forEach(st=>parseStory(st).gaps.forEach(g=>{if(g.type==="verb") g.answers.forEach(a=>{if(!a.includes(" ")) addForm(a,{inf:g.inf,t:g.tense==="pret"?"pretérito":"imperfecto"})})}));
-let storyKind="past", storyId=null, storyChecked=false;
+let storyKind="past", storyId=null, storyChecked=false, storyAttempts={};
 const storyGroups=[["past","Past tense","Pick pretérito or imperfecto for each verb"],["pron","Object pronouns","Type lo, la, le, se lo, me la…"]];
 function renderStoryList(kind){
   if(kind) storyKind=kind;
@@ -1382,15 +1386,29 @@ function renderStory(id){
   $("drill").innerHTML=`
     <div class="meta"><span class="pill ${st.kind==="past"?"pret":"both"}">${st.kind==="past"?"Past tense":"Pronouns"}</span><span class="label">${gaps.length} gaps</span></div>
     <div><h2 class="hello">${esc(st.title)}</h2><p class="sub">${esc(st.en)}</p></div>
-    <p class="prompt">${st.kind==="past"?"Type each verb in the pretérito or imperfecto.":"Type the object pronoun(s) for each gap. The note after each gap says what it replaces."}<span class="tapnote">Tap any word for its meaning.</span></p>
+    <p class="prompt">${st.kind==="past"?"Type each verb in the pretérito or imperfecto.":"Type the object pronoun(s) for each gap. The note after each gap says what it replaces."}<span class="tapnote">Each gap turns green or red when you move on. Red? Tap it and try again. Tap any word for its meaning.</span></p>
     <p class="story" id="storyText">${body}</p>`;
   $("actions").innerHTML=`<button type="button" class="ghost" id="sClear">Clear</button><button type="button" class="grow" id="sCheck">Check story</button>`;
   $("accents").hidden=false;
   const inputs=[...document.querySelectorAll("#storyText .sb")];
+  // instant feedback: a gap turns green or red when you leave it; the first try is what counts
+  const att=(ST.storyDraft[id]&&ST.storyDraft[id].a)||{};
+  const mark=(inp,k,silent)=>{
+    if(storyChecked) return;
+    const v=inp.value.trim(); inp.classList.remove("live-ok","live-bad");
+    if(!v) return;
+    const ok=gaps[k].answers.some(a=>norm(a)===norm(v));
+    if(att[k]===undefined){att[k]=ok; const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d.a=att; saveLocal()}
+    inp.classList.add(ok?"live-ok":"live-bad");
+    if(!silent) haptic(ok?12:[40,30,40]);
+  };
   inputs.forEach((inp,k)=>{
-    makeField(inp,()=>{if(inputs[k+1]) inputs[k+1].focus(); else checkStory()});
+    makeField(inp,()=>{if(inputs[k+1]) inputs[k+1].focus(); else {mark(inp,k); checkStory()}});
     inp.addEventListener("input",()=>{const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal()});
+    inp.addEventListener("blur",()=>mark(inp,k));
+    if(inp.value.trim()) mark(inp,k,true);
   });
+  storyAttempts=att;
   // while a gap has the keyboard, hide Clear / Check story to give the paragraph room
   const stEl=$("storyText");
   stEl.addEventListener("focusin",()=>$("app").classList.add("typing"));
@@ -1422,8 +1440,10 @@ function checkStory(){
   let score=0; const wrong=[], accents=[];
   inputs.forEach((inp,k)=>{
     const g=gaps[k], val=inp.value.trim(), ok=val&&g.answers.some(a=>norm(a)===norm(val));
-    inp.readOnly=true; inp.classList.add("done");
-    if(ok){score++; inp.classList.add("right"); if(!g.answers.some(a=>plain(a)===plain(val))) accents.push(g)}
+    const first=storyAttempts[k]===undefined?ok:storyAttempts[k];
+    inp.readOnly=true; inp.classList.remove("live-ok","live-bad"); inp.classList.add("done");
+    if(ok&&!first){inp.classList.add("fixed"); wrong.push({g,val:null,fixed:true})}
+    else if(ok){score++; inp.classList.add("right"); if(!g.answers.some(a=>plain(a)===plain(val))) accents.push(g)}
     else{
       inp.classList.add(val?"wrong":"empty"); if(!val) inp.value="—";
       inp.insertAdjacentHTML("afterend",`<span class="fix"> ${esc(g.answers[0])}</span>`);
@@ -1443,8 +1463,8 @@ function checkStory(){
   fb.style.maxHeight="52%";
   fb.innerHTML=`<div class="body">
       <div class="verdict">${score===n?"¡Perfecto!":score>=n*0.6?"¡Bien hecho!":"Keep going"}</div>
-      <div class="gain"><b>${score} / ${n}</b><span>${T.best[st.id]>score?`best ${T.best[st.id]}/${n}`:"saved"}</span></div>
-      ${wrong.length?`<div class="mistakes">${wrong.map(({g,val})=>`<div><span class="dot ${g.type==="verb"?g.tense:"io"}"></span><span><b>${esc(g.answers[0])}</b>${val?` (you wrote <i>${esc(val)}</i>)`:""} · ${esc(gapExplain(g))}</span></div>`).join("")}</div>`:""}
+      <div class="gain"><b>${score} / ${n}</b><span>right first time · ${T.best[st.id]>score?`best ${T.best[st.id]}/${n}`:"saved"}</span></div>
+      ${wrong.length?`<div class="mistakes">${wrong.map(({g,val,fixed})=>`<div><span class="dot ${g.type==="verb"?g.tense:"io"}"></span><span><b>${esc(g.answers[0])}</b>${fixed?" (fixed on a second try)":val?` (you wrote <i>${esc(val)}</i>)`:""} · ${esc(gapExplain(g))}</span></div>`).join("")}</div>`:""}
       ${accents.length?`<p class="note" style="color:var(--muted)">Accepted, but check the accents on: ${accents.map(g=>`<b>${esc(g.answers[0])}</b>`).join(", ")}.</p>`:""}
       <p class="note" style="color:var(--muted)">Tap any gap in the story to see why.</p>
     </div>
