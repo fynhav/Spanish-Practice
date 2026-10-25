@@ -196,7 +196,8 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .order{grid-column:1/-1;font-size:.9rem;color:var(--muted)}
 @media(max-width:440px){.rules{grid-template-columns:1fr}}
 .accents{flex:none;display:flex;gap:6px;padding-top:8px;overflow-x:auto;scrollbar-width:none}
-.accents button{flex:1 0 auto;min-width:36px;padding:8px 0;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-bottom-width:3px;border-radius:9px;font-size:1.05rem;font-weight:600}
+.accents button{flex:1 1 0;min-width:30px;padding:8px 0;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-bottom-width:3px;border-radius:9px;font-size:1.05rem;font-weight:600}
+.accents button.nav{background:var(--ink);color:var(--paper);border-color:var(--ink);font-size:1.3rem;line-height:1}
 .accents button:active{transform:translateY(2px);border-bottom-width:1.5px}
 .sentence .t{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .sentence .t.tapped{background:var(--line);border-radius:6px}
@@ -265,7 +266,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
   <div class="progress" id="progress" hidden></div>
   <main id="drill" aria-live="polite"></main>
   <div class="accents" id="accents" hidden aria-label="Spanish characters">
-    <button type="button" data-ch="á">á</button><button type="button" data-ch="é">é</button><button type="button" data-ch="í">í</button><button type="button" data-ch="ó">ó</button><button type="button" data-ch="ú">ú</button><button type="button" data-ch="ñ">ñ</button><button type="button" data-ch="ü">ü</button><button type="button" data-ch="¿">¿</button><button type="button" data-ch="¡">¡</button>
+    <button type="button" data-ch="á">á</button><button type="button" data-ch="é">é</button><button type="button" data-ch="í">í</button><button type="button" data-ch="ó">ó</button><button type="button" data-ch="ú">ú</button><button type="button" data-ch="ñ">ñ</button><button type="button" class="ex" data-ch="ü">ü</button><button type="button" class="ex" data-ch="¿">¿</button><button type="button" class="ex" data-ch="¡">¡</button><button type="button" class="nav" data-nav="-1" aria-label="Previous gap" hidden>‹</button><button type="button" class="nav" data-nav="1" aria-label="Next gap" hidden>›</button>
   </div>
   <div class="actions" id="actions"></div>
   <div class="sheet" id="fb" hidden></div>
@@ -295,7 +296,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 14:40</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 14:45</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -746,8 +747,18 @@ function insertChar(ch){
   i.value=i.value.slice(0,a)+ch+i.value.slice(b);
   i.setSelectionRange(a+ch.length,a+ch.length); i.focus({preventScroll:true});
 }
-$("accents").addEventListener("pointerdown",e=>{const b=e.target.closest("button"); if(!b) return; e.preventDefault(); insertChar(b.dataset.ch)});
-$("accents").addEventListener("click",e=>{if(e.detail===0){const b=e.target.closest("button"); if(b) insertChar(b.dataset.ch)}});
+function gapNav(dir){
+  const gs=[...document.querySelectorAll("#storyText .sb")]; if(!gs.length) return;
+  const i=gs.indexOf(document.activeElement), j=i<0?0:Math.min(gs.length-1,Math.max(0,i+dir));
+  if(i>=0&&j===i) return;
+  const g=gs[j]; g.focus({preventScroll:false});
+  // put the cursor at the end of the gap's text
+  try{const r=document.createRange(); r.selectNodeContents(g); r.collapse(false); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r)}catch(e){}
+  g.scrollIntoView({block:"nearest"});
+}
+const accentTap=b=>{if(b.dataset.nav) gapNav(+b.dataset.nav); else insertChar(b.dataset.ch)};
+$("accents").addEventListener("pointerdown",e=>{const b=e.target.closest("button"); if(!b) return; e.preventDefault(); accentTap(b)});
+$("accents").addEventListener("click",e=>{if(e.detail===0){const b=e.target.closest("button"); if(b) accentTap(b)}});
 
 // keep the app sized to the visible area (shrinks above the keyboard)
 function fit(){
@@ -875,6 +886,8 @@ function setCourseColour(c){
 }
 function chrome(){
   closeGloss(); $("fb").style.maxHeight=""; $("drill").style.paddingBottom=""; $("app").classList.remove("typing");
+  document.querySelectorAll("#accents .nav").forEach(b=>b.hidden=screen!=="story");
+  document.querySelectorAll("#accents .ex").forEach(b=>b.hidden=screen==="story");
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
   $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()); $("quit").hidden=!(inS||screen==="dq");
@@ -1404,8 +1417,14 @@ function renderStory(id){
   };
   inputs.forEach((inp,k)=>{
     makeField(inp,()=>{if(inputs[k+1]) inputs[k+1].focus(); else {mark(inp,k); checkStory()}});
-    inp.addEventListener("input",()=>{const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal()});
-    inp.addEventListener("blur",()=>mark(inp,k));
+    inp.addEventListener("input",()=>{
+      const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal();
+      const v=inp.value.trim(), ok=v&&gaps[k].answers.some(a=>norm(a)===norm(v));
+      if(ok&&!inp.classList.contains("live-ok")&&att[k]!==undefined){inp.classList.remove("live-bad"); inp.classList.add("live-ok"); haptic(12)}
+      else if(!ok) inp.classList.remove("live-ok","live-bad");
+    });
+    inp.addEventListener("focus",()=>{if(inp.classList.contains("live-bad")) inp.classList.remove("live-bad")});
+    inp.addEventListener("blur",()=>mark(inp,k,inp.classList.contains("live-ok")));
     if(inp.value.trim()) mark(inp,k,true);
   });
   storyAttempts=att;
