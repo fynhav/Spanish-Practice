@@ -106,6 +106,8 @@ button:disabled{opacity:.35;cursor:default}
 button:focus-visible,input:focus-visible,.tile:focus-visible{outline:3px solid var(--cc);outline-offset:2px}
 /* feedback sheet */
 .sheet{position:absolute;left:0;right:0;bottom:0;max-height:66%;display:flex;flex-direction:column;border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(42,38,32,.12);z-index:20;animation:up .22s ease-out}
+.sheet.top{top:0;bottom:auto;border-radius:0 0 18px 18px;box-shadow:0 8px 24px rgba(42,38,32,.14);animation:down .22s ease-out}
+.sheet.top .body{padding-bottom:16px}
 .sheet.ok{background:var(--ok-soft)} .sheet.bad{background:var(--bad-soft)}
 .sheet .body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:14px max(16px,env(safe-area-inset-left,0px)) 4px;min-height:0}
 .sheet .vrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -113,6 +115,7 @@ button:focus-visible,input:focus-visible,.tile:focus-visible{outline:3px solid v
 .sheet .foot{padding:10px max(16px,env(safe-area-inset-right,0px)) calc(14px + var(--kb-pad,env(safe-area-inset-bottom,0px))) max(16px,env(safe-area-inset-left,0px));flex:none}
 .sheet .foot button{width:100%}
 .ok .foot button{background:var(--ok);border-color:var(--ok)} .bad .foot button{background:var(--bad);border-color:var(--bad)}
+@keyframes down{from{transform:translateY(-24px);opacity:0}to{transform:none;opacity:1}}
 @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
 .verdict{font-family:var(--f-display);font-size:1.3rem}
 .ok .verdict{color:var(--ok)} .bad .verdict{color:var(--bad)}
@@ -380,7 +383,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:42</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:48</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1777,7 +1780,7 @@ function setCourseColour(c){
   s.setProperty("--cc",`var(--${k})`); s.setProperty("--cc-soft",`var(--${k}-soft)`);
 }
 function chrome(){
-  closeGloss(); $("fb").style.maxHeight=""; $("drill").style.paddingBottom=""; $("app").classList.remove("typing");
+  closeGloss(); $("fb").style.maxHeight=""; $("fb").style.top=""; $("drill").style.paddingBottom=""; $("app").classList.remove("typing");
   document.querySelectorAll("#accents .nav").forEach(b=>b.hidden=true);
   document.querySelectorAll("#accents .ex").forEach(b=>b.hidden=screen==="story");
   const inS=screen==="q"||screen==="intro";
@@ -2046,7 +2049,7 @@ function drawTiles(){
   a.innerHTML=built.map(id=>`<button type="button" class="tile" data-id="${id}" data-in="1">${esc(tiles.find(x=>x.id===id).t)}</button>`).join("");
   a.classList.toggle("empty",!built.length);
   b.innerHTML=tiles.map(x=>`<button type="button" class="tile${built.includes(x.id)?" ghosted":""}" data-id="${x.id}" ${built.includes(x.id)?'tabindex="-1" aria-hidden="true"':""}>${esc(x.t)}</button>`).join("");
-  $("checkBtn").disabled=!built.length||answered;
+  if(!answered) $("checkBtn").disabled=!built.length;
   document.querySelectorAll("#answer .tile, #bank .tile:not(.ghosted)").forEach(bindTile);
 }
 function bindTile(el){
@@ -2151,7 +2154,7 @@ function showFeedback(val,ok){
   const lastQ=!drillOn&&pos+1>=queue.length, partEnds=!drillOn&&(lastQ||queue[pos+1].part!==cur().part);
   const g=drillOn?drill.lastGain:null;
   const fb=$("fb");
-  fb.className="sheet "+(ok?"ok":"bad");
+  fb.className="sheet top "+(ok?"ok":"bad");
   fb.innerHTML=`
     <div class="body">
       <div class="vrow"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>
@@ -2167,20 +2170,23 @@ function showFeedback(val,ok){
       ${ok&&val!==null&&item.extra?(()=>{const x=item.extra.find(e=>e.raw===plain(val)||norm(e.raw)===norm(val));return x?`<p class="note"><b>${esc(x.note)}</b></p>`:""})():""}
       ${item.note?`<p class="note">${esc(item.note)}</p>`:""}
       ${missingAccent?`<p class="note" style="color:var(--muted)">Accepted, but check your accents${isPast?`: <b>${esc(item.ans)}</b>`:""}.</p>`:""}
-    </div>
-    <div class="foot"><button type="button" id="nextBtn">${drillOn?"Next":lastQ?"Finish day":partEnds?"Next part":"Continue"}</button></div>`;
+    </div>`;
+  // the panel drops in from the top; the question and tiles stay where they are and Next takes Check's place under the thumb
+  const m=$("drill"), qEl=m.querySelector(".qpush"), qTop=qEl&&qEl.nextElementSibling?qEl.nextElementSibling.offsetTop:m.clientHeight;
+  fb.style.top=m.offsetTop+"px";
+  fb.style.maxHeight=Math.max(Math.round(m.clientHeight*.4),qTop-12)+"px";
   fb.hidden=false;
-  const m=$("drill"); m.style.paddingBottom=(fb.offsetHeight+12)+"px";
-  requestAnimationFrame(()=>{const a=$("ans")||$("answer"); if(a){const r=a.getBoundingClientRect(), fr=fb.getBoundingClientRect(); if(r.bottom>fr.top-8) m.scrollTop+=r.bottom-fr.top+16}});
   drawLinks();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(drawLinks);
-  $("nextBtn").onclick=()=>{
+  const nb=$("checkBtn"); nb.textContent=drillOn?"Next":lastQ?"Finish day":partEnds?"Next part":"Continue"; nb.disabled=false;
+  $("hintBtn").hidden=true; $("skip").hidden=true;
+  nb.onclick=()=>{
     if(drillOn){nextDrill();return}
     if(lastQ){justDone={c:course,day,score:Object.values(scores).reduce((a,b)=>a+b,0)}; selDay=null; renderCourse(course); return}
     pos++; tilesFor=-1;
     if(partEnds) renderIntro(cur().part); else renderQ(false);
   };
-  $("nextBtn").focus({preventScroll:true});
+  nb.focus({preventScroll:true});
 }
 
 // ================= tap a word for its meaning =================
