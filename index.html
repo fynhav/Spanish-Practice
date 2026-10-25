@@ -83,8 +83,9 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,1
 .tile.r-imp{background:var(--imp-soft);color:var(--imp);border-color:var(--imp)}
 .float{position:fixed;z-index:50;pointer-events:none;box-shadow:0 8px 20px rgba(42,38,32,.2);transform:rotate(-2deg)}
 .locked .tile{pointer-events:none}
-input[type=text]{width:100%;font:inherit;font-size:1.1rem;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--tile);color:var(--ink)}
-input[type=text]:focus{outline:none;border-color:var(--cc)}
+/* typing boxes are one-line textareas: Safari never offers contact AutoFill on a textarea */
+#ans{display:block;width:100%;font:inherit;font-size:1.1rem;line-height:1.4;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--tile);color:var(--ink);resize:none;overflow:hidden;height:calc(1.4em + 27px);white-space:nowrap}
+#ans:focus{outline:none;border-color:var(--cc)}
 /* actions */
 .actions{flex:none;display:flex;gap:8px;padding-block:10px 14px;border-top:1px solid var(--line)}
 .actions:empty{display:none}
@@ -205,7 +206,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .story .t{cursor:pointer;border-radius:5px}
 .story .t.tapped{background:var(--line)}
 .gapw{white-space:nowrap}
-.sb{font:inherit;font-size:16px;line-height:1.3;border:0;border-bottom:2px solid var(--cc);background:var(--cc-soft);border-radius:6px 6px 0 0;padding:1px 6px;margin:0 2px;text-align:center;color:var(--ink);min-width:3.5ch;max-width:60vw}
+.sb{display:inline-block;vertical-align:baseline;resize:none;overflow:hidden;white-space:nowrap;height:calc(1.3em + 4px);font:inherit;font-size:16px;line-height:1.3;border:0;border-bottom:2px solid var(--cc);background:var(--cc-soft);border-radius:6px 6px 0 0;padding:1px 6px;margin:0 2px;text-align:center;color:var(--ink);min-width:3.5ch;max-width:60vw}
 .sb:focus{outline:2px solid var(--cc);outline-offset:1px}
 .sb.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
 .sb.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
@@ -218,6 +219,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .srow .sc{grid-row:1/3;grid-column:2;font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums;padding:3px 9px;border-radius:20px;background:var(--line);color:var(--muted)}
 .srow .sc.full{background:var(--ok-soft);color:var(--ok)}
 .slist{display:flex;flex-direction:column;gap:8px}
+.app.typing .actions{display:none}
 .mistakes{display:flex;flex-direction:column;gap:6px;font-size:.9rem;margin-top:6px}
 .mistakes div{display:flex;gap:8px;align-items:baseline}
 .course.stories{--cc:var(--both);--cc-soft:var(--both-soft)}
@@ -719,7 +721,7 @@ function haptic(pattern){
   for(let k=0;k<n;k++){ if(k===0) hapticEl.click(); else setTimeout(()=>{try{hapticEl.click()}catch(e){}},k*110) }
 }
 function insertChar(ch){
-  const ae=document.activeElement, i=ae&&ae.matches&&ae.matches("input.sb,#ans")?ae:$("ans"); if(!i||i.readOnly) return;
+  const ae=document.activeElement, i=ae&&ae.matches&&ae.matches(".sb,#ans")?ae:$("ans"); if(!i||i.readOnly) return;
   const a=i.selectionStart??i.value.length, b=i.selectionEnd??a;
   i.value=i.value.slice(0,a)+ch+i.value.slice(b);
   i.setSelectionRange(a+ch.length,a+ch.length); i.focus({preventScroll:true});
@@ -852,7 +854,7 @@ function setCourseColour(c){
   s.setProperty("--cc",`var(--${k})`); s.setProperty("--cc-soft",`var(--${k}-soft)`);
 }
 function chrome(){
-  closeGloss(); $("fb").style.maxHeight=""; $("drill").style.paddingBottom="";
+  closeGloss(); $("fb").style.maxHeight=""; $("drill").style.paddingBottom=""; $("app").classList.remove("typing");
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
   $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()); $("quit").hidden=!(inS||screen==="dq");
@@ -1059,7 +1061,7 @@ function renderQ(restore){
     <p class="prompt">${prompt}</p>
     ${m==="tiles"
       ?`<div class="answer empty" id="answer" data-ph="${isPast?"Tap the right form":"Drag or tap words here"}" aria-label="Your answer"></div><div class="bank" id="bank"></div>`
-      :`<form id="f"><input type="text" id="ans" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></form>`}
+      :`<form id="f" autocomplete="off"><textarea id="ans" rows="1" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" data-form-type="other" placeholder="${isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></textarea></form>`}
     <p class="hint" id="hint" hidden>${hintText(item)}</p>`;
   $("actions").innerHTML=`<button class="ghost" type="button" id="hintBtn">Hint</button><button class="ghost" type="button" id="skip">Answer</button><button type="button" class="grow" id="checkBtn" ${m==="tiles"?"disabled":""}>Check</button>`;
   $("hintBtn").onclick=()=>{if(!answered&&$("hint").hidden){$("hint").hidden=false; hintUsed=true}};
@@ -1073,6 +1075,8 @@ function renderQ(restore){
     const ans=$("ans"); ans.value=typed;
     const go=()=>{if(answered||!ans.value.trim())return;check(ans.value)};
     $("f").onsubmit=e=>{e.preventDefault();go()};
+    ans.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();go()}});
+    ans.addEventListener("input",()=>{if(/\n/.test(ans.value)){ans.value=ans.value.replace(/\n/g,"");go()}});
     $("checkBtn").onclick=go;
     if(!restore) ans.focus({preventScroll:true});
   }
@@ -1352,7 +1356,7 @@ function renderStory(id){
     if(typeof sg==="string") return storyWords(sg);
     const w=Math.max(sg.answers[0].length,3)+2;
     const label=sg.type==="verb"?`(${sg.inf})`:`(= ${sg.hint})`;
-    return `<span class="gapw"><input class="sb" id="g${sg.i}" data-i="${sg.i}" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="${sg.i<gaps.length-1?"next":"done"}" style="width:${w}ch" value="${esc(draft[sg.i]||"")}" aria-label="Gap ${sg.i+1} ${esc(label)}"><span class="ginf">${esc(label)}</span></span>`;
+    return `<span class="gapw"><textarea class="sb" rows="1" id="g${sg.i}" data-i="${sg.i}" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-form-type="other" enterkeyhint="${sg.i<gaps.length-1?"next":"done"}" style="width:${w}ch" aria-label="Gap ${sg.i+1} ${esc(label)}">${esc(draft[sg.i]||"")}</textarea><span class="ginf">${esc(label)}</span></span>`;
   }).join("");
   $("drill").innerHTML=`
     <div class="meta"><span class="pill ${st.kind==="past"?"pret":"both"}">${st.kind==="past"?"Past tense":"Pronouns"}</span><span class="label">${gaps.length} gaps</span></div>
@@ -1363,9 +1367,15 @@ function renderStory(id){
   $("accents").hidden=false;
   const inputs=[...document.querySelectorAll("#storyText .sb")];
   inputs.forEach((inp,k)=>{
-    inp.addEventListener("input",()=>{const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal()});
+    inp.addEventListener("input",()=>{
+      if(/\n/.test(inp.value)){inp.value=inp.value.replace(/\n/g,""); if(inputs[k+1]) inputs[k+1].focus(); else checkStory()}
+      const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal()});
     inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault(); if(inputs[k+1]) inputs[k+1].focus(); else checkStory()}});
   });
+  // while a gap has the keyboard, hide Clear / Check story to give the paragraph room
+  const stEl=$("storyText");
+  stEl.addEventListener("focusin",()=>$("app").classList.add("typing"));
+  stEl.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement; if(!(a&&a.classList&&a.classList.contains("sb"))) $("app").classList.remove("typing")},60));
   $("sCheck").onclick=checkStory;
   $("sClear").onclick=()=>{delete ST.storyDraft[id]; saveLocal(); renderStory(id)};
 }
@@ -1401,7 +1411,7 @@ function checkStory(){
       wrong.push({g,val});
     }
   });
-  storyChecked=true; $("accents").hidden=true;
+  storyChecked=true; $("accents").hidden=true; $("app").classList.remove("typing");
   if(document.activeElement) document.activeElement.blur();
   const n=gaps.length, tk=todayKey(), T=ST.stories;
   T.best[st.id]=Math.max(T.best[st.id]||0,score); T.log[tk]=(T.log[tk]||0)+1;
