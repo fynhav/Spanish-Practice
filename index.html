@@ -26,7 +26,7 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;overflow:hidden;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
 .app{position:fixed;left:0;right:0;top:var(--vt,0px);height:var(--vh,100%);max-width:632px;margin:0 auto;display:flex;flex-direction:column;
@@ -314,7 +314,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 16:05</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 16:10</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -785,8 +785,16 @@ function fit(){
   r.setProperty("--vh",h+"px"); r.setProperty("--vt",(vv?vv.offsetTop:0)+"px");
   if(window.innerHeight-h>120) r.setProperty("--kb-pad","0px"); else r.removeProperty("--kb-pad");
 }
-if(window.visualViewport){visualViewport.addEventListener("resize",fit);visualViewport.addEventListener("scroll",fit)}
-window.addEventListener("resize",fit); fit();
+// iOS reports the keyboard size while it is still animating, so measure again once it has settled
+let fitTimers=[];
+function fitSoon(){fitTimers.forEach(clearTimeout); fit(); fitTimers=[60,180,350,600,900].map(ms=>setTimeout(fit,ms))}
+if(window.visualViewport){visualViewport.addEventListener("resize",fitSoon);visualViewport.addEventListener("scroll",fit)}
+window.addEventListener("resize",fitSoon);
+document.addEventListener("focusin",fitSoon);
+document.addEventListener("focusout",()=>{fitSoon(); setTimeout(()=>{const a=document.activeElement; if(!a||a===document.body){window.scrollTo(0,0); fit()}},250)});
+window.addEventListener("pageshow",fitSoon);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible") fitSoon()});
+fit();
 
 // ================= progress: saved on device first, synced to account =================
 const LS="pd-v2";
