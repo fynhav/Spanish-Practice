@@ -241,6 +241,8 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .sp-msg{font-size:.78rem;color:var(--muted)}
 @keyframes pop-in{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.splash,.sp-row .sm i,.sp-bar i{transition:none}.sp-logo{animation:none}}
+.credit{font-size:.78rem;color:var(--muted);margin:0;line-height:1.4}
+.credit a{color:var(--pret)}
 .feed{display:flex;flex-direction:column;gap:16px;padding-block:6px 46vh}
 .ecard{font-size:1.12rem;line-height:2.05;padding:12px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);opacity:.32;transition:opacity .35s ease,box-shadow .35s ease}
 .ecard.cur{opacity:1;box-shadow:0 6px 22px rgba(42,38,32,.09);border-color:var(--pret)}
@@ -367,7 +369,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 17:00</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:10</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1014,7 +1016,7 @@ function renderMenu(){
     </button>
     <button type="button" class="course stories" id="storyCard">
       <span><span class="cn">Stories</span><br><span class="cs">Short paragraphs: tap or type the missing words</span></span><span class="chev" aria-hidden="true">›</span>
-      <span class="cs"><span class="now">${(()=>{const ids=new Set([...STORIES.map(x=>x.id),...STORIES.filter(x=>x.kind==="past").map(x=>"e:"+x.id)]); return `${Object.keys(ST.stories.best).filter(k=>ids.has(k)).length} of ${ids.size} done`})()}</span>${(ST.stories.log[tk]||0)?` · ${ST.stories.log[tk]} today`:""}</span>
+      <span class="cs"><span class="now">${(()=>{const ids=new Set([...STORIES.map(x=>x.id),...REAL_STORIES.map(x=>"e:"+x.id)]); return `${Object.keys(ST.stories.best).filter(k=>ids.has(k)).length} of ${ids.size} done`})()}</span>${(ST.stories.log[tk]||0)?` · ${ST.stories.log[tk]} today`:""}</span>
     </button>
     <div class="stats two">
       <div class="stat"><b>${streak(has)}</b><span>day streak</span></div>
@@ -1449,13 +1451,13 @@ const storyGroups=[["easy","Past · tap"],["past","Past · type"],["pron","Prono
 function renderStoryList(kind){
   if(kind) storyKind=kind;
   screen="slist"; course=null; drillOn=false; $("fb").hidden=true; chrome();
-  const list=STORIES.filter(x=>x.kind===(storyKind==="easy"?"past":storyKind));
-  const intro={easy:"Tap mode: read one sentence at a time and tap pretérito or imperfecto. No typing.",past:"Type mode: type every verb into the story.",pron:"Type the object pronouns into the story."}[storyKind];
+  const list=storyKind==="easy"?REAL_STORIES:STORIES.filter(x=>x.kind===storyKind);
+  const intro={easy:"Tap mode: real stories by Spanish-language authors. Read one sentence at a time and tap pretérito or imperfecto.",past:"Type mode: type every verb into the story.",pron:"Type the object pronouns into the story."}[storyKind];
   $("drill").innerHTML=`
     <div><h2 class="hello">Stories</h2><p class="sub">${intro}</p></div>
     <div class="seg" id="segStory">${storyGroups.map(([k,l])=>`<button type="button" data-v="${k}" aria-pressed="${k===storyKind}">${l}</button>`).join("")}</div>
-    <div class="slist">${list.map(st=>{const n=parseStory(st).gaps.length, b=ST.stories.best[(storyKind==="easy"?"e:":"")+st.id];
-      return `<button type="button" class="srow" data-id="${st.id}"><span class="st">${esc(st.title)}</span><span class="sc${b===n?" full":""}">${b!=null?`${b}/${n}`:`${n} ${storyKind==="easy"?"verbs":"gaps"}`}</span><span class="se">${esc(st.en)}</span></button>`}).join("")}</div>
+    <div class="slist">${list.map(st=>{const n=storyKind==="easy"?(st.text.match(REAL_RE)||[]).length:parseStory(st).gaps.length, b=ST.stories.best[(storyKind==="easy"?"e:":"")+st.id];
+      return `<button type="button" class="srow" data-id="${st.id}"><span class="st">${esc(st.title)}</span><span class="sc${b===n?" full":""}">${b!=null?`${b}/${n}`:`${n} ${storyKind==="easy"?"verbs":"gaps"}`}</span><span class="se">${storyKind==="easy"?esc(st.src.author)+" · ":""}${esc(st.en)}</span></button>`}).join("")}</div>
     <p class="syncline"></p>`;
   $("actions").innerHTML="";
   $("segStory").onclick=e=>{const b=e.target.closest("button"); if(b) renderStoryList(b.dataset.v)};
@@ -1608,16 +1610,13 @@ const PFX=inf=>XF[inf]||pastForms(inf);
 // who is doing the action, where yo and él share the same imperfecto form (0 = yo, 2 = él/ella)
 const EASY_P={p1:{1:2,4:2},p2:{0:0,1:0,3:2},p3:{1:0,2:2,5:2,6:2,7:2,9:2},p4:{1:2},p5:{0:0,1:0,3:0,5:0,7:2},p6:{1:2,2:2,4:2,5:2,6:2,7:0},p7:{1:0,2:0,4:2},p8:{0:2,1:2,2:2,3:2,4:2,5:2},p9:{1:2},p10:{1:0,2:0,3:0,4:0},p11:{1:2,2:2,6:2},p12:{1:2},p13:{1:2,3:2,4:2},p14:{1:2,2:0,3:0},p15:{2:2,3:2},p16:{1:2,2:2,3:2,8:2}};
 function easyCards(st){
-  const re=new RegExp(GAP_RE.source,"g"), cards=[]; let gi=0, pending="";
+  const re=new RegExp(REAL_RE.source,"g"), cards=[]; let gi=0, pending="";
   st.text.split(/(?<=[.!?])\s+/).forEach(sn=>{
     const segs=[], gaps=[]; let last=0, m; re.lastIndex=0;
     while((m=re.exec(sn))){
       if(m.index>last) segs.push(sn.slice(last,m.index));
-      const g={inf:m[1],answers:m[2].split("|"),tense:m[3]==="p"?"pret":"imp",i:gi++};
-      const f=PFX(g.inf), o=g.tense==="pret"?"imp":"pret", lc=g.answers[0].toLowerCase();
-      let p=(EASY_P[st.id]||{})[g.i]; if(p==null) p=Math.max(0,f[g.tense].indexOf(lc));
-      let other=f[o][p]; if(g.answers[0][0]!==lc[0]) other=cap(other);
-      g.right=g.answers[0]; g.other=other; g.otherTense=o; g.bothOk=g.answers.some(a=>norm(a)===norm(other));
+      const tense=m[3]==="p"?"pret":"imp";
+      const g={inf:m[4],right:m[1],other:m[2],tense,otherTense:tense==="pret"?"imp":"pret",bothOk:!!m[5],i:gi++};
       gaps.push(g); segs.push(g); last=re.lastIndex;
     }
     if(last<sn.length) segs.push(sn.slice(last));
@@ -1628,15 +1627,35 @@ function easyCards(st){
   if(pending&&cards.length) cards[cards.length-1].segs.push(" "+pending.trim());
   return cards;
 }
+// ================= real stories for tap mode (public domain, via Project Gutenberg) =================
+// gap: {right|other:p or i:infinitive} — right is the author's own verb; add ":both" when either tense reads naturally
+const LAVAL={author:"Ramón A. Laval",book:"Cuentos populares en Chile (1923)",url:"https://www.gutenberg.org/ebooks/63424"};
+const COLOMA={author:"Luis Coloma",book:"Ratón Pérez (1894)",url:"https://www.gutenberg.org/ebooks/36558"};
+const QUIROGA={author:"Horacio Quiroga",book:"Cuentos de amor de locura y de muerte (1917)",url:"https://www.gutenberg.org/ebooks/13507"};
+const REAL_STORIES=[
+ {id:"rl1",src:LAVAL,title:"Las tres mentiras",en:"The three lies · Chilean folk tale",text:"Un campesino, al morir, {dejó|dejaba:p:dejar} por toda herencia a los tres hijos que {tenía|tuvo:i:tener} la cantidad de trescientos pesos. Los dos mayores, que {eran|fueron:i:ser} muy ambiciosos, {querían|quisieron:i:querer} adueñarse de toda la cantidad; y {propusieron|proponían:p:proponer} al menor dejar enterrada la plata y salir a rodar tierras por un año, y entregarla al que, al volver, contara la mentira más grande. {Aceptó|Aceptaba:p:aceptar} la proposición el menor, y {salieron|salían:p:salir}. Al año justo se {juntaron|juntaban:p:juntar} los tres en el mismo punto en que se habían apartado, y después de abrazarse, {comenzó|comenzaba:p:comenzar} el mayor: —Yo, hermanitos, he trabajado durante todo el año de chacarero, y una vez {planté|plantaba:p:plantar} una mata de garbanzos que creció tanto, tanto, que llegó hasta el cielo. —Yo —dijo el segundo— {estuve|estaba:p:estar:both} trabajando en una hilandería, y torcí en una ocasión un hilo tan largo, tan largo, que mientras yo lo tenía de una punta la otra llegaba al cielo. —Yo —dijo el menor— no trabajé en nada fijo. Una noche que {venía|vine:i:venir} por un camino muy solo, me puse a torcer un cigarrito, y cuando lo fui a encender, me encontré con que no {tenía|tuve:i:tener} fósforos. ¿Qué hice entonces? {Divisé|Divisaba:p:divisar} una luz en la Luna y {subí|subía:p:subir} hasta ella a encender mi cigarro. —¿Y por dónde subiste? —Por el hilo que tú torciste. —¿Y por dónde bajaste? —Por el garbanzo que tú plantaste. Los trescientos pesos le {correspondieron|correspondían:p:corresponder} al menor, que {era|fue:i:ser} el menos ambicioso."},
+ {id:"rl2",src:LAVAL,title:"El Diablo y el Campesino",en:"The Devil and the farmer · Chilean folk tale",text:"El Diablo le {propuso|proponía:p:proponer} a un Campesino trabajar a medias, durante tres años. El Diablo pondría el terreno y el Campesino la semilla. Preguntó el hombre: —¿Y cómo haremos la partición? El Diablo {contestó|contestaba:p:contestar}: —Yo tomaré lo que den las plantas arriba y tú tomarás lo que quede debajo de la tierra. —Y se {fue|iba:p:ir}. Entonces el Campesino {sembró|sembraba:p:sembrar} papas, y cuando {llegó|llegaba:p:llegar} el tiempo de partirse la cosecha, el Diablo {tuvo|tenía:p:tener} que llevarse las matas y dejar las papas al hombre. El Diablo se repelaba, y {pensó|pensaba:p:pensar}: esta otra vez no me harás leso. Se fue el Demonio y el Campesino sembró sandías y melones, y cuando el Diablo vino por la parte que le correspondía y {vio|veía:p:ver} que le {tocaban|tocaron:i:tocar} puras raíces, se puso a rabiar como un condenado y se {arrancaba|arrancó:i:arrancar} las mechas de ira. Pero el hombre {sembró|sembraba:p:sembrar} maíz; y cuando el Diablo vino a reclamar su porción, los choclos correspondieron al Campesino y el Diablo {quedó|quedaba:p:quedar} nuevamente burlado."},
+ {id:"rl3",src:LAVAL,title:"La laguna de Taguatagua",en:"The lake of Taguatagua · Chilean legend, told in 1910",text:"Cuando don Javier Errázuriz {hacía|hizo:i:hacer} secar la laguna de Taguatagua, {decían|dijeron:i:decir} los pobladores de la hacienda que a la hora de la siesta {salía|salió:i:salir} el Diablo en figura de un toro con las astas de oro. El mayordomo del fundo lo {enlazó|enlazaba:p:enlazar} un día y el toro {cortó|cortaba:p:cortar} el lazo. Mandó hacer entonces otro más fuerte, de cuero de novillo, que el toro no pudo cortar, pero {arrastró|arrastraba:p:arrastrar} al mayordomo, sin embargo de que {montaba|montó:i:montar} un caballo muy bueno. Cuando el mayordomo {iba|fue:i:ir} cerca de la laguna, que aún no estaba bien seca, {sacó|sacaba:p:sacar} su corvo y cortó el lazo, para no morir ahogado. El toro {cuidaba|cuidó:i:cuidar} de una niña que todas las tardes, después de ponerse el sol, {salía|salió:i:salir} a la orilla de la misma laguna y se sentaba en una piedra a peinar sus rubios cabellos con un peine de oro. La gente la {oía|oyó:i:oír} cantar desde lejos. Si alguien se acercaba, {huía|huyó:i:huir} precipitadamente y se zambullía en el agua, para no salir hasta la tarde siguiente."},
+ {id:"rl4",src:LAVAL,title:"La laguna de Pudahuel",en:"The lake of Pudahuel · Chilean legend, told in 1911",text:"Hace muchos años, seis carreteros que con sus correspondientes carretas cargadas {venían|vinieron:i:venir} del puerto a la capital, {llegaron|llegaban:p:llegar} a la laguna de Pudahuel, un Viernes Santo. Cinco carreteros no {quisieron|querían:p:querer} seguir adelante, en consideración a lo sagrado del día; pero el sexto {dijo|decía:p:decir} que no le importaba que fuese Viernes Santo y que él no estaba para perder el tiempo. Y dándole con la picana a los bueyes, se {metió|metía:p:meter}, con la carreta, en el agua, por la parte más baja de la laguna. En el momento en que {iban|fueron:i:ir} más o menos por el medio, un Cuero que había en el fondo {asió|asía:p:asir} bueyes y carretas y los atrajo hacia sí. El carretero, viendo que los bueyes se {hundían|hundieron:i:hundir}, los picaneaba y les {gritaba|gritó:i:gritar} para que salieran afuera; pero inútilmente. Una vez que aseguró sus presas en lo más hondo de la laguna, {cogió|cogía:p:coger} también al carretero, a quien sus compañeros {vieron|veían:p:ver} desaparecer instantes después."},
+ {id:"rl5",src:LAVAL,title:"Las tres Pascualas",en:"The three Pascualas · Chilean legend",text:"Allá en los tiempos en que los españoles {dominaban|dominaron:i:dominar} en Chile, {vivía|vivió:i:vivir} cerca de Concepción, en un hermoso palacio rodeado de huertos y jardines, una bella dama, madre de tres lindísimas hijas. {Murió|Moría:p:morir} la madre, y las niñas se {entregaron|entregaban:p:entregar} a una vida disipada, viviendo en continua fiesta con los jóvenes de Concepción y otras ciudades, que {iban|fueron:i:ir} a divertirse al palacio que habitaban. Dios, cansado de tanto pecado, {hizo|hacía:p:hacer} que un día de gran fiesta se hundiera el palacio con las tres niñas y todos sus acompañantes. Una vez un joven se {quedó|quedaba:p:quedar} dormido sobre una gran piedra que hay a la orilla de esta laguna, y cuando {despertó|despertaba:p:despertar} vio que tres hermosas niñas {ponían|pusieron:i:poner} una mesita delante de él y le sirvieron toda clase de manjares y vinos exquisitos. {Estuvo|Estaba:p:estar} con ellas el resto del día y toda la noche divirtiéndose alegremente. Al día siguiente, {despertó|despertaba:p:despertar} como a las 12 y se encontró desnudo sobre un banco de arena del Bío-Bío."},
+ {id:"rc1",src:COLOMA,title:"Ratón Pérez: el diente",en:"Ratón Pérez: the tooth · the original tooth-mouse story",text:"Consta que {floreció|florecía:p:florecer} en aquella época un rey Buby I, grande amigo de los niños pobres y protector decidido de los ratones. {Era|Fue:i:ser} entonces el rey Buby un verdadero encanto. {Parecía|Pareció:i:parecer} un muñequito de Sèvres, que en vez de colocarlo sobre la chimenea, lo hubieran puesto sentadito en el trono. Pues {sucedió|sucedía:p:suceder} que, comiendo un día el Rey unas sopitas, se le comenzó a menear un diente. El caso {era|fue:i:ser} grave, pues todo indicaba que había llegado para Su Majestad la hora de mudar los dientes. Los médicos {quisieron|querían:p:querer:both} cloroformizarle. Pero el rey Buby {era|fue:i:ser} animoso y valiente, y se empeñó en arrostrar el peligro cara a cara. El médico más anciano {comenzó|comenzaba:p:comenzar} a tirar con tanto pulso y acierto, que a la mitad del empuje {hizo|hacía:p:hacer} el Rey un pucherito, y {saltó|saltaba:p:saltar} el diente tan blanco, tan limpio y tan precioso como una perlita sin engaste. La Reina {resolvió|resolvía:p:resolver} que el rey Buby escribiese a Ratón Pérez una atenta carta, y pusiese aquella misma noche el diente debajo de su almohada."},
+ {id:"rc2",src:COLOMA,title:"Ratón Pérez: la visita",en:"Ratón Pérez: the night visit",text:"Ratón Pérez {tardaba|tardó:i:tardar}, y el Reyecito se entretuvo en pensar el discurso que había de pronunciarle. De pronto, {sintió|sentía:p:sentir} una cosa suave que le {rozaba|rozó:i:rozar} la frente. Se incorporó de un brinco, sobresaltado, y {vio|veía:p:ver} delante de sí, de pie sobre la almohada, un ratón muy pequeño, con sombrero de paja, lentes de oro, zapatos de lienzo crudo y una cartera roja. Pero Su Majestad no {dijo|decía:p:decir} nada, porque el discurso se le {olvidó|olvidaba:p:olvidar} de pronto. Su conversación {era|fue:i:ser} variada e instructiva y su erudición pasmosa. {Habló|Hablaba:p:hablar} también de su familia, que no {era|fue:i:ser} muy numerosa: dos hijas, ya casaderas, Adelaida y Elvira, y un hijo adolescente, Adolfo. {Vivía|Vivió:i:vivir} Ratón Pérez en la calle del Arenal, número 8, frente por frente de una gran pila de quesos de Gruyère. Ratón Pérez {saltó|saltaba:p:saltar} de repente sobre su hombro, y le metió por la nariz la punta del rabo: {estornudó|estornudaba:p:estornudar} estrepitosamente el Reyecito, y quedó convertido en el ratón más lindo y primoroso que imaginaciones de hadas pudieran soñar. {Era|Fue:i:ser} todo él brillante como el oro, y suave como la seda."},
+ {id:"rq1",src:QUIROGA,title:"El almohadón de pluma (I)",en:"The feather pillow, part 1 · Uruguayan classic, 1907",text:"Su luna de miel {fue|era:p:ser} un largo escalofrío. Rubia, angelical y tímida, el carácter duro de su marido {heló|helaba:p:helar} sus soñadas niñerías de novia. Lo {quería|quiso:i:querer} mucho, sin embargo. Él, por su parte, la {amaba|amó:i:amar} profundamente, sin darlo a conocer. Durante tres meses —se habían casado en abril— {vivieron|vivían:p:vivir} una dicha especial. La casa en que {vivían|vivieron:i:vivir} influía no poco en sus estremecimientos. En ese extraño nido de amor, Alicia {pasó|pasaba:p:pasar} todo el otoño. {Tuvo|Tenía:p:tener} un ligero ataque de influenza que se arrastró insidiosamente días y días; Alicia no se reponía nunca. Al fin, una tarde {pudo|podía:p:poder} salir al jardín apoyada en el brazo de él. {Miraba|Miró:i:mirar} indiferente a uno y otro lado. {Fue|Era:p:ser} ese el último día que Alicia estuvo levantada."},
+ {id:"rq2",src:QUIROGA,title:"El almohadón de pluma (II)",en:"The feather pillow, part 2",text:"Al otro día Alicia {seguía|siguió:i:seguir} peor. Todo el día el dormitorio {estaba|estuvo:i:estar} con las luces prendidas y en pleno silencio. Alicia {dormitaba|dormitó:i:dormitar}. Jordán {vivía|vivió:i:vivir} casi en la sala, también con toda la luz encendida. Pronto Alicia {comenzó|comenzaba:p:comenzar} a tener alucinaciones. Los médicos {volvieron|volvían:p:volver} inútilmente. {Murió|Moría:p:morir}, por fin. La sirvienta, que {entró|entraba:p:entrar} después a deshacer la cama, {miró|miraba:p:mirar} un rato extrañada el almohadón. Jordán lo levantó; {pesaba|pesó:i:pesar} extraordinariamente. Sobre el fondo, entre las plumas, moviendo lentamente las patas velludas, {había|hubo:i:haber} un animal monstruoso, una bola viviente y viscosa."}
+];
+const REAL_RE=/\{([^|{}]+)\|([^:{}]+):([pi]):([^:{}]+)(?::(both))?\}/g;
+Object.assign(VERB_EN,{dejar:"to leave; to let",aceptar:"to accept",juntar:"juntarse: to meet up",comenzar:"to begin",plantar:"to plant",divisar:"to make out, spot",corresponder:"to belong to, go to",proponer:"to propose",contestar:"to answer",sembrar:"to sow",pensar:"to think",arrancar:"to pull out",quedar:"to end up, be left",enlazar:"to lasso",cortar:"to cut",arrastrar:"to drag",montar:"to ride",sacar:"to take out",cuidar:"to look after",huir:"to flee",asir:"to seize",meter:"meterse: to go into",hundir:"hundirse: to sink",coger:"to catch, grab",dominar:"to rule, dominate",entregar:"entregarse: to give oneself over",despertar:"to wake up",florecer:"to flourish",suceder:"to happen",resolver:"to decide",tardar:"to take a long time",sentir:"to feel",rozar:"to brush against",olvidar:"to forget",estornudar:"to sneeze",helar:"to freeze",amar:"to love",seguir:"to continue; to be still",dormitar:"to doze",pesar:"to weigh",saltar:"to jump",subir:"to go up"});
+
 let easy=null;
 function renderEasy(id){
-  const st=STORIES.find(x=>x.id===id); if(!st) return renderStoryList("easy");
+  const st=REAL_STORIES.find(x=>x.id===id); if(!st) return renderStoryList("easy");
   storyId=id; storyKind="easy"; screen="easy"; $("fb").hidden=true; chrome();
   $("title").textContent=st.title;
   const cards=easyCards(st), total=cards.reduce((a,c)=>a+c.gaps.length,0);
   easy={id,st,cards,total,cur:0,done:0,score:0,res:{}};
   $("drill").innerHTML=`
     <div class="meta"><span class="pill pret">Tap mode</span><span class="sub" style="margin:0">${esc(st.en)} · ${total} verbs</span></div>
+    <p class="credit">By <b>${esc(st.src.author)}</b>, <i>${esc(st.src.book)}</i>. Public domain, from <a href="${st.src.url}" target="_blank" rel="noopener">Project Gutenberg</a>. Short excerpt, old spellings modernised.</p>
     <p class="hint" style="margin:0">Tap the form that fits: <b class="pret-t">pretérito</b> for finished events, <b class="imp-t">imperfecto</b> for background and habits.</p>
     <div class="feed" id="feed">${cards.map((c,ci)=>`<div class="ecard${ci===0?" cur":""}" data-c="${ci}"><div class="etext">${c.segs.map(sg=>typeof sg==="string"?storyWords(sg):
       `<span class="pick" data-g="${sg.i}">${shuf([[sg.right,sg.tense],[sg.other,sg.otherTense]]).map(([t,tn])=>`<button type="button" class="opt" data-v="${esc(t)}" data-t="${tn}">${esc(t)}</button>`).join("")}</span><span class="ginf">(${esc(sg.inf)})</span>`).join("")}</div><div class="enote"></div></div>`).join("")}</div>`;
@@ -1685,13 +1704,13 @@ function easyFinish(){
   const E=easy, st=E.st, n=E.total, tk=todayKey(), T=ST.stories, key="e:"+st.id;
   T.best[key]=Math.max(T.best[key]||0,E.score); T.log[tk]=(T.log[tk]||0)+1; commit("stories");
   haptic(E.score===n?[30,40,30,40,80]:20);
-  const list=STORIES.filter(x=>x.kind==="past"), next=list[(list.indexOf(st)+1)%list.length];
+  const list=REAL_STORIES, next=list[(list.indexOf(st)+1)%list.length];
   const fb=$("fb"); fb.className="sheet "+(E.score>=n*0.6?"ok":"bad"); fb.style.maxHeight="45%";
   fb.innerHTML=`<div class="body"><div class="vrow"><div class="verdict">${E.score===n?"¡Perfecto!":E.score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${E.score} / ${n}</b><span>${T.best[key]>E.score?`best ${T.best[key]}/${n}`:"saved"}</span></div></div>
-    <p class="note" style="color:var(--muted)">Scroll up to reread the story. Ready to type the verbs yourself? Try this story in Type mode.</p></div>
-    <div class="foot" style="display:flex;gap:8px"><button type="button" id="eType" style="flex:1;background:var(--card);color:var(--ink);border-color:var(--line)">Type mode</button><button type="button" id="eNext" style="flex:2">Next story</button></div>`;
+    <p class="note" style="color:var(--muted)">Scroll up to reread it. ${esc(st.src.author)}, <i>${esc(st.src.book)}</i>.</p></div>
+    <div class="foot" style="display:flex;gap:8px"><button type="button" id="eType" style="flex:1;background:var(--card);color:var(--ink);border-color:var(--line)">Try again</button><button type="button" id="eNext" style="flex:2">Next story</button></div>`;
   fb.hidden=false; $("drill").style.paddingBottom=(fb.offsetHeight+12)+"px";
-  $("eType").onclick=()=>renderStory(st.id);
+  $("eType").onclick=()=>renderEasy(st.id);
   $("eNext").onclick=()=>renderEasy(next.id);
 }
 
@@ -1820,7 +1839,7 @@ renderMenu();
   const str=streak(has);
   $("spStreak").innerHTML=str?`<b>${str}</b>day streak${has(tk)?" · done today":" · keep it going today"}`:(has(tk)?"Nice work today":"Ready for today’s practice");
   $("spWeek").innerHTML=wk.map((k,i)=>`<span><i class="${has(k)?"on":""}${k===tk?" today":""}" style="animation-delay:${.08*i}s"></i>${LBL[i].slice(0,1)}</span>`).join("");
-  const storyIds=new Set([...STORIES.map(x=>x.id),...STORIES.filter(x=>x.kind==="past").map(x=>"e:"+x.id)]);
+  const storyIds=new Set([...STORIES.map(x=>x.id),...REAL_STORIES.map(x=>"e:"+x.id)]);
   const storyDone=Object.keys(ST.stories.best).filter(k=>storyIds.has(k)).length;
   const rows=[
     ["Object pronouns",Object.keys(ST.pron.done).length,DAYS,"do"],
