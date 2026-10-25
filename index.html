@@ -31,9 +31,12 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-siz
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
 .app{position:fixed;left:0;right:0;top:var(--vt,0px);height:var(--vh,100%);max-width:632px;margin:0 auto;display:flex;flex-direction:column;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  padding-top:env(safe-area-inset-top,0px);padding-bottom:var(--kb-pad,env(safe-area-inset-bottom,0px))}
+  padding-top:0;padding-bottom:var(--kb-pad,env(safe-area-inset-bottom,0px))}
 /* top */
-.topbar{display:flex;align-items:center;gap:8px;padding-top:12px;min-height:46px}
+/* solid header band that runs up under the phone's status bar */
+.topbar{display:flex;align-items:center;gap:8px;flex:none;min-height:46px;background:var(--card);border-bottom:1px solid var(--line);
+  margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+  padding:calc(env(safe-area-inset-top,0px) + 10px) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
 h1{font-family:var(--f-display);font-weight:400;font-size:1.25rem;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .score{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--muted);white-space:nowrap}
 .iconbtn{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:.85rem;display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:34px}
@@ -198,6 +201,26 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .gloss .gw{font-family:var(--f-display);font-size:1.15rem}
 .gloss .gm{color:var(--muted);font-size:.8rem;margin-top:2px}
 .gloss a{display:inline-block;margin-top:6px;font-size:.8rem;color:var(--do);font-weight:600;text-decoration:none}
+.story{font-size:1.1rem;line-height:2.15;margin:0}
+.story .t{cursor:pointer;border-radius:5px}
+.story .t.tapped{background:var(--line)}
+.gapw{white-space:nowrap}
+.sb{font:inherit;font-size:16px;line-height:1.3;border:0;border-bottom:2px solid var(--cc);background:var(--cc-soft);border-radius:6px 6px 0 0;padding:1px 6px;margin:0 2px;text-align:center;color:var(--ink);min-width:3.5ch;max-width:60vw}
+.sb:focus{outline:2px solid var(--cc);outline-offset:1px}
+.sb.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
+.sb.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.sb.empty{background:var(--bad-soft);border-color:var(--bad)}
+.ginf{font-size:.72rem;color:var(--muted);font-style:italic;margin-right:3px}
+.fix{font-weight:700;color:var(--ok);margin-right:3px}
+.srow{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:11px 14px;width:100%;font-weight:400}
+.srow .st{font-family:var(--f-display);font-size:1.05rem}
+.srow .se{font-size:.82rem;color:var(--muted)}
+.srow .sc{grid-row:1/3;grid-column:2;font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums;padding:3px 9px;border-radius:20px;background:var(--line);color:var(--muted)}
+.srow .sc.full{background:var(--ok-soft);color:var(--ok)}
+.slist{display:flex;flex-direction:column;gap:8px}
+.mistakes{display:flex;flex-direction:column;gap:6px;font-size:.9rem;margin-top:6px}
+.mistakes div{display:flex;gap:8px;align-items:baseline}
+.course.stories{--cc:var(--both);--cc-soft:var(--both-soft)}
 .t .chip.in{padding:1px 3px !important;border-radius:5px}
 .streakchip{font-size:.75rem;font-weight:700;letter-spacing:.03em;padding:3px 9px;border-radius:20px;background:var(--io-soft);color:var(--io);white-space:nowrap}
 .streakchip.hot{background:var(--io);color:#fff}
@@ -287,6 +310,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
         <div class="order"><b>Ask the question:</b> <i>what? / whom?</i> → <span class="do-t">direct</span> · <i>to whom? / for whom?</i> → <span class="io-t">indirect</span>.</div>
         <div class="order"><b>Order:</b> <span class="io-t">indirect</span> before <span class="do-t">direct</span>, both before the conjugated verb.</div>
         <div class="order"><b>Two verbs:</b> attach to the infinitive or gerund and add an accent (<i>voy a dárselo, estoy leyéndolo</i>), or put them before the first verb (<i>se lo voy a dar</i>).</div>
+        <div class="order"><b>me, te, nos</b> are the same for direct and indirect, and never change to se: <i>me lo dio</i>, <i>nos la trajo</i>.</div>
         <div class="order"><b>Everyday Spanish</b> often keeps <i>le</i> even when the person is named: <i>Le doy el libro a María</i> is normal and correct.</div>
       </div>
       <div id="rulesPast" class="rules">
@@ -695,7 +719,7 @@ function haptic(pattern){
   for(let k=0;k<n;k++){ if(k===0) hapticEl.click(); else setTimeout(()=>{try{hapticEl.click()}catch(e){}},k*110) }
 }
 function insertChar(ch){
-  const i=$("ans"); if(!i||i.readOnly) return;
+  const ae=document.activeElement, i=ae&&ae.matches&&ae.matches("input.sb,#ans")?ae:$("ans"); if(!i||i.readOnly) return;
   const a=i.selectionStart??i.value.length, b=i.selectionEnd??a;
   i.value=i.value.slice(0,a)+ch+i.value.slice(b);
   i.setSelectionRange(a+ch.length,a+ch.length); i.focus({preventScroll:true});
@@ -719,6 +743,7 @@ const blank=()=>({done:{},log:{}});
 let ST={pron:blank(),past:blank(),sess:{pron:null,past:null},dirty:[]};
 try{const v=JSON.parse(localStorage.getItem(LS)||"null"); if(v) ST={...ST,...v}}catch(e){}
 ST.drill=ST.drill||{best:0,bestStreak:0,log:{}};
+ST.stories=ST.stories||{best:{},log:{}}; ST.storyDraft=ST.storyDraft||{};
 const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const todayKey=()=>dkey(new Date());
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(ST))}catch(e){}}
@@ -734,6 +759,7 @@ function mergeCourse(dst,src){
 }
 function docData(k){
   if(k==="drill") return {...ST.drill,updatedAt:Date.now()};
+  if(k==="stories") return {...ST.stories,updatedAt:Date.now()};
   const [t,c]=k.split("-");
   if(t==="prog") return {done:ST[c].done,log:ST[c].log,updatedAt:Date.now()};
   return ST.sess[c]||{cleared:true,updatedAt:0};
@@ -753,12 +779,13 @@ async function initDb(){
       const v=d.data(); if(!v) return;
       if(d.id.startsWith("prog-")){const c=d.id.slice(5); if(ST[c]) mergeCourse(ST[c],v)}
       else if(d.id.startsWith("session-")){const c=d.id.slice(8); if(c in ST.sess&&(!ST.sess[c]||(v.updatedAt||0)>(ST.sess[c].updatedAt||0))) ST.sess[c]=v}
+      else if(d.id==="stories"){const T=ST.stories; for(const [k2,x] of Object.entries(v.best||{})) T.best[k2]=Math.max(T.best[k2]||0,x||0); for(const [k2,x] of Object.entries(v.log||{})) T.log[k2]=Math.max(T.log[k2]||0,x||0)}
       else if(d.id==="drill"){const D=ST.drill; D.best=Math.max(D.best||0,v.best||0); D.bestStreak=Math.max(D.bestStreak||0,v.bestStreak||0); for(const [k2,x] of Object.entries(v.log||{})) D.log[k2]=Math.max(D.log[k2]||0,x||0)}
       else if(d.id.startsWith("day-")&&v.date){ST.pron.log[v.date]=Math.max(ST.pron.log[v.date]||0,v.best||0)}
     });
     dbCol=col; dbState="ok";
-    ["prog-pron","prog-past","session-pron","session-past","drill"].forEach(markDirty); saveLocal();
-    if(screen==="menu") renderMenu(); else if(screen==="course") renderCourse(course); else if(screen==="dsetup") renderDrillSetup();
+    ["prog-pron","prog-past","session-pron","session-past","drill","stories"].forEach(markDirty); saveLocal();
+    if(screen==="menu") renderMenu(); else if(screen==="course") renderCourse(course); else if(screen==="dsetup") renderDrillSetup(); else if(screen==="slist") renderStoryList();
     push();
   }catch(e){dbState="offline"; updateSync()}
 }
@@ -819,16 +846,18 @@ function streak(has){
   return n;
 }
 const isDrill=()=>screen==="dsetup"||screen==="dq"||screen==="dsum";
+const isStory=()=>screen==="slist"||screen==="story";
 function setCourseColour(c){
-  const k=isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
+  const k=isStory()?(storyKind==="past"?"pret":"both"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
   s.setProperty("--cc",`var(--${k})`); s.setProperty("--cc-soft",`var(--${k}-soft)`);
 }
 function chrome(){
-  closeGloss();
+  closeGloss(); $("fb").style.maxHeight=""; $("drill").style.paddingBottom="";
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
-  $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"); $("quit").hidden=!(inS||screen==="dq");
-  $("title").textContent=isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
+  $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()); $("quit").hidden=!(inS||screen==="dq");
+  $("backBtn").textContent=screen==="story"?"‹ Stories":"‹ Menu";
+  $("title").textContent=isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
   $("progress").hidden=!inS;
   $("score").textContent=inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
   if(inS){
@@ -838,7 +867,7 @@ function chrome(){
   }
   setCourseColour(course);
 }
-$("backBtn").onclick=()=>{drillOn=false;renderMenu()};
+$("backBtn").onclick=()=>{drillOn=false; if(screen==="story") renderStoryList(); else renderMenu()};
 $("quit").onclick=()=>{if(screen==="dq"){endDrill();return} justDone=null;renderCourse(course)};
 
 function weekHTML(ringFor){
@@ -849,9 +878,9 @@ function weekHTML(ringFor){
 function renderMenu(){
   screen="menu"; course=null; drillOn=false; $("fb").hidden=true; chrome();
   const tk=todayKey(), wk=weekDays().map(dkey);
-  const has=k=>ST.pron.log[k]!=null||ST.past.log[k]!=null||(ST.drill.log[k]||0)>0;
-  const ring=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=(ST.drill.log[k]||0)>0;
-    return {cls:a||b||c?" any":"",label:[a&&"object pronouns",b&&"past tense",c&&"drill"].filter(Boolean).join(", ")||"nothing yet",html:`<span class="dd"><i class="${a?"a":""}"></i><i class="${b?"b":""}"></i><i class="${c?"c":""}"></i></span>`}};
+  const has=k=>ST.pron.log[k]!=null||ST.past.log[k]!=null||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0;
+  const ring=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0;
+    return {cls:a||b||c?" any":"",label:[a&&"object pronouns",b&&"past tense",c&&"drill or stories"].filter(Boolean).join(", ")||"nothing yet",html:`<span class="dd"><i class="${a?"a":""}"></i><i class="${b?"b":""}"></i><i class="${c?"c":""}"></i></span>`}};
   const cards=Object.keys(COURSES).map(c=>{
     const C=COURSES[c], s=activeSession(c), nd=nextDay(c), doneN=Object.keys(ST[c].done).length, tdone=ST[c].log[tk]!=null;
     const status=s?`<span class="now">In progress · Day ${s.day}, ${s.pos}/${TOTAL(c)}</span>`
@@ -863,11 +892,15 @@ function renderMenu(){
   }).join("");
   $("drill").innerHTML=`
     <h2 class="hello">${has(tk)?"Nice work today":"Today’s practice"}</h2>
-    <div><p class="label" style="margin-bottom:8px">This week <span style="text-transform:none;letter-spacing:0;font-weight:500">· <i class="dot do" style="width:8px;height:8px"></i> pronouns <i class="dot pret" style="width:8px;height:8px"></i> past <i class="dot" style="width:8px;height:8px;background:var(--io)"></i> drill</span></p>${weekHTML(ring)}</div>
+    <div><p class="label" style="margin-bottom:8px">This week <span style="text-transform:none;letter-spacing:0;font-weight:500">· <i class="dot do" style="width:8px;height:8px"></i> pronouns <i class="dot pret" style="width:8px;height:8px"></i> past <i class="dot" style="width:8px;height:8px;background:var(--io)"></i> drill/stories</span></p>${weekHTML(ring)}</div>
     ${cards}
     <button type="button" class="course drill" id="drillCard">
       <span><span class="cn">Endless drill</span><br><span class="cs">Unlimited sentences · score points</span></span><span class="chev" aria-hidden="true">›</span>
       <span class="cs"><span class="now">${(ST.drill.log[tk]||0).toLocaleString()} pts today</span> · best ${(ST.drill.best||0).toLocaleString()}</span>
+    </button>
+    <button type="button" class="course stories" id="storyCard">
+      <span><span class="cn">Stories</span><br><span class="cs">Read a paragraph, type the missing words</span></span><span class="chev" aria-hidden="true">›</span>
+      <span class="cs"><span class="now">${Object.keys(ST.stories.best).filter(k=>STORIES.some(x=>x.id===k)).length} of ${STORIES.length} done</span>${(ST.stories.log[tk]||0)?` · ${ST.stories.log[tk]} today`:""}</span>
     </button>
     <div class="stats two">
       <div class="stat"><b>${streak(has)}</b><span>day streak</span></div>
@@ -877,6 +910,7 @@ function renderMenu(){
   $("actions").innerHTML="";
   document.querySelectorAll(".course[data-c]").forEach(b=>b.onclick=()=>{justDone=null;renderCourse(b.dataset.c)});
   $("drillCard").onclick=renderDrillSetup;
+  $("storyCard").onclick=()=>renderStoryList();
   updateSync();
 }
 function renderCourse(c){
@@ -1234,13 +1268,165 @@ function showGloss(el){
 }
 document.addEventListener("click",e=>{
   if(e.target.closest(".gloss")) return;
-  const el=e.target.closest(".sentence .chip.in")||e.target.closest(".sentence .t");
+  const gapEl=e.target.closest(".sb.done");
+  if(gapEl){ if(glossFor===gapEl){closeGloss();return} showGapGloss(gapEl); return }
+  const el=e.target.closest(".sentence .chip.in")||e.target.closest(".sentence .t")||e.target.closest(".story .t");
   if(!el||e.target.closest(".tile")){closeGloss();return}
   if(glossFor===el){closeGloss();return}
   showGloss(el);
 });
 document.addEventListener("scroll",closeGloss,true);
 window.addEventListener("resize",closeGloss);
+
+// ================= stories: paragraphs with gaps to type =================
+// verb gap: {infinitive=answer|other accepted:p or i}   pronoun gap: {[answer|other]:what it replaces}
+const STORIES=[
+ {id:"p1",kind:"past",title:"Un sábado en Madrid",en:"A Saturday in Madrid",text:"El sábado pasado {ir=fui:p} a Madrid con mi hermana. {hacer=Hacía:i} sol y {haber=había:i} mucha gente en la calle. Primero {visitar=visitamos:p} el Museo del Prado. Mientras mi hermana {mirar=miraba|estaba mirando:i} los cuadros de Goya, yo {comprar=compré:p} unas postales en la tienda. Después {comer=comimos:p} en un restaurante pequeño cerca de la Plaza Mayor. {estar=Estábamos:i} muy cansados, pero {ser=fue:p} un día perfecto."},
+ {id:"p2",kind:"past",title:"Mi infancia",en:"My childhood",text:"Cuando {ser=era:i} pequeño, {vivir=vivía:i} en un pueblo cerca del mar. Todos los veranos mis abuelos nos {visitar=visitaban:i}. Mi abuelo {tener=tenía:i} un barco pequeño y los domingos {salir=salíamos:i} a pescar. Un día, de repente, {empezar=empezó:p} a llover muy fuerte y {volver=volvimos:p} a casa completamente mojados. Esa noche mi abuela nos {preparar=preparó:p} un chocolate caliente."},
+ {id:"p3",kind:"past",title:"La entrevista",en:"The job interview",text:"Ayer {tener=tuve:p} una entrevista de trabajo. {estar=Estaba:i} muy nervioso porque {ser=era:i} una empresa muy grande. {llegar=Llegué:p} quince minutos antes. Cuando {entrar=entré:p} en la oficina, la directora {hablar=hablaba|estaba hablando:i} por teléfono. {llevar=Llevaba:i} un traje azul y {parecer=parecía:i} muy seria. Al final de la entrevista me {decir=dijo:p} que el puesto {ser=era:i} mío."},
+ {id:"p4",kind:"past",title:"Un viaje en tren",en:"A train journey",text:"El verano pasado mis amigos y yo {viajar=viajamos:p} en tren por Portugal. El tren {ser=era:i} viejo pero muy cómodo. Mientras {mirar=mirábamos|estábamos mirando:i} el paisaje, un señor mayor nos {contar=contó:p} la historia de su pueblo. En Oporto {dormir=dormimos:p} en un hotel antiguo y {probar=probamos:p} el famoso vino de la ciudad. {ser=Fue:p} el mejor viaje de mi vida."},
+ {id:"p5",kind:"past",title:"El apagón",en:"The power cut",text:"Anoche {estar=estaba:i} en casa y {ver=veía|estaba viendo:i} una película. De repente se {ir=fue:p} la luz. No {ver=veía:i} nada, así que {buscar=busqué:p} una vela en la cocina. Mientras la {buscar=buscaba|estaba buscando:i}, {oír=oí:p} un ruido extraño detrás de la puerta. ¡{ser=Era:i} mi gato!"},
+ {id:"p6",kind:"past",title:"El primer día de clase",en:"The first day of class",text:"El primer día de clase me {levantar=levanté:p} a las siete. {hacer=Hacía:i} frío y {llover=llovía|estaba lloviendo:i}. En el autobús {conocer=conocí:p} a Laura, una chica muy simpática que también {estudiar=estudiaba:i} español. La profesora {ser=era:i} de Colombia y {hablar=hablaba:i} muy rápido. Al final del día ya {tener=tenía:i} tres amigos nuevos."},
+ {id:"p7",kind:"past",title:"Una cena desastrosa",en:"A disastrous dinner",text:"El viernes pasado {invitar=invité:p} a mis vecinos a cenar. {querer=Quería:i} preparar una paella, pero no {tener=tenía:i} arroz. {ir=Fui:p} al supermercado, pero ya {estar=estaba:i} cerrado. Al final {pedir=pedimos:p} pizza y nos {reír=reímos:p} mucho. La cena no {ser=fue:p} perfecta, pero {ser=fue:p} muy divertida."},
+ {id:"p8",kind:"past",title:"Mi abuela Carmen",en:"My grandmother Carmen",text:"Mi abuela se {llamar=llamaba:i} Carmen. {ser=Era:i} bajita y {tener=tenía:i} el pelo blanco. Siempre {llevar=llevaba:i} un delantal azul y {cantar=cantaba:i} mientras {cocinar=cocinaba:i}. En 1950 {abrir=abrió:p} una pequeña tienda en el pueblo. {morir=Murió:p} en 2010, a los noventa años."},
+ {id:"p9",kind:"past",title:"La final",en:"The final",text:"El domingo {jugar=jugamos:p} la final del torneo. Al principio el otro equipo {jugar=jugaba|jugó:i} mejor y en el minuto diez {marcar=marcó:p} un gol. Nosotros {estar=estábamos:i} nerviosos, pero en la segunda parte Pedro {marcar=marcó:p} dos goles. Cuando el árbitro {pitar=pitó:p} el final, todos {gritar=gritamos:p} de alegría."},
+ {id:"p10",kind:"past",title:"Mi vida en Londres",en:"My life in London",text:"Hace dos años {decidir=decidí:p} mudarme a Londres. Al principio no {conocer=conocía:i} a nadie y {echar=echaba:i} de menos a mi familia. {trabajar=Trabajaba:i} mucho y los fines de semana {pasear=paseaba:i} por los parques. Un día, en una fiesta, {conocer=conocí:p} a un grupo de españoles. Ese día {empezar=empecé:p} a sentirme en casa."},
+ {id:"p11",kind:"past",title:"Un robo en el café",en:"A theft at the café",text:"{ser=Eran:i} las nueve de la mañana. El café {estar=estaba:i} lleno y la camarera {servir=servía|estaba sirviendo:i} los desayunos. De repente, un hombre {entrar=entró:p}, {tomar=tomó:p} un bolso de una mesa y {salir=salió:p} corriendo. Nadie {saber=sabía|supo:i} qué hacer. Por suerte, un policía lo {ver=vio:p} y lo {detener=detuvo:p} en la esquina."},
+ {id:"p12",kind:"past",title:"Veranos en el río",en:"Summers by the river",text:"De niños, mi hermano y yo {pasar=pasábamos:i} los veranos en la casa de mis tíos. La casa {tener=tenía:i} un jardín enorme. Por las mañanas {nadar=nadábamos:i} en el río y por las tardes {leer=leíamos:i} cómics. Un verano mi hermano se {romper=rompió:p} el brazo y {tener=tuvimos:p} que volver a la ciudad."},
+ {id:"p13",kind:"past",title:"Noche de jazz",en:"Jazz night",text:"El sábado pasado {ir=fui:p} a un concierto de jazz. La sala {ser=era:i} pequeña y {haber=había:i} poca luz. Mientras el grupo {tocar=tocaba|estaba tocando:i}, la gente {bailar=bailaba|estaba bailando:i} entre las mesas. A medianoche la cantante {subir=subió:p} al escenario y todos {aplaudir=aplaudimos:p}. {volver=Volví:p} a casa a las tres de la mañana."},
+ {id:"p14",kind:"past",title:"Seis meses en Lima",en:"Six months in Lima",text:"En 2022 {vivir=viví:p} seis meses en Lima. Mi piso {estar=estaba:i} en Miraflores, muy cerca del mar. Cada mañana {correr=corría:i} por el malecón y después {desayunar=desayunaba:i} en un café pequeño. Allí {aprender=aprendí:p} a preparar ceviche. Un fin de semana {viajar=viajé:p} a Cusco y {subir=subí:p} a Machu Picchu. {ser=Fue:p} una experiencia increíble."},
+ {id:"p15",kind:"past",title:"La boda de mi prima",en:"My cousin’s wedding",text:"Mi prima se {casar=casó:p} en junio. La ceremonia {ser=fue:p} en una iglesia antigua. La novia {llevar=llevaba:i} un vestido precioso y {estar=estaba:i} muy emocionada. Durante la cena los novios {bailar=bailaron:p} un vals. Mientras los invitados {comer=comían|estaban comiendo:i} el postre, mi tío {dar=dio:p} un discurso muy divertido."},
+ {id:"p16",kind:"past",title:"El perro perdido",en:"The lost dog",text:"Una tarde de invierno {encontrar=encontré:p} un perro en el parque. {estar=Estaba:i} solo, {tener=tenía:i} frío y no {llevar=llevaba:i} collar. Lo {llevar=llevé:p} a casa y le {dar=di:p} comida. Al día siguiente {poner=puse:p} carteles por el barrio. Una semana después, una niña {llamar=llamó:p} a mi puerta: ¡{ser=era:i} su perro!"},
+ {id:"r1",kind:"pron",title:"El cumpleaños de mi madre",en:"My mother’s birthday",text:"Es el cumpleaños de mi madre. Ayer compré un libro de cocina y esta mañana {[lo]:el libro} envolví en papel rojo. Esta noche {[se lo]:el libro → a mi madre} voy a dar después de la cena. Mi hermano compró unas flores y {[se las]:las flores → a mi madre} va a dar también. Mi padre preparó una tarta, pero mi madre todavía no {[la]:la tarta} ha visto. ¡Espero que {[le]:a mi madre} gusten los regalos!"},
+ {id:"r2",kind:"pron",title:"En el restaurante",en:"At the restaurant",text:"El camarero nos trajo la carta y {[la]:la carta} leímos con calma. El camarero {[nos]:a nosotros} recomendó un vino blanco y {[lo]:el vino} probamos. Al final pedimos la cuenta y el camarero {[nos la]:la cuenta → a nosotros} trajo enseguida. Dejamos una propina para el camarero y {[se la]:la propina → al camarero} dimos en la mano."},
+ {id:"r3",kind:"pron",title:"La llamada del domingo",en:"The Sunday phone call",text:"Mi abuela me llama todos los domingos, pero ayer {[la]:a mi abuela} llamé yo. {[Le]:a mi abuela} conté mis planes para el verano y {[le]:a mi abuela} encantaron. Me preguntó por las fotos del viaje, así que {[se las]:las fotos → a mi abuela} mandé por correo. Esta mañana me escribió: “¡Gracias! {[Las]:las fotos} voy a imprimir.”"},
+ {id:"r4",kind:"pron",title:"Mi bicicleta roja",en:"My red bike",text:"Tengo una bicicleta roja. {[La]:la bicicleta} compré hace tres años y {[la]:la bicicleta} uso todos los días. La semana pasada mi vecino Carlos me pidió la bicicleta y {[se la]:la bicicleta → a Carlos} presté. Ayer {[me la]:la bicicleta → a mí} devolvió con una rueda pinchada. Ahora {[la]:la bicicleta} tengo que arreglar yo."},
+ {id:"r5",kind:"pron",title:"Los deberes",en:"The homework",text:"El profesor nos dio unos ejercicios muy difíciles. Yo no {[los]:los ejercicios} entendía, así que llamé a mi amiga Lucía. Ella {[me los]:los ejercicios → a mí} explicó por teléfono. Esta mañana {[se los]:los ejercicios → al profesor} entregué. El profesor {[los]:los ejercicios} corrigió y {[me]:a mí} dijo que estaban perfectos."},
+ {id:"r6",kind:"pron",title:"La fiesta sorpresa",en:"The surprise party",text:"Queríamos hacer una fiesta sorpresa para Ana. Pedro compró la tarta y {[la]:la tarta} escondió en la nevera. Yo escribí las invitaciones y {[se las]:las invitaciones → a los amigos} mandé a todos los amigos. Nadie {[le]:a Ana} dijo nada. Cuando Ana llegó, {[la]:a Ana} esperábamos en el salón con las luces apagadas. ¡{[Le]:a Ana} encantó la sorpresa!"},
+ {id:"r7",kind:"pron",title:"Un regalo para mi hermana",en:"A present for my sister",text:"Vi una chaqueta preciosa en un escaparate. {[La]:la chaqueta} compré para mi hermana porque su cumpleaños es el sábado. La dependienta {[me la]:la chaqueta → a mí} envolvió en papel de regalo. El sábado {[se la]:la chaqueta → a mi hermana} voy a dar en la fiesta. También compré unos guantes, pero {[los]:los guantes} voy a guardar para mí."},
+ {id:"r8",kind:"pron",title:"El coche de mis padres",en:"My parents’ car",text:"Mis padres compraron un coche nuevo en septiembre y {[lo]:el coche} cuidan muchísimo. El mes pasado {[me lo]:el coche → a mí} prestaron para ir a la playa. Antes de devolverlo, {[lo]:el coche} lavé por dentro y por fuera. Después {[se lo]:el coche → a mis padres} devolví con el depósito lleno. Mi padre {[me]:a mí} dio las gracias."},
+ {id:"r9",kind:"pron",title:"En la biblioteca",en:"At the library",text:"Necesitaba un libro de historia para un trabajo. La bibliotecaria {[lo]:el libro} buscó en el ordenador y {[me lo]:el libro → a mí} trajo enseguida. {[Lo]:el libro} leí en dos días. Mi compañero Pedro también {[lo]:el libro} necesitaba, así que {[se lo]:el libro → a Pedro} presté antes de devolverlo."},
+ {id:"r10",kind:"pron",title:"Las llaves de los vecinos",en:"The neighbours’ keys",text:"Mis vecinos se fueron de vacaciones y {[me]:a mí} dejaron las llaves de su casa. {[Las]:las llaves} guardé en un cajón. Todos los días regaba sus plantas y {[les]:a mis vecinos} mandaba fotos. Cuando volvieron, {[se las]:las llaves → a mis vecinos} devolví. Ellos {[me]:a mí} trajeron un regalo de Italia."}
+];
+const GAP_RE=/\{(?:([^=\[}]+)=([^:}]+):([pi])|\[([^\]]+)\]:([^}]+))\}/g;
+function parseStory(st){
+  const segs=[], gaps=[]; let last=0, m; GAP_RE.lastIndex=0;
+  while((m=GAP_RE.exec(st.text))){
+    if(m.index>last) segs.push(st.text.slice(last,m.index));
+    const g=m[1]?{type:"verb",inf:m[1],answers:m[2].split("|"),tense:m[3]==="p"?"pret":"imp"}:{type:"pron",answers:m[4].split("|"),hint:m[5]};
+    g.i=gaps.length; gaps.push(g); segs.push(g); last=GAP_RE.lastIndex;
+  }
+  if(last<st.text.length) segs.push(st.text.slice(last));
+  return {segs,gaps};
+}
+
+Object.assign(VERB_EN,{haber:"there to be (había = there was/were)",mirar:"to look at",parecer:"to seem",llevar:"to wear; to carry, take",entrar:"to go in, enter",probar:"to try, taste","oír":"to hear",levantar:"levantarse: to get up","reír":"reírse: to laugh",decidir:"to decide",echar:"echar de menos: to miss",pasear:"to walk, stroll",detener:"to stop, arrest",pasar:"to spend (time); to pass",romper:"to break",subir:"to go up, climb",aplaudir:"to clap",desayunar:"to have breakfast",aprender:"to learn",encontrar:"to find",marcar:"to score",pitar:"to blow the whistle",gritar:"to shout",morir:"to die",cantar:"to sing"});
+Object.assign(WORD_EN,{hermana:"sister",gente:"people",museo:"museum",cuadros:"paintings",tienda:"shop",pueblo:"village, town",barco:"boat",pescar:"to fish",mojados:"wet",chocolate:"hot chocolate",caliente:"hot",entrevista:"interview",nervioso:"nervous",empresa:"company",directora:"director (f)",traje:"suit",azul:"blue",seria:"serious",puesto:"job, position",paisaje:"landscape, view",señor:"man, gentleman",mayor:"older",antiguo:"old",famoso:"famous",vida:"life",vela:"candle",ruido:"noise","extraño":"strange",gato:"cat",chica:"girl","rápido":"fast",nuevos:"new",arroz:"rice",supermercado:"supermarket",cerrado:"closed",divertida:"fun",bajita:"short",pelo:"hair",blanco:"white",delantal:"apron",equipo:"team",gol:"goal",goles:"goals","árbitro":"referee","alegría":"joy",nadie:"nobody",parques:"parks",lleno:"full",camarera:"waitress",bolso:"handbag",suerte:"luck","policía":"police officer",esquina:"corner","tíos":"uncle and aunt","jardín":"garden","río":"river","cómics":"comics",brazo:"arm",sala:"room, venue",gente:"people",escenario:"stage",medianoche:"midnight","malecón":"seafront promenade",ceviche:"ceviche",experiencia:"experience",prima:"cousin (f)",ceremonia:"ceremony",iglesia:"church",novia:"bride; girlfriend",vestido:"dress",emocionada:"emotional, moved",novios:"bride and groom",vals:"waltz",invitados:"guests","tío":"uncle",discurso:"speech",invierno:"winter",collar:"collar",comida:"food",carteles:"posters","niña":"girl",regalos:"presents",carta:"menu; letter",propina:"tip",camarero:"waiter",planes:"plans",rueda:"wheel",pinchada:"flat (tyre)","difíciles":"difficult",perfectos:"perfect",nevera:"fridge",invitaciones:"invitations","salón":"living room",luces:"lights",apagadas:"switched off",chaqueta:"jacket",escaparate:"shop window",dependienta:"shop assistant (f)",papel:"paper",guantes:"gloves","depósito":"(fuel) tank",gracias:"thanks",bibliotecaria:"librarian (f)",vacaciones:"holidays",plantas:"plants",cajón:"drawer",enseguida:"straight away",calma:"calm",muchísimo:"a great deal",dentro:"inside",fuera:"outside"});
+STORIES.forEach(st=>parseStory(st).gaps.forEach(g=>{if(g.type==="verb") g.answers.forEach(a=>{if(!a.includes(" ")) addForm(a,{inf:g.inf,t:g.tense==="pret"?"pretérito":"imperfecto"})})}));
+let storyKind="past", storyId=null, storyChecked=false;
+const storyGroups=[["past","Past tense","Pick pretérito or imperfecto for each verb"],["pron","Object pronouns","Type lo, la, le, se lo, me la…"]];
+function renderStoryList(kind){
+  if(kind) storyKind=kind;
+  screen="slist"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  const list=STORIES.filter(x=>x.kind===storyKind);
+  $("drill").innerHTML=`
+    <div><h2 class="hello">Stories</h2><p class="sub">Each story is a short paragraph with gaps. Type into every gap, then check.</p></div>
+    <div class="seg" id="segStory">${storyGroups.map(([k,l])=>`<button type="button" data-v="${k}" aria-pressed="${k===storyKind}">${l}</button>`).join("")}</div>
+    <div class="slist">${list.map(st=>{const n=parseStory(st).gaps.length, b=ST.stories.best[st.id];
+      return `<button type="button" class="srow" data-id="${st.id}"><span class="st">${esc(st.title)}</span><span class="sc${b===n?" full":""}">${b!=null?`${b}/${n}`:`${n} gaps`}</span><span class="se">${esc(st.en)}</span></button>`}).join("")}</div>
+    <p class="syncline"></p>`;
+  $("actions").innerHTML="";
+  $("segStory").onclick=e=>{const b=e.target.closest("button"); if(b) renderStoryList(b.dataset.v)};
+  document.querySelectorAll(".srow").forEach(b=>b.onclick=()=>renderStory(b.dataset.id));
+  updateSync();
+}
+function storyWords(txt){
+  // wrap words so they can be tapped for a meaning; keep spaces and punctuation as they are
+  return txt.split(/(\s+)/).map(w=>/^\s+$/.test(w)||!w?w:`<span class="t">${esc(w)}</span>`).join("");
+}
+function renderStory(id){
+  const st=STORIES.find(x=>x.id===id); if(!st) return renderStoryList();
+  storyId=id; storyKind=st.kind; storyChecked=false; screen="story"; $("fb").hidden=true; chrome();
+  const {segs,gaps}=parseStory(st), draft=ST.storyDraft[id]||{};
+  const body=segs.map(sg=>{
+    if(typeof sg==="string") return storyWords(sg);
+    const w=Math.max(sg.answers[0].length,3)+2;
+    const label=sg.type==="verb"?`(${sg.inf})`:`(= ${sg.hint})`;
+    return `<span class="gapw"><input class="sb" id="g${sg.i}" data-i="${sg.i}" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="${sg.i<gaps.length-1?"next":"done"}" style="width:${w}ch" value="${esc(draft[sg.i]||"")}" aria-label="Gap ${sg.i+1} ${esc(label)}"><span class="ginf">${esc(label)}</span></span>`;
+  }).join("");
+  $("drill").innerHTML=`
+    <div class="meta"><span class="pill ${st.kind==="past"?"pret":"both"}">${st.kind==="past"?"Past tense":"Pronouns"}</span><span class="label">${gaps.length} gaps</span></div>
+    <div><h2 class="hello">${esc(st.title)}</h2><p class="sub">${esc(st.en)}</p></div>
+    <p class="prompt">${st.kind==="past"?"Type each verb in the pretérito or imperfecto.":"Type the object pronoun(s) for each gap. The note after each gap says what it replaces."}<span class="tapnote">Tap any word for its meaning.</span></p>
+    <p class="story" id="storyText">${body}</p>`;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="sClear">Clear</button><button type="button" class="grow" id="sCheck">Check story</button>`;
+  $("accents").hidden=false;
+  const inputs=[...document.querySelectorAll("#storyText .sb")];
+  inputs.forEach((inp,k)=>{
+    inp.addEventListener("input",()=>{const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal()});
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault(); if(inputs[k+1]) inputs[k+1].focus(); else checkStory()}});
+  });
+  $("sCheck").onclick=checkStory;
+  $("sClear").onclick=()=>{delete ST.storyDraft[id]; saveLocal(); renderStory(id)};
+}
+function gapExplain(g){
+  if(g.type==="pron") return `${g.answers[0]} replaces ${g.hint.replace("→","and")}.`;
+  return g.tense==="pret"
+    ?`Pretérito: a completed event that moves the story forward.`
+    :`Imperfecto: background, a description, a habit, or something in progress.`;
+}
+function showGapGloss(el){
+  closeGloss();
+  const st=STORIES.find(x=>x.id===storyId), g=parseStory(st).gaps[+el.dataset.i];
+  const d=document.createElement("div"); d.className="gloss";
+  d.innerHTML=`<div class="gw">${esc(g.answers[0])}</div>${g.type==="verb"?`<div>${esc(g.inf)} · ${esc(VERB_EN[g.inf]||"")}</div>`:""}<div class="gm">${esc(gapExplain(g))}${g.answers.length>1?` Also accepted: ${g.answers.slice(1).map(esc).join(", ")}.`:""}</div>`;
+  document.body.appendChild(d);
+  const b=el.getBoundingClientRect(), gr=d.getBoundingClientRect();
+  let top=b.top-gr.height-8; if(top<8) top=b.bottom+8;
+  d.style.top=top+"px"; d.style.left=Math.min(Math.max(12,b.left+b.width/2-gr.width/2),window.innerWidth-gr.width-12)+"px";
+  glossEl=d; glossFor=el;
+}
+function checkStory(){
+  if(storyChecked) return;
+  const st=STORIES.find(x=>x.id===storyId), {gaps}=parseStory(st);
+  const inputs=[...document.querySelectorAll("#storyText .sb")];
+  let score=0; const wrong=[], accents=[];
+  inputs.forEach((inp,k)=>{
+    const g=gaps[k], val=inp.value.trim(), ok=val&&g.answers.some(a=>norm(a)===norm(val));
+    inp.readOnly=true; inp.classList.add("done");
+    if(ok){score++; inp.classList.add("right"); if(!g.answers.some(a=>plain(a)===plain(val))) accents.push(g)}
+    else{
+      inp.classList.add(val?"wrong":"empty"); if(!val) inp.value="—";
+      inp.insertAdjacentHTML("afterend",`<span class="fix"> ${esc(g.answers[0])}</span>`);
+      wrong.push({g,val});
+    }
+  });
+  storyChecked=true; $("accents").hidden=true;
+  if(document.activeElement) document.activeElement.blur();
+  const n=gaps.length, tk=todayKey(), T=ST.stories;
+  T.best[st.id]=Math.max(T.best[st.id]||0,score); T.log[tk]=(T.log[tk]||0)+1;
+  delete ST.storyDraft[st.id];
+  commit("stories");
+  haptic(score===n?[30,40,30,40,80]:score>=n/2?20:[70,50,70]);
+  const list=STORIES.filter(x=>x.kind===st.kind), next=list[(list.indexOf(st)+1)%list.length];
+  const fb=$("fb");
+  fb.className="sheet "+(score===n?"ok":score>=n*0.6?"ok":"bad");
+  fb.style.maxHeight="52%";
+  fb.innerHTML=`<div class="body">
+      <div class="verdict">${score===n?"¡Perfecto!":score>=n*0.6?"¡Bien hecho!":"Keep going"}</div>
+      <div class="gain"><b>${score} / ${n}</b><span>${T.best[st.id]>score?`best ${T.best[st.id]}/${n}`:"saved"}</span></div>
+      ${wrong.length?`<div class="mistakes">${wrong.map(({g,val})=>`<div><span class="dot ${g.type==="verb"?g.tense:"io"}"></span><span><b>${esc(g.answers[0])}</b>${val?` (you wrote <i>${esc(val)}</i>)`:""} · ${esc(gapExplain(g))}</span></div>`).join("")}</div>`:""}
+      ${accents.length?`<p class="note" style="color:var(--muted)">Accepted, but check the accents on: ${accents.map(g=>`<b>${esc(g.answers[0])}</b>`).join(", ")}.</p>`:""}
+      <p class="note" style="color:var(--muted)">Tap any gap in the story to see why.</p>
+    </div>
+    <div class="foot" style="display:flex;gap:8px"><button type="button" class="ghost" id="sAgain" style="flex:1;background:var(--card);color:var(--ink);border-color:var(--line)">Try again</button><button type="button" id="sNext" style="flex:2">Next story</button></div>`;
+  fb.hidden=false;
+  // let the corrected story scroll up above the results panel
+  $("drill").style.paddingBottom=(fb.offsetHeight+12)+"px";
+  $("sAgain").onclick=()=>{fb.style.maxHeight="";renderStory(st.id)};
+  $("sNext").onclick=()=>{fb.style.maxHeight="";renderStory(next.id)};
+  $("actions").innerHTML="";
+}
 
 // ================= endless drill =================
 let drill={points:0,streak:0,bestStreak:0,answered:0,correct:0,recent:[],item:null,cat:null,lastGain:null,startBest:0};
