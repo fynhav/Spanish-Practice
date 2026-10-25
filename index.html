@@ -47,7 +47,7 @@ h1{font-family:var(--f-display);font-weight:400;font-size:1.25rem;margin:0;flex:
 .p-do i{background:var(--do)} .p-io i{background:var(--io)} .p-both i{background:var(--both)}
 .p-pret i{background:var(--pret)} .p-imp i{background:var(--imp)} .p-mix i{background:var(--mix)}
 /* main */
-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,16px);padding-block:clamp(10px,2.5vh,20px);overflow-y:auto}
+main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,16px);padding-block:clamp(10px,2.5vh,20px);overflow-y:auto;transition:padding-bottom .22s ease}
 .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0}
 .pill{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap}
@@ -66,6 +66,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,1
 .tag.do{color:var(--do)} .tag.io{color:var(--io)} .tag.pret{color:var(--pret)} .tag.imp{color:var(--imp)}
 .w.pw .t{padding-top:clamp(6px,1.2vh,10px)}
 .w .t.subj{font-size:clamp(.88rem,2.1vh,1rem);font-style:italic;color:var(--muted);padding-top:clamp(5px,1.4vh,9px)}
+.qpush{flex:1 1 0;min-height:0;margin:0}
 .slot{position:relative;box-sizing:border-box;text-align:center;vertical-align:middle;transition:background .15s,border-color .15s}
 .slot::before{content:attr(data-ph)}
 .slot:not(.empty){border-style:solid;border-color:transparent;background:none}
@@ -379,7 +380,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:30</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:42</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -603,9 +604,17 @@ const OVR={
   dar:{pret:["di","diste","dio","dimos","dieron"]},
   conducir:{pret:["conduje","condujiste","condujo","condujimos","condujeron"]},
   dormir:{pret:["dormí","dormiste","durmió","dormimos","durmieron"]},
-  pedir:{pret:["pedí","pediste","pidió","pedimos","pidieron"]}
+  pedir:{pret:["pedí","pediste","pidió","pedimos","pidieron"]},
+  poder:{pret:["pude","pudiste","pudo","pudimos","pudieron"]},
+  "sonreír":{pret:["sonreí","sonreíste","sonrió","sonreímos","sonrieron"]},
+  sentir:{pret:["sentí","sentiste","sintió","sentimos","sintieron"]},
+  conseguir:{pret:["conseguí","conseguiste","consiguió","conseguimos","consiguieron"]},
+  andar:{pret:["anduve","anduviste","anduvo","anduvimos","anduvieron"]},
+  caer:{pret:["caí","caíste","cayó","caímos","cayeron"]},
+  construir:{pret:["construí","construiste","construyó","construimos","construyeron"]},
+  vestir:{pret:["vestí","vestiste","vistió","vestimos","vistieron"]}
 };
-const YO={pagar:"pagué",llegar:"llegué",jugar:"jugué",buscar:"busqué",empezar:"empecé"};
+const YO={pagar:"pagué",llegar:"llegué",jugar:"jugué",buscar:"busqué",empezar:"empecé",sacar:"saqué",chocar:"choqué",abrazar:"abracé"};
 function pastForms(inf){
   const st=inf.slice(0,-2), e=inf.slice(-2);
   let f=e==="ar"
@@ -631,7 +640,7 @@ function makePast(inf,comp,p,trig,tense,r){
   for(const q of shuf([0,1,2,3,4].filter(x=>x!==p),r)){
     for(const t of shuf(["pret","imp"],r)){const w=f[t][q]; if(tiles.length<4&&!tiles.includes(w)) tiles.push(w)}
   }
-  return {kind:"past",tokens:[{trig,suf:trig==="Siempre"?"":","},subj,{blank:true},comp+"."],inf,ans,alt,tense,p,trig,reason:reasonFor(tense,trig),
+  return {kind:"past",subjTok:1,tokens:[{trig,suf:trig==="Siempre"?"":","},subj,{blank:true},comp+"."],inf,ans,alt,tense,p,trig,reason:reasonFor(tense,trig),
     tileWords:tiles,accept:[norm(ans)],acceptRaw:[ans],display:ans};
 }
 // in the mixed part the clue alone must decide the tense: use only point-in-time clues and skip estar/tener,
@@ -775,17 +784,787 @@ const COURSES={
     {key:"mix",n:5,typing:true,name:"Choose the tense",pill:"Part 3 · Mixed",rule:`Decide which tense fits, then type the form. Look for the time phrase, or for an action that gets interrupted.`,ex:"Mientras (yo) ___ (leer), sonó el teléfono → leía"}]}
 };
 const TOTAL=c=>COURSES[c].parts.reduce((s,p)=>s+p.n,0);
+const XF={ser:{pret:["fui","fuiste","fue","fuimos","fueron"],imp:["era","eras","era","éramos","eran"]},
+ haber:{pret:["hubo","hubo","hubo","hubo","hubo"],imp:["había","había","había","había","había"]},
+ "reír":{pret:["reí","reíste","rió","reímos","rieron"],imp:["reía","reías","reía","reíamos","reían"]},
+ morir:{pret:["morí","moriste","murió","morimos","murieron"],imp:["moría","morías","moría","moríamos","morían"]},
+ detener:{pret:["detuve","detuviste","detuvo","detuvimos","detuvieron"],imp:["detenía","detenías","detenía","deteníamos","detenían"]},
+ "oír":{pret:["oí","oíste","oyó","oímos","oyeron"],imp:["oía","oías","oía","oíamos","oían"]},
+ querer:{pret:["quise","quisiste","quiso","quisimos","quisieron"],imp:["quería","querías","quería","queríamos","querían"]},
+ saber:{pret:["supe","supiste","supo","supimos","supieron"],imp:["sabía","sabías","sabía","sabíamos","sabían"]},
+ servir:{pret:["serví","serviste","sirvió","servimos","sirvieron"],imp:["servía","servías","servía","servíamos","servían"]},
+ tocar:{pret:["toqué","tocaste","tocó","tocamos","tocaron"],imp:["tocaba","tocabas","tocaba","tocábamos","tocaban"]},
+ llover:{pret:["llovió","llovió","llovió","llovió","llovió"],imp:["llovía","llovía","llovía","llovía","llovía"]}};
+const PFX=inf=>XF[inf]||pastForms(inf);
+// ================= realistic sentence bank (pretérito, imperfecto, mixed) =================
+// line: sentence with {cue} and _ for the verb | infinitive | person (0 yo, 1 tú, 2 él/ella, 3 nosotros, 4 ellos) [| tense p/i | why]
+const BANK_PRET=`{Ayer} (yo) _ con mi madre por teléfono casi una hora.|hablar|0
+{Anoche} (nosotros) _ pizza en casa de Pablo.|cenar|3
+{El otro día} (yo) _ a tu hermano en el supermercado.|ver|0
+¿Por qué (tú) no me _ {anoche}?|llamar|1
+{Esta mañana} Laura _ tarde a la oficina.|llegar|2
+{El sábado pasado} (nosotros) _ al cine con unos amigos.|ir|3
+{Ayer} (yo) me _ el pelo en la peluquería.|cortar|0
+{Anoche} mis padres _ una película en el sofá.|ver|4
+{Hace dos días} (yo) _ una camiseta muy barata.|comprar|0
+{El lunes} (tú) _ la clase de inglés, ¿verdad?|perder|1
+{Ayer por la tarde} Carlos _ al fútbol con sus primos.|jugar|2
+{La semana pasada} (nosotros) _ a casa de mis abuelos.|ir|3
+{De repente} (yo) _ un ruido en la cocina.|oír|0
+{Anoche} (tú) no _ nada de ruido, ¿no?|oír|1
+{Por fin} mi hermano _ el examen de conducir.|aprobar|2
+{Ayer} (yo) _ el móvil en el taxi.|perder|0
+{El año pasado} (nosotros) _ unas vacaciones en Cádiz.|pasar|3
+{Hace un mes} mis vecinos _ de casa.|mudarse|4
+{El viernes} (yo) _ a María en una fiesta.|conocer|0
+{Esta mañana} (yo) _ café y una tostada.|tomar|0
+{Anoche} Marta _ muy mal por el ruido de la calle.|dormir|2
+{Ayer} (tú) _ una pregunta muy buena en clase.|hacer|1
+{Hace tres días} (nosotros) _ una mesa en ese restaurante.|reservar|3
+{El domingo pasado} Pedro _ la comida para toda la familia.|preparar|2
+{De repente} el perro _ a ladrar.|empezar|2
+{Ayer} (yo) _ dos horas en el tren.|estar|0
+{El otro día} (tú) me _ algo muy raro.|decir|1
+{Anoche} (nosotros) _ hasta las dos de la mañana.|bailar|3
+{Hace una semana} mis amigos me _ un regalo de cumpleaños.|dar|4
+{Ayer} (yo) _ un correo muy largo a mi jefe.|escribir|0
+{Esta tarde} el médico me _ unas pastillas.|dar|2
+{Ayer} (nosotros) _ la mesa para ocho personas.|poner|3
+{El año pasado} Ana _ a vivir a Barcelona.|ir|2
+{Hace un rato} (yo) _ a Luis por la calle.|ver|0
+{Anoche} (tú) _ muy tarde a casa.|volver|1
+{El lunes} mis compañeros _ una reunión importante.|tener|4
+{Ayer} (yo) _ mucho en la oficina.|trabajar|0
+{El jueves} (nosotros) _ la cena a las nueve.|empezar|3
+{De repente} la luz _.|apagarse|2
+{Por fin} (yo) _ la casa de mis sueños.|encontrar|0
+{El otro día} Elena me _ unas fotos de su viaje.|enseñar|2
+{Ayer} (tú) _ cinco kilómetros, ¿no?|correr|1
+{Anoche} (yo) _ contigo.|soñar|0
+{Esta mañana} mis padres _ por el parque.|pasear|4
+{Hace dos años} (nosotros) _ a vivir en Valencia.|empezar|3
+{Ayer} la profesora nos _ un examen difícil.|dar|2
+{El verano pasado} (yo) _ italiano en Roma.|estudiar|0
+{Anoche} (tú) me _ un mensaje muy raro.|escribir|1
+{Esa noche} (nosotros) _ en un hotel muy pequeño.|dormir|3
+{De pronto} Juan _ y salió corriendo.|levantarse|2
+{El martes} (yo) _ la compra en el mercado.|hacer|0
+{Hace una hora} (yo) _ con tu padre.|hablar|0
+{Ayer} mis hijos _ toda la tarde en la piscina.|nadar|4
+{El otro día} (nosotros) _ una película muy buena.|ver|3
+{Por fin} (tú) me _ la verdad.|decir|1
+{Ayer} Sara _ la ventana porque hacía frío.|cerrar|2
+{Anoche} (yo) _ la tele hasta muy tarde.|mirar|0
+{Esta semana} (nosotros) _ mucho trabajo.|tener|3
+{El miércoles} (yo) _ una cita con el dentista.|tener|0
+{Anoche} el bebé _ cinco veces.|llorar|2
+{Ayer} (tú) _ un libro entero, qué rápido.|leer|1
+{Hace un año} mis tíos _ una casa en la playa.|comprar|4
+{De repente} (yo) _ cuenta de que no tenía las llaves.|darse|0
+{El sábado} (nosotros) _ en un restaurante nuevo.|comer|3
+{Ayer} (yo) _ tres veces a Pablo, pero no contestó.|llamar|0
+{Anoche} Carmen _ una sopa muy rica.|preparar|2
+{Ayer} (tú) _ a tu madre en la estación.|ver|1
+{El otro día} mis vecinos _ una fiesta enorme.|hacer|4
+{Esta mañana} (yo) _ a las seis y media.|levantarse|0
+{Ayer} el tren _ con media hora de retraso.|llegar|2
+{De repente} todos _ a reírse.|empezar|4
+{La semana pasada} (nosotros) _ dos días en la montaña.|pasar|3
+{Hace dos semanas} (yo) _ un trabajo nuevo.|empezar|0
+{Anoche} (tú) _ muy bien en la fiesta.|bailar|1
+{El lunes} Miguel _ de viaje a Lima.|salir|2
+{Ayer} (nosotros) _ un taxi para llegar al aeropuerto.|tomar|3
+{Por fin} mis padres _ de vacaciones.|irse|4
+{Anoche} (yo) _ la puerta con llave.|cerrar|0
+{El otro día} (tú) _ a mi hermana en el gimnasio.|conocer|1
+{Hace una semana} Lucía _ la bici a su primo.|vender|2
+{Ayer} (yo) _ una carta de mi abuela.|recibir|0
+{Esa mañana} (nosotros) _ al mercado temprano.|ir|3
+{Anoche} los niños _ en el coche.|dormirse|4
+{Ayer} (tú) _ la cuenta en el bar, gracias.|pagar|1
+{El año pasado} (yo) _ mi primer maratón.|correr|0
+{Hace diez minutos} Ana _ del trabajo.|salir|2
+{De repente} (nosotros) _ mucho miedo.|tener|3
+{Ayer} mis amigos _ un apartamento en el centro.|alquilar|4
+{Anoche} (yo) _ las llaves en el coche.|dejar|0
+{Hace tres meses} (nosotros) _ una casa nueva.|comprar|3
+{Esta mañana} (tú) _ muy temprano, ¿no?|salir|1
+{El viernes} Rosa _ a todos sus amigos a cenar.|invitar|2
+{Ayer} (yo) _ una llamada muy importante.|recibir|0
+{El otro día} mi jefe me _ un aumento de sueldo.|dar|2
+{Anoche} (nosotros) _ mucho por la película.|reírse|3
+{Ayer} (tú) _ un regalo para mí, qué detalle.|traer|1
+{De repente} el cielo _ a oscurecerse.|empezar|2
+{Hace dos días} mis hermanos _ a casa de mis padres.|venir|4
+{El sábado} (yo) _ toda la casa.|limpiar|0
+{Por fin} (nosotros) _ el tren de las ocho.|coger|3
+{Ayer} Tomás _ en la piscina por primera vez.|nadar|2
+{Anoche} (yo) _ en el sofá sin querer.|dormirse|0
+{El lunes} (tú) _ una nota muy buena en el examen.|sacar|1
+{Esta tarde} mis primos _ en bici hasta el lago.|ir|4
+{Hace un mes} (yo) _ de trabajo.|cambiar|0
+{El otro día} (nosotros) _ de ti con unos amigos.|hablar|3
+{Ayer} la tienda _ a las siete.|cerrar|2
+{Anoche} (tú) _ más de lo normal, ¿no?|comer|1
+{De repente} (yo) _ a llorar.|empezar|0
+{El año pasado} mis abuelos _ cincuenta años casados.|cumplir|4
+{Ayer} (nosotros) _ el coche para ir a la playa.|coger|3
+{Hace dos horas} (yo) _ el desayuno.|terminar|0
+{Esta mañana} Alba me _ un mensaje.|mandar|2
+{Ayer} mi equipo _ el partido por un gol.|ganar|2
+{El domingo} (nosotros) _ 3 a 1 contra el Sevilla.|perder|3
+{De repente} Pablo _ la copa y todos nos reímos.|romper|2
+{Anoche} (yo) me _ de la cama sin querer.|caer|0
+{El año pasado} mis primos se _ en una playa de Cuba.|casar|4
+{Hace tres años} (yo) _ de trabajo por primera vez.|cambiar|0
+{El otro día} (tú) me _ un secreto, ¿te acuerdas?|contar|1
+{Esa tarde} (nosotros) _ por todo el centro de la ciudad.|andar|3
+{De repente} Sofía me _ y me dio un abrazo.|abrazar|2
+{Ayer} (yo) _ una buena noticia en el trabajo.|recibir|0
+{Por fin} (tú) _ el trabajo que querías.|conseguir|1
+{La semana pasada} mi hermana _ un perro.|adoptar|2
+{Anoche} (yo) _ muy triste después de la llamada.|sentirse|0
+{Hace un año} mis padres _ de ciudad.|cambiar|4
+{Esta mañana} (nosotros) _ el autobús por unos segundos.|perder|3
+{Ayer} el jefe nos _ una sorpresa.|dar|2
+{El sábado por la noche} (yo) _ con mis amigos hasta tarde.|salir|0
+{De pronto} (tú) _ y me miraste muy serio.|sonreír|1
+{Anoche} Elena _ una cena para diez personas.|preparar|2
+{Ayer} (nosotros) _ en la cola más de una hora.|esperar|3
+{El mes pasado} mis padres _ a mi tía en Madrid.|visitar|4
+{Ayer} (yo) _ una pizza por teléfono.|pedir|0
+{El otro día} Raúl _ con su ex en el supermercado.|encontrarse|2
+{Hace dos días} (tú) _ la contraseña, ¿verdad?|olvidar|1
+{De repente} mis amigos _ por la puerta con una tarta.|entrar|4
+{El martes} (yo) _ a casa muy cansado.|volver|0
+{Por fin} (nosotros) _ las vacaciones.|empezar|3
+{Anoche} (yo) _ que alguien llamaba a la puerta.|oír|0
+{Ayer} Julia _ en la cocina y se quemó la mano.|cocinar|2
+{Esta mañana} (tú) _ mucho en el gimnasio.|sudar|1
+{El año pasado} (yo) _ mi coche a un amigo.|vender|0
+{Anoche} (nosotros) _ de la fiesta a las tres.|salir|3
+{Hace una semana} mi vecino _ de un árbol.|caer|2
+{Ayer} (tú) _ el último tren, qué mala suerte.|perder|1
+{De repente} mis padres _ en la puerta de casa.|aparecer|4
+{El otro día} (yo) _ una película que me encantó.|ver|0
+{Anoche} Marcos _ la cena en el restaurante.|pagar|2
+{Esta semana} (nosotros) _ muchas cosas nuevas en clase.|aprender|3
+{Ayer} (yo) _ la clase porque estaba enfermo.|faltar|0
+{Hace un mes} (tú) _ a vivir con tu novio.|irse|1
+{De repente} el coche _ en medio de la carretera.|parar|2
+{El jueves} (nosotros) _ una paella enorme.|hacer|3
+{Esta tarde} (yo) _ un mensaje a mi hermano.|escribir|0
+{Anoche} mis amigos _ un taxi para volver a casa.|coger|4
+{Ayer} (tú) me _ un favor muy grande.|hacer|1
+{Hace dos horas} Marta _ por la ventana.|mirar|2
+{El otro día} (yo) _ con mi jefe sobre el sueldo.|hablar|0
+{Anoche} (nosotros) _ en casa y vimos una serie.|quedarse|3
+{De repente} (yo) _ mucho calor.|sentir|0
+{El sábado} Daniel le _ a su madre un ramo de flores.|regalar|2
+{Ayer} (tú) _ más de lo que pensabas, ¿no?|gastar|1
+{La semana pasada} los obreros _ el trabajo.|terminar|4
+{Por fin} (nosotros) _ a casa de Javier.|llegar|3
+{Esta mañana} (yo) _ las llaves dentro de casa.|dejar|0
+{Ayer} Lola _ su tarea antes de cenar.|hacer|2
+{Hace tres días} (tú) _ una carta muy bonita, ¿no?|recibir|1
+{De repente} los niños _ a gritar.|empezar|4
+{El año pasado} (nosotros) _ por primera vez en un avión.|viajar|3
+{Anoche} (yo) _ una pesadilla horrible.|tener|0
+{El lunes} el profesor _ a todos con una sonrisa.|saludar|2
+{Ayer} (tú) _ con tu jefe, ¿cómo fue?|reunirse|1
+{Hace una hora} mis primos _ al aeropuerto.|llegar|4
+{El otro día} (nosotros) _ una tienda muy bonita.|encontrar|3
+{Ayer} (yo) _ mucho dinero en la tienda.|gastar|0
+{De repente} Carmen _ y salió del cine.|levantarse|2
+{Anoche} mi madre me _ por teléfono muy preocupada.|llamar|2
+{Anoche} (tú) _ muy rápido, ¿qué pasó?|conducir|1
+{El domingo} (nosotros) _ al parque con los niños.|ir|3
+{Hace dos años} mis abuelos _ una casa en el campo.|construir|4
+{Ayer} (yo) _ una buena idea para el regalo.|tener|0
+{Por fin} Tomás _ a su novia a conocer a sus padres.|llevar|2
+{De repente} (yo) _ la verdad.|entender|0
+{Anoche} (tú) no _ a la cena, ¿qué pasó?|venir|1
+{Esta mañana} (nosotros) _ el desayuno en la terraza.|tomar|3
+{El lunes} mis compañeros _ muy tarde al trabajo.|llegar|4
+{Ayer} Paula _ una foto preciosa del atardecer.|sacar|2
+{Hace una semana} (yo) _ mi bici en la calle.|dejar|0
+{Anoche} (tú) _ la tele muy alta.|poner|1
+{El otro día} (nosotros) _ en el cine con mis suegros.|estar|3
+{De repente} un coche nos _ a toda velocidad.|pasar|2
+{Ayer} (yo) _ mi cumpleaños con la familia.|celebrar|0
+{El año pasado} Sandra _ de ser profesora.|dejar|2
+{Esta tarde} (tú) _ una llamada de tu banco.|recibir|1
+{Hace tres años} (nosotros) _ en esta calle.|vivir|3
+{Anoche} mis hijos _ de la cama dos veces.|levantarse|4
+{Ayer} (yo) _ con el coche contra una pared.|chocar|0
+{Por fin} (tú) _ mis mensajes.|contestar|1
+{El viernes} Jaime _ una gran noticia.|dar|2
+{Esa noche} (nosotros) _ de un tema muy serio.|hablar|3
+{De pronto} (yo) _ a mi viejo amigo Luis entre la gente.|ver|0
+{Hace un mes} mis padres me _ un móvil nuevo.|comprar|4
+{Ayer} (tú) _ al médico, ¿qué te dijo?|ir|1
+{Anoche} el equipo _ la copa.|ganar|2
+{Esta mañana} (yo) _ el tren por muy poco.|coger|0
+{El otro día} Rosa se _ y se rompió el brazo.|caer|2
+{Ayer} (nosotros) _ la cuenta entre todos.|pagar|3
+{Hace dos días} (tú) _ una cosa muy rara, ¿no?|decir|1
+{Ayer} (yo) _ la tarde entera con mi sobrino.|pasar|0
+{El año pasado} (tú) _ a Sevilla con tus amigos.|viajar|1
+{Anoche} Tomás _ de la oficina a las diez.|salir|2
+{La semana pasada} (nosotros) _ muchos regalos.|recibir|3
+{De repente} mis vecinos _ a gritar.|empezar|4
+{Ayer} (yo) _ una chaqueta nueva en las rebajas.|comprar|0
+{El otro día} (tú) _ al museo con tu clase, ¿no?|ir|1
+{Esta mañana} Lucía _ la maleta en cinco minutos.|hacer|2
+{Por fin} (nosotros) _ el coche nuevo.|tener|3
+{Anoche} mis amigos _ hasta la madrugada.|cantar|4
+{Ayer} (yo) _ de casa sin paraguas.|salir|0
+{El martes} (tú) _ una cosa muy graciosa.|decir|1
+{Hace dos días} Pedro _ un accidente en la carretera.|ver|2
+{Anoche} (nosotros) _ las maletas para el viaje.|preparar|3
+{De repente} (yo) _ el teléfono.|oír|0
+{El otro día} los jugadores _ una cena de equipo.|organizar|4
+{Ayer} (tú) _ más de diez mensajes, ¿qué pasó?|mandar|1
+{Hace un año} (yo) _ a tocar la guitarra.|empezar|0
+{Anoche} Mónica _ con su hermana por videollamada.|hablar|2
+{Esta tarde} (nosotros) _ un café en la plaza.|tomar|3
+{Por fin} mis padres _ la casa.|vender|4
+{Ayer} (yo) _ en la biblioteca hasta las ocho.|estudiar|0
+{El domingo} (tú) _ una paella buenísima.|hacer|1
+{De pronto} Andrés _ de la sala sin decir nada.|salir|2
+{Esa noche} (nosotros) _ por las calles del barrio.|caminar|3
+{Hace una semana} los niños _ en el lago.|bañarse|4
+{Ayer} (yo) _ mi pasaporte en el aeropuerto.|perder|0
+{Anoche} (tú) _ muy contento al llegar a casa.|estar|1
+{Esta mañana} el cartero _ un paquete para ti.|traer|2
+{El otro día} (nosotros) _ al dentista con los niños.|ir|3
+{De repente} las luces _.|apagarse|4
+{Ayer} (yo) _ un pastel de chocolate.|hacer|0
+{La semana pasada} (tú) _ una entrevista de trabajo.|tener|1
+{Hace dos horas} Nuria _ del médico.|volver|2
+{Anoche} (nosotros) _ en un bar con música en vivo.|cenar|3
+{Por fin} mis hermanos _ a vernos.|venir|4
+{Ayer} (yo) _ una buena noticia: me subieron el sueldo.|recibir|0
+{El mes pasado} (tú) _ un curso de cocina.|empezar|1
+{De repente} Gabriel _ la puerta y entró.|abrir|2
+{Esta mañana} (nosotros) _ por el parque con el perro.|pasear|3
+{Anoche} mis tíos nos _ a cenar a su casa.|invitar|4
+{Ayer} (yo) _ el informe antes de las cinco.|terminar|0
+{El otro día} (tú) _ un buen restaurante, ¿cómo se llamaba?|encontrar|1
+{Hace tres semanas} Elisa _ su primer trabajo.|conseguir|2
+{Anoche} (nosotros) _ la última escena de la serie.|ver|3
+{De repente} los chicos _ del cuarto corriendo.|salir|4
+{Ayer} (yo) _ un mensaje de voz muy largo.|mandar|0
+{El sábado} (tú) _ de fiesta con tu hermano.|salir|1
+{Por fin} Mateo _ a hablar con su padre.|llamar|2
+{Esta mañana} (nosotros) _ en el atasco una hora.|estar|3
+{Anoche} (yo) _ pronto porque estaba cansado.|acostarse|0
+{El otro día} mis padres _ una cosa muy bonita de ti.|decir|4
+{Ayer} (tú) _ sin querer el vaso de agua.|tirar|1
+{Hace dos días} Rebeca _ una ensalada para todos.|preparar|2
+{Esa mañana} (nosotros) _ a la playa en autobús.|ir|3
+{De repente} (yo) _ una idea genial.|tener|0
+{Anoche} los vecinos _ la música muy alta.|poner|4
+{Ayer} (tú) _ la comida en el horno, ¿verdad?|poner|1
+{El otro día} Ana _ mucho en la película.|llorar|2
+{Hace un año} (nosotros) _ de casa.|mudarse|3
+{Por fin} (yo) _ el libro que me recomendaste.|leer|0
+{Esta tarde} los alumnos _ el examen de matemáticas.|hacer|4
+{Anoche} (tú) _ muy tarde del trabajo.|volver|1
+{El viernes} Luis _ un coche nuevo.|comprar|2
+{De repente} (nosotros) _ cuenta de que no teníamos gasolina.|darse|3
+{Ayer} (yo) _ la ropa a mano.|lavar|0
+{La semana pasada} (tú) _ en el campo con tus primos.|estar|1
+{Hace dos horas} Silvia me _ una foto del perro.|enviar|2
+{Anoche} (nosotros) _ el partido en un bar.|ver|3
+{Por fin} los dos _ la verdad.|saber|4
+{El otro día} (yo) _ con un viejo amigo del colegio.|encontrarse|0
+{Esta mañana} (tú) _ más de lo normal.|dormir|1
+{Ayer} Hugo _ su primer día de colegio.|tener|2
+{Hace tres noches} (nosotros) _ las estrellas desde el balcón.|mirar|3
+{De repente} mi madre _ la cocina llena de humo.|ver|2
+{Anoche} (yo) _ el último capítulo.|ver|0
+{El año pasado} mis amigos _ la montaña más alta del país.|subir|4
+{Ayer} (tú) _ con la mochila perdida, ¿la encontraste?|buscar|1
+{Hace un rato} Clara _ a su madre.|llamar|2
+{Ayer} (yo) _ un dolor de cabeza horrible y me fui a la cama.|tener|0
+{El otro día} (nosotros) _ en un atasco de tres horas.|estar|3
+{Esta mañana} mi hermano _ una multa.|recibir|2
+{De repente} (tú) _ una cosa que me sorprendió.|decir|1
+{Hace dos semanas} mis amigos _ de viaje a México.|irse|4
+{Anoche} Carla _ una película de miedo.|ver|2
+{Por fin} (yo) _ el coraje de hablar con él.|tener|0
+{El año pasado} (nosotros) _ al mismo hotel.|volver|3
+{Ayer} (tú) _ un mensaje a tu jefe, ¿no?|escribir|1
+{Hace un rato} el cartero _ a la puerta.|llamar|2
+{De repente} los vecinos _ una discusión enorme.|tener|4`;
+const BANK_IMP=`{De pequeño}, (yo) _ al fútbol todos los días en la calle.|jugar|0
+{Cuando era niña}, (tú) _ mucho miedo a la oscuridad.|tener|1
+{Antes}, mi abuelo _ el periódico cada mañana.|leer|2
+{Los domingos} (nosotros) _ en casa de mi abuela.|comer|3
+{Siempre} mis padres _ una siesta después de comer.|dormir|4
+{Cuando vivía en Madrid}, (yo) _ al trabajo en metro.|ir|0
+{De niña}, Laura _ muchísimo en el colegio.|reírse|2
+{Todos los veranos} (nosotros) _ a la playa con mis primos.|ir|3
+{Antes} (tú) _ más sano, ¿no?|comer|1
+{Por las mañanas}, mi madre _ café y escuchaba la radio.|tomar|2
+{De joven}, mis padres _ mucho por Europa.|viajar|4
+{Siempre} (yo) _ la puerta con llave antes de dormir.|cerrar|0
+{Cuando éramos pequeños}, (nosotros) _ mucho en el parque.|jugar|3
+{Normalmente} (tú) _ a las siete, ¿verdad?|levantarse|1
+{A veces} mi hermano me _ al colegio en bici.|llevar|2
+{En aquella época} (yo) _ en una oficina del centro.|trabajar|0
+{Todos los días} mis vecinos _ música a todo volumen.|poner|4
+{Cuando era niño}, (yo) _ muchas películas con mi padre.|ver|0
+{Antes} (nosotros) _ en un piso muy pequeño.|vivir|3
+{Los sábados} Carmen _ con sus amigas por el centro.|pasear|2
+{De pequeña}, (tú) _ canciones muy graciosas.|cantar|1
+{Cada verano} mis tíos _ a visitarnos al pueblo.|venir|4
+{Siempre} (yo) _ el mismo café en ese bar.|pedir|0
+{Todas las tardes} Jorge _ a su perro por el parque.|sacar|2
+{Cuando estudiábamos en la universidad}, (nosotros) _ en la biblioteca.|estudiar|3
+{A menudo} (tú) me _ cosas muy graciosas.|decir|1
+{De niño}, Miguel _ a casa muy sucio.|volver|2
+{Antes} mis padres no _ móvil.|tener|4
+{Todos los días} (yo) _ la comida para toda la familia.|preparar|0
+{Los domingos} mi abuelo nos _ cuentos.|contar|2
+{Cuando era joven}, (yo) _ el pelo muy largo.|llevar|0
+{Normalmente} (nosotros) _ en el mismo restaurante.|cenar|3
+{En verano} (tú) _ en el mar todas las mañanas.|nadar|1
+{Siempre} Rosa _ a su madre los domingos.|llamar|2
+{De pequeños}, mis hermanos _ muchísimo.|pelearse|4
+{Todos los días} (yo) _ dos kilómetros por el parque.|correr|0
+{Antes} (tú) _ la tele hasta muy tarde.|ver|1
+{Cada Navidad} (nosotros) _ toda la familia junta.|estar|3
+{Cuando era niña}, mi madre _ en un banco.|trabajar|2
+{A veces} (yo) _ tarde al colegio.|llegar|0
+{De joven}, Pablo _ en un grupo de rock.|tocar|2
+{En aquel pueblo} todos los vecinos se _.|conocer|4
+{Siempre} (tú) _ a tus amigos a cenar a casa.|invitar|1
+{Cuando éramos novios}, (nosotros) _ por teléfono todas las noches.|hablar|3
+{Antes} el tren _ más despacio.|ir|2
+{Cada mañana} (yo) _ a mi hijo al colegio.|llevar|0
+{De niña}, Marta _ todo el día en la calle.|estar|2
+{Los viernes} (nosotros) _ al cine.|ir|3
+{Siempre} mis abuelos _ muy temprano.|levantarse|4
+{Todos los fines de semana} (tú) _ con tu padre.|pescar|1
+{Antes} (yo) _ mucho más libros.|leer|0
+{De pequeño}, mi primo _ en el campo.|vivir|2
+{A menudo} (nosotros) _ unos tacos en esa calle.|comer|3
+{Cuando era estudiante}, (yo) _ en una pizzería.|trabajar|0
+{Todos los días} el profesor nos _ deberes.|dar|2
+{Siempre} (tú) _ razón, qué pesada.|tener|1
+{En mi infancia}, mis padres _ todos los veranos en el pueblo.|pasar|4
+{Antes} (yo) _ cada día a las seis de la mañana.|levantarse|0
+{Normalmente} Elena _ en bici al trabajo.|ir|2
+{De niños}, (nosotros) _ en el río.|bañarse|3
+{Siempre} mi madre _ la mesa antes de cenar.|poner|2
+{Cuando éramos jóvenes}, (nosotros) _ mucho.|bailar|3
+{Todas las noches} (yo) _ una página de mi libro.|leer|0
+{Antes} mis abuelos _ muy cerca de nosotros.|vivir|4
+{De pequeña}, (tú) no _ verduras.|comer|1
+{Cada tarde} Paco _ un helado en la plaza.|tomar|2
+{Normalmente} (nosotros) _ a casa a las seis.|volver|3
+{A esa edad}, (yo) _ muy tímido.|ser|0
+{Antes} (tú) _ muy rápido, ¿ahora ya no?|conducir|1
+{De niño}, Álex siempre _ el mismo juguete.|pedir|2
+{Los lunes} mis compañeros _ siempre tarde.|llegar|4
+{Todas las mañanas} (yo) _ el periódico en el bar.|leer|0
+{Siempre} (nosotros) _ el verano en el pueblo de mi padre.|pasar|3
+{Cuando era joven}, mi tía _ muy guapa.|ser|2
+{Antes} (tú) _ en un banco, ¿no?|trabajar|1
+{Hacía mucho frío} y (nosotros) _ en casa.|estar|3
+{Eran las ocho} y todavía (yo) _ en la cama.|estar|0
+{Cuando llegué a casa}, mi madre _ la cena.|preparar|2
+{Mientras} (yo) _ la mesa, mi padre cocinaba.|poner|0
+{Llovía} y la gente _ muy deprisa.|andar|4
+{Cuando entré en la sala}, los niños _ en el suelo.|dormir|4
+{Mientras} (tú) _ la ducha, sonó el teléfono.|tomar|1
+{Hacía sol} y los niños _ en la playa.|jugar|4
+{Cuando salí del trabajo}, _ muy tarde.|ser|2
+{Eran las nueve} y (nosotros) _ en el tren.|ir|3
+{Cuando llegamos}, Pablo _ la tele.|ver|2
+{Mientras} Ana _ la cena, yo ponía la mesa.|hacer|2
+{Hacía calor} y (yo) no _ dormir.|poder|0
+{Cuando te llamé}, (tú) _ con tu madre, ¿verdad?|hablar|1
+{Mientras} (nosotros) _ por la calle, empezó a llover.|caminar|3
+{Había mucha gente} y todos _ a la vez.|hablar|4
+{Cuando vi a Luis}, él _ un traje azul.|llevar|2
+{Estaba muy cansado} porque (yo) no _ bien.|dormir|0
+{Eran las tres} y mis padres todavía _.|comer|4
+{Cuando llegó la policía}, (nosotros) _ en el sofá.|estar|3
+{Hacía viento} y (tú) _ frío, ¿no?|tener|1
+{Mientras} los niños _, nosotros preparábamos la cena.|jugar|4
+{Cuando abrí la puerta}, el perro _.|dormir|2
+{Estaba nervioso} porque (yo) _ una reunión importante.|tener|0
+{Mientras} Raúl _ al jefe, yo esperaba fuera.|hablar|2
+{Cuando llegó el camarero}, (nosotros) _ el menú.|mirar|3
+{Hacía mucho ruido} y (yo) no _ nada.|oír|0
+{Cuando entró el jefe}, todos _ en silencio.|trabajar|4
+{Mientras} (tú) _ café, yo leía el periódico.|tomar|1
+{Era un día precioso} y la gente _ en las terrazas.|estar|4
+{Cuando era pequeña}, mi hermana _ siete años menos que yo.|tener|2
+{Eran las diez de la noche} y (yo) _ aún en la oficina.|estar|0
+{Mientras} los jugadores _, el público cantaba.|calentar|4
+{Había una cola enorme} y todos _ con paciencia.|esperar|4
+{Cuando me levanté}, ya _ de día.|ser|2
+{La casa estaba vacía} y (nosotros) _ un ruido raro.|oír|3
+{Hacía mal tiempo} y (yo) no _ salir.|querer|0
+{Mientras} (yo) _ a Lucía, él me miraba.|escuchar|0
+{Cuando llegamos al hotel}, la recepcionista _ al teléfono.|hablar|2
+{Estaba lloviendo} y mis hijos _ en casa.|jugar|4
+{Eran las seis} y Marta todavía _ con los clientes.|hablar|2
+{Cuando tenía diez años}, (yo) _ mucha vergüenza.|tener|0
+{Mientras} (nosotros) _ la película, se fue la luz.|ver|3
+{Cuando me llamaste}, (yo) _ en el metro.|ir|0
+{De joven}, mi abuela _ muy simpática y todos la querían.|ser|2
+{Cuando llegué a la fiesta}, todos _.|bailar|4
+{Hacía un día perfecto} y (nosotros) _ en el campo.|comer|3
+{Mientras} Sara _ el coche, hablaba por teléfono.|conducir|2
+{Cuando abrí la ventana}, la calle _ vacía.|estar|2
+{Eran las doce} y los niños _ en la cama.|estar|4
+{Cuando éramos novios}, (tú) _ más cariñoso.|ser|1
+{Estaba tan cansado} que (yo) casi no _.|ver|0
+{Mientras} los obreros _ la calle, el ruido era enorme.|arreglar|4
+{Cuando llegó el tren}, (nosotros) _ en el andén.|esperar|3
+{Cuando me desperté}, (yo) _ un dolor de cabeza horrible.|tener|0
+{Mientras} Pedro _ la cena, yo ponía la mesa.|preparar|2
+{Hacía mucho frío} y (tú) no _ abrigo.|llevar|1
+{Cuando le vi}, Carlos _ una maleta enorme.|llevar|2
+{Había mucha niebla} y (nosotros) casi no _ nada.|ver|3
+{Cuando llegué}, todos mis amigos ya _ allí.|estar|4
+{Mientras} (yo) _ la compra, mi hijo jugaba en el parque.|hacer|0
+{Era muy tarde} y las calles _ vacías.|estar|4
+{Cuando nos conocimos}, (tú) _ en París.|vivir|1
+{Mientras} (nosotros) _ el menú, el camarero esperaba.|elegir|3
+{Hacía tanto calor} que mis padres _ la ventana abierta.|tener|4
+{Cuando entré en la cocina}, Julia _ una canción.|cantar|2
+{Eran las cinco de la tarde} y (nosotros) aún _.|trabajar|3
+{Mientras} (tú) _ a tu amigo, yo hablaba con su hermana.|esperar|1
+{Cuando llamó el médico}, mi madre _ en la cocina.|estar|2
+{Había tanto ruido} que (nosotros) no _ hablar.|poder|3
+{Cuando entramos}, los camareros _ las mesas.|limpiar|4
+{Estaba muy contento} porque (yo) _ vacaciones al día siguiente.|tener|0
+{De niño}, me _ mucho el chocolate.|gustar|2
+{Cuando era joven}, me _ mucho las películas de terror.|gustar|4
+{Cuando llegué a la oficina}, me _ la cabeza.|doler|2
+{Anoche} (yo) _ de ti y no podía dormir.|pensar|0
+{Cuando te vi}, (tú) _ muy triste, ¿qué te pasaba?|estar|1
+{Cuando salí a la calle}, la luna _ muy grande.|estar|2
+{Cuando salimos del cine}, (nosotros) _ muy contentos.|estar|3
+{Cuando llegué a la oficina}, (yo) _ un poco enfermo.|estar|0
+{Antes} (yo) no _ que Elena vivía aquí.|saber|0
+{En esa época} (nosotros) no _ a nadie en el barrio.|conocer|3
+{Cuando era pequeño}, mi padre _ en un barco.|trabajar|2
+{Mientras} (nosotros) _ de camino a casa, empezó a nevar.|ir|3
+{Hacía un frío horrible} y nevaba, pero (yo) _ salir.|querer|0
+{Cuando la conocí}, Marta _ veinte años.|tener|2
+{De pequeño}, (yo) _ ser médico.|querer|0
+{Cuando éramos niños}, nuestros padres nos _ todos los domingos al parque.|llevar|4
+{En ese momento} Ana _ un libro en el sofá.|leer|2
+{Aquel día} (tú) _ una camisa verde, ¿te acuerdas?|llevar|1
+{Cuando vivía en Lima}, (yo) _ por el mar cada mañana.|correr|0
+{Antes} mis vecinos _ en el piso de arriba.|vivir|4
+{Cuando era niña}, (yo) _ en una casa con jardín.|vivir|0
+{Mientras} (tú) _ la ducha, preparé el desayuno.|tomar|1
+{Cuando llegó la ambulancia}, el hombre ya no _.|respirar|2
+{De joven}, mis abuelos _ muy bien.|bailar|4
+{Cuando llegué al aeropuerto}, el vuelo todavía _ en la pantalla.|aparecer|2
+{Siempre} (nosotros) _ en la misma mesa del bar.|sentarse|3
+{Los fines de semana} (yo) _ con mis amigos hasta tarde.|salir|0
+{En su juventud}, mi madre _ en un restaurante.|trabajar|2
+{Cuando era pequeño}, mi hermano _ mucho.|llorar|2
+{Antes} (tú) _ más tiempo para leer, ¿no?|tener|1
+{Cuando me casé}, (yo) _ en una empresa pequeña.|trabajar|0
+{Cada tarde} los niños _ del colegio con hambre.|volver|4
+{Todas las semanas} (nosotros) _ a la abuela.|visitar|3
+{Todos los días} Lucía _ un mensaje a su novio.|escribir|2
+{A menudo} (tú) _ de tu pueblo con mucho cariño.|hablar|1
+{Cuando teníamos tiempo}, (nosotros) _ por la montaña.|caminar|3
+{Antes} (yo) _ café, pero ahora no.|tomar|0
+{Por aquel entonces} Pedro _ en un restaurante de la plaza.|comer|2
+{En esa casa} siempre _ un olor a pan recién hecho.|haber|2
+{Cuando era niño}, (yo) _ en el columpio todos los días.|jugar|0
+{De joven}, Rafa _ la guitarra en la calle.|tocar|2
+{Siempre} (nosotros) _ la tele después de cenar.|ver|3
+{Cuando íbamos al pueblo}, mi abuela nos _ galletas.|hacer|2
+{En aquellos años} (tú) _ mucho por trabajo.|viajar|1
+{Todos los días} mis padres _ una hora por el barrio.|pasear|4
+{De niña}, (yo) _ el pelo muy corto.|llevar|0
+{Cuando llegaba el verano}, (nosotros) _ muy felices.|ser|3
+{Antes} Carlos _ más joven y más delgado.|ser|2
+{Cada mañana} la panadera nos _ con una sonrisa.|saludar|2
+{Siempre} (tú) _ la última en llegar.|ser|1
+{En mi barrio} todos los niños _ juntos en la calle.|jugar|4
+{Todas las noches} (yo) _ con mi madre por teléfono.|hablar|0
+{Cuando éramos pequeños}, mi hermana y yo _ la misma habitación.|compartir|3
+{Los domingos} (nosotros) _ el cine en casa.|ver|3
+{A esa hora} Lola siempre _ en la cocina.|estar|2
+{Antes} la gente _ muchas más cartas.|escribir|4
+{De niño}, (tú) _ muy rápido, ¿no?|correr|1
+{Siempre} (yo) _ mi bocadillo en el patio.|comer|0
+{Cuando vivíamos en el campo}, (nosotros) _ gallinas.|tener|3
+{Entonces} mis abuelos no _ coche.|tener|4
+{De pequeña}, Julia _ dormir con la luz encendida.|querer|2
+{Cada verano} (tú) _ a Italia con tus padres.|ir|1
+{Antes} los niños _ más tiempo en la calle.|pasar|4
+{En el colegio} (yo) siempre _ con mi mejor amigo.|sentarse|0
+{Todas las mañanas} el profesor _ la clase con una canción.|empezar|2
+{Siempre} (nosotros) _ el mismo camino al trabajo.|hacer|3
+{A veces} mis padres me _ dinero para el cine.|dar|4
+{Todos los días} (yo) _ el autobús de las ocho.|coger|0
+{De pequeño}, mi padre me _ siempre un cuento antes de dormir.|leer|2
+{Cuando éramos jóvenes}, (nosotros) _ mucho en las fiestas.|bailar|3
+{Antes} (tú) _ más tarde a casa, ¿no?|volver|1
+{Los veranos} mis primos _ con nosotros en el pueblo.|quedarse|4
+{Siempre} Marcos _ su mochila en el mismo sitio.|dejar|2
+{Cuando era estudiante}, (yo) _ poco dinero.|tener|0
+{De niña}, Alicia _ muy bien al ajedrez.|jugar|2
+{Todos los días} (nosotros) _ el mismo programa de radio.|escuchar|3
+{Cuando entré en la cocina}, mi abuela _ una sopa.|hacer|2
+{Mientras} (yo) _ el coche, mi padre miraba el mapa.|conducir|0
+{Cuando llegamos a la estación}, el tren _ ya.|salir|2
+{En aquella época} mis padres _ mucho.|trabajar|4
+{Antes de dormir}, (yo) siempre _ un vaso de leche.|tomar|0
+{Cuando vi a Lucía}, ella _ con un chico muy alto.|hablar|2
+{Cuando sonó el despertador}, (nosotros) _ aún.|dormir|3
+{Mientras} Laura _ en el sofá, su hijo jugaba.|descansar|2
+{De pequeño}, mi tío me _ siempre a pescar.|llevar|2
+{Cuando abrí el paquete}, el regalo _ roto.|estar|2
+{Los domingos por la tarde}, (nosotros) _ al parque.|ir|3
+{Siempre} (tú) _ el último de la clase en llegar.|ser|1
+{Cuando era niña}, mi madre me _ una canción antes de dormir.|cantar|2
+{Hacía mucho calor} y (yo) _ muchísima sed.|tener|0
+{Cuando llegó el jefe}, (nosotros) _ en la sala de reuniones.|esperar|3
+{Mientras} los niños _ la tele, preparé la cena.|ver|4
+{Antes} mi hermano _ mucho más que ahora.|comer|2
+{Cuando vivía con mis padres}, (yo) _ la cama cada mañana.|hacer|0
+{De joven}, Carmen _ en un hotel de la costa.|trabajar|2
+{Cuando salíamos del cine}, (nosotros) _ de qué hablar.|tener|3
+{Cada año} mis primos _ a pasar la Navidad con nosotros.|venir|4
+{Cuando llegué a casa}, la puerta _ abierta.|estar|2
+{Mientras} (tú) _ al perro, yo preparaba el café.|pasear|1
+{Todas las noches} mi madre nos _ un cuento.|leer|2
+{Cuando era joven}, (yo) _ a todos mis vecinos.|conocer|0
+{Antes} (nosotros) _ en esa calle.|vivir|3
+{Cuando llegó el invierno}, la gente _ más en casa.|quedarse|2
+{Siempre} (tú) _ café sin azúcar.|tomar|1
+{Cuando me llamó mi madre}, (yo) _ de camino al gimnasio.|ir|0
+{Mientras} Víctor _ la cuenta, pedimos un taxi.|pagar|2
+{Cuando conocí a Sara}, ella _ en Londres.|vivir|2
+{De niños}, (nosotros) _ siempre en la calle.|jugar|3
+{Todas las vacaciones} (yo) _ a casa de mi abuela.|ir|0
+{Cuando empezó la película}, todos _ en silencio.|estar|4
+{Mientras} (nosotros) _ la maleta, sonó el teléfono.|hacer|3
+{Antes} mis amigos y yo _ cada viernes.|salir|3
+{Cuando llegué a la parada}, un chico _ el móvil.|mirar|2
+{Cuando era pequeño}, (yo) _ muchas veces enfermo.|estar|0
+{Hacía muy mal tiempo} y casi nadie _ por la calle.|andar|2
+{Siempre} Elisa _ café cuando trabajaba.|beber|2
+{De pequeño}, (tú) _ mucho con tu hermano.|jugar|1
+{Mientras} (yo) _ en la cola, vi a un viejo amigo.|esperar|0
+{Cuando llegamos al pueblo}, todos _ en la plaza.|estar|4
+{Cada tarde}, (nosotros) _ un rato en la terraza.|sentarse|3
+{Antes} mi hermano _ con mis padres.|vivir|2
+{Cuando me enteré}, (yo) _ en el trabajo.|estar|0
+{Mientras} los alumnos _, la profesora corregía.|escribir|4
+{De joven}, (tú) _ siempre a la última moda.|vestirse|1
+{Siempre} mi padre _ la tele muy alta.|poner|2
+{Cuando salí de casa}, _ de noche.|ser|2
+{Antes} (nosotros) _ más tiempo libre.|tener|3
+{Cuando me casé}, mi mujer _ en una escuela.|trabajar|2
+{Todos los días} (yo) _ el mismo camino.|hacer|0
+{Mientras} (nosotros) _ de vacaciones, nos robaron en casa.|estar|3
+{De niña}, Rosa siempre me _ sus dulces.|dar|2
+{En ese bar} los camareros siempre nos _ con una sonrisa.|saludar|4
+{Cuando era pequeña}, (yo) _ de menos a mis primos.|echar|0
+{A menudo} (tú) me _ con los deberes.|ayudar|1
+{Cuando sonó el teléfono}, mi padre _ el coche.|lavar|2
+{Antes} (yo) _ la radio todas las mañanas.|escuchar|0
+{De pequeños}, (nosotros) no _ miedo a nada.|tener|3
+{Cada sábado} mis abuelos _ en el mercado.|comprar|4
+{Mientras} (tú) _ la ropa, yo hacía la comida.|lavar|1
+{Cuando conocí a Pedro}, él _ en una tienda de música.|trabajar|2
+{Siempre} (yo) _ en la última fila del cine.|sentarse|0
+{Antes} la panadería _ a las siete de la mañana.|abrir|2
+{Cuando era niño}, mis padres me _ cada verano al pueblo.|llevar|4
+{Todos los fines de semana} (nosotros) _ la casa.|limpiar|3
+{De joven}, (tú) _ siempre tarde.|llegar|1
+{Cuando llegó la noche}, los niños aún _.|jugar|4
+{Antes} mi abuela _ el pan en casa.|hacer|2
+{Mientras} (yo) _ la sopa, mi madre ponía la mesa.|probar|0
+{Cuando llamé a la puerta}, nadie _.|contestar|2
+{Siempre} (nosotros) _ en esa terraza los viernes.|cenar|3
+{Cuando éramos pequeños}, mi hermano y yo _ en la misma cama.|dormir|3
+{Siempre} Nuria _ sus llaves en el bolso.|llevar|2
+{Antes} (yo) _ al gimnasio tres veces por semana.|ir|0`;
+const BANK_MIX=`{Mientras} (yo) _ la compra, me llamó mi madre.|hacer|0|i|Mientras sets up an action in progress. The call is the event that interrupted it.
+{Cuando} (yo) _ a casa, mi madre ya había cenado.|llegar|0|p|Arriving is one finished event.
+(Nosotros) _ en el sofá {cuando sonó el timbre}.|estar|3|i|You were already on the sofa. The doorbell is the interruption.
+{De repente} Marta _ a llorar sin motivo.|empezar|2|p|De repente = a sudden, one-off event.
+{Cuando era niño}, (yo) _ siempre en casa de mis abuelos.|comer|0|i|Cuando era niño + siempre: how things used to be.
+{Ayer} (tú) _ una película increíble, ¿no?|ver|1|p|Ayer is a finished day, so one completed action.
+{Mientras} (tú) _ la cena, yo ponía la mesa.|preparar|1|i|Two actions at the same time: both imperfecto.
+{El otro día} (yo) _ a mi profesor en el supermercado.|ver|0|p|El otro día = one occasion in the past.
+{Siempre} (nosotros) _ el mismo plato en ese restaurante.|pedir|3|i|Siempre marks a habit.
+(Yo) _ por la calle {cuando empezó a llover}.|caminar|0|i|Walking was in progress. The rain started and interrupted it.
+{Anoche} Pedro _ a casa a las doce.|volver|2|p|Anoche + an exact time: one finished event.
+{Cuando llegué}, mis padres _ la tele.|ver|4|i|Arriving is the event. What they were doing is the background.
+{Hacía frío} y (nosotros) _ en casa.|quedarse|3|i|Weather sets the scene, so the action alongside it is background.
+{Un día}, mi abuelo _ de casa y no volvió.|salir|2|p|Un día introduces one event in the story.
+{Todos los días} (yo) _ al trabajo en bici.|ir|0|i|Todos los días marks a repeated habit.
+{De repente} (tú) _ la puerta y entraste.|abrir|1|p|De repente + a quick sequence of events: pretérito.
+(Yo) _ una ducha {cuando se fue la luz}.|tomar|0|i|The shower was in progress when the power went out.
+{Eran las cinco} y los niños _ en el parque.|jugar|4|i|Time and scene-setting take the imperfecto.
+{Esa noche} (nosotros) _ a casa muy tarde.|llegar|3|p|Esa noche = one specific night. Arriving is an event.
+{Cuando tenía cinco años}, (yo) _ en un pueblo pequeño.|vivir|0|i|Age in the past sets a period: how life was.
+{Ayer} mis amigos y yo _ al fútbol en el parque.|jugar|3|p|Ayer + a finished activity: pretérito.
+{Mientras} mi hermano _ la tele, yo hacía los deberes.|ver|2|i|Two actions at the same time.
+{Por fin} (yo) _ el examen.|aprobar|0|p|Por fin = the moment it finally happened.
+{De pequeña}, (tú) _ el pelo muy largo.|tener|1|i|De pequeña describes how you were then.
+{Cuando sonó la alarma}, (yo) _ aún.|dormir|0|i|You were still asleep. The alarm is the event.
+{El lunes} (nosotros) _ una reunión con el cliente.|tener|3|p|El lunes = a specific day: one finished event.
+{Normalmente} Luis _ el autobús de las siete.|coger|2|i|Normalmente marks a habit.
+(Yo) _ la cena {cuando llegaron mis amigos}.|preparar|0|i|The cooking was in progress when they arrived.
+{De repente} el teléfono _ y me asusté.|sonar|2|p|De repente = a sudden one-off event.
+{Anoche} (tú) _ muy poco, ¿no?|dormir|1|p|Anoche = one finished night.
+{Cuando era joven}, mi padre _ en una fábrica.|trabajar|2|i|Cuando era joven: how things used to be.
+{El año pasado} (nosotros) _ a Perú.|viajar|3|p|El año pasado = a finished, specific time.
+{Mientras} (nosotros) _ en la cola, empezó a llover.|esperar|3|i|Waiting was in progress when the rain began.
+{Hace tres días} Andrea _ un coche nuevo.|comprar|2|p|Hace tres días = a point in the past.
+{Todos los veranos} mis primos _ a la playa con nosotros.|venir|4|i|Todos los veranos marks a repeated habit.
+(Yo) _ al médico {cuando me llamó mi jefe}.|ir|0|i|You were on your way when the call came.
+{Ayer} Sara _ las llaves en el coche.|olvidar|2|p|Ayer + one finished event.
+{Cuando me levanté}, _ sol y el cielo estaba azul.|hacer|2|i|Describing the scene when you got up: imperfecto.
+{De repente} (nosotros) _ unos gritos.|oír|3|p|De repente + a sudden sound: one event.
+{Antes} (yo) _ mucho más rápido.|correr|0|i|Antes sets up how things used to be.
+{El sábado} mis padres _ una cena en casa.|hacer|4|p|El sábado = one specific day.
+{Mientras} (yo) _ el periódico, mi mujer cocinaba.|leer|0|i|Two things happening together.
+{Cuando llegó la profesora}, los alumnos _ en clase.|hablar|4|i|Arriving is the event. What they were doing is the background.
+{Una vez}, (yo) _ a un actor famoso en el aeropuerto.|ver|0|p|Una vez = a single occasion.
+(Tú) _ una película {cuando te llamé}, ¿no?|ver|1|i|You were in the middle of watching it.
+{Cada mañana} el abuelo _ el café en el balcón.|tomar|2|i|Cada mañana marks a habit.
+{De repente} la profesora _ de la clase.|salir|2|p|De repente + one quick event.
+{Cuando llegué al banco}, _ cerrado.|estar|2|i|Describing the situation when you arrived.
+{Ayer} (yo) _ dos horas en la cola.|esperar|0|p|Ayer + two hours: a finished stretch of time.
+{Mientras} Pedro _ el coche, yo miraba el mapa.|conducir|2|i|Two actions at the same time.
+{A los diez años}, (yo) _ a nadar.|aprender|0|p|A los diez años = a point in time when you learned.
+{Entonces} (nosotros) no _ internet en casa.|tener|3|i|Entonces here describes how things were back then.
+{Por la mañana}, mi madre siempre _ la radio.|escuchar|2|i|Siempre marks a habit.
+{Anteayer} (tú) _ con Lucía en el cine.|encontrarse|1|p|Anteayer = a specific past day.
+(Nosotros) _ en el mercado {cuando vimos a Carlos}.|estar|3|i|You were already at the market. Seeing Carlos is the event.
+{De repente} (yo) _ muy mal y me fui a casa.|sentirse|0|p|De repente + a sudden change.
+{Cuando éramos pequeños}, (nosotros) _ muchas tardes en el río.|pasar|3|i|How things used to be.
+{El jueves} (yo) _ una carta de mi banco.|recibir|0|p|El jueves = one specific day.
+{Cuando se rompió el coche}, (nosotros) _ de vacaciones.|ir|3|i|You were on the way when it broke down.
+{Todos los sábados} mi padre _ la bici por el parque.|montar|2|i|Todos los sábados marks a habit.
+{Esta mañana} mi hermana _ tarde otra vez.|llegar|2|p|Esta mañana = one finished event today.
+{Cuando entré}, todos _ a mi alrededor.|mirar|4|i|The entering is the event; what they were doing is the background.
+{Hace cinco años} (yo) _ a trabajar aquí.|empezar|0|p|Hace cinco años = a point in the past.
+(Yo) _ el último capítulo {cuando alguien llamó a la puerta}.|ver|0|i|You were in the middle of watching.
+{De niño}, Hugo _ siempre el último en salir.|ser|2|i|De niño describes how he used to be.
+{Anoche} (nosotros) _ mucho en la fiesta.|bailar|3|p|Anoche = one finished night.
+{Mientras} (yo) _ la maleta, mi marido buscaba los pasaportes.|hacer|0|i|Two actions in parallel.
+{Aquel día} el tren _ con mucho retraso.|llegar|2|p|Aquel día = one specific day. Arriving is the event.
+{Siempre} (tú) _ lo mismo en el desayuno.|pedir|1|i|Siempre marks a habit.
+{De repente} mis amigos _ por la puerta con una tarta.|entrar|4|p|De repente + a sudden event.
+{Cuando éramos novios}, (nosotros) _ por teléfono todos los días.|hablar|3|i|Cuando éramos novios + todos los días: a habit in that period.
+{El otro día} (yo) _ un libro que me encantó.|leer|0|p|El otro día = one occasion.
+{Antes} Rita _ en el campo con sus abuelos.|vivir|2|i|Antes sets up how things used to be.
+(Nosotros) _ la película {cuando se fue la luz}.|ver|3|i|The film was in progress when the power cut happened.
+{Ayer} (tú) me _ un mensaje muy gracioso.|mandar|1|p|Ayer + one finished action.
+{Anoche} (yo) _ muy mal.|dormir|0|p|Anoche = one finished night.
+{Cuando llegamos a la playa}, _ mucho viento.|hacer|2|i|Describing the weather when you arrived.
+{Hace una semana} mis vecinos _ de casa.|mudarse|4|p|Hace una semana = a point in the past: one event.
+{Todos los días} (yo) _ con mi perro por el parque.|pasear|0|i|Todos los días marks a habit.
+{Mientras} (tú) _, yo hice la cena.|ducharse|1|i|Your shower was in progress while I made dinner.
+{De pequeño}, mi hermano _ mucho miedo a los perros.|tener|2|i|De pequeño: how he was back then.
+{Anoche} (nosotros) _ por fin de la casa.|salir|3|p|Anoche + one finished event.
+{Por la tarde}, siempre (yo) _ un café con mi vecina.|tomar|0|i|Siempre marks a habit.
+{El domingo} (yo) _ con mis tíos en un restaurante.|comer|0|p|El domingo = one specific day.
+{Cuando llamaste}, (yo) _ en el supermercado.|estar|0|i|You were already there when the call came.
+{De repente} Nuria _ y se fue sin decir nada.|levantarse|2|p|De repente + a quick event.
+{Antes} (nosotros) _ más en familia.|salir|3|i|Antes sets up how things used to be.
+{Ayer} mis padres _ a Madrid en tren.|volver|4|p|Ayer + one finished trip.
+{Cuando llegué a la reunión}, todos _ ya sentados.|estar|4|i|Describing the situation when you arrived.
+{Hace dos meses} (tú) _ de ciudad, ¿no?|cambiar|1|p|Hace dos meses = a point in the past.
+{Mientras} los niños _, nosotros hablábamos en la cocina.|dormir|4|i|Two things happening at the same time.
+{Una vez} mi abuelo _ un oso en el monte.|ver|2|p|Una vez = a single occasion.
+{A los veinte años}, (yo) _ a vivir solo.|irse|0|p|A los veinte años = the moment it happened.
+{Cuando era pequeña}, (yo) _ en el colegio de mi barrio.|estudiar|0|i|Cuando era pequeña: how things used to be.
+{Ayer} mi jefe _ una buena noticia en la reunión.|dar|2|p|Ayer + a finished event.
+(Yo) _ el correo {cuando entró mi jefe}.|escribir|0|i|The writing was in progress when he came in.
+{Esta mañana} (nosotros) _ el sol desde el balcón.|ver|3|p|Esta mañana + a finished event.
+{Todos los inviernos} mis abuelos _ unos días en la montaña.|pasar|4|i|Todos los inviernos marks a habit.
+{De repente} (yo) _ el olor a quemado.|notar|0|p|De repente + a sudden perception.
+{Cuando era pequeño}, mi padre me _ al fútbol cada domingo.|llevar|2|i|Cada domingo: a habit.
+{El año pasado} Pablo _ su casa por mucho dinero.|vender|2|p|El año pasado = a finished time.
+{Mientras} (nosotros) _ en el tren, vimos un accidente.|viajar|3|i|The trip was in progress when we saw the accident.
+{Anoche} (yo) _ a mi hermana tres veces.|llamar|0|p|Tres veces = counted occasions: pretérito.
+{De niña}, (yo) _ siempre el postre antes de cenar.|pedir|0|i|De niña + siempre: a habit.
+{Hacía mucho sol} y (nosotros) _ en la terraza.|desayunar|3|i|The weather sets the scene.
+{Por fin} Teresa _ el valor de decírselo.|tener|2|p|Por fin = the moment she finally managed it.
+{Cuando sonó el teléfono}, (yo) _ en la ducha.|estar|0|i|You were already in the shower. The phone ringing is the event.
+{El verano pasado} (nosotros) _ en Mallorca una semana.|estar|3|p|One finished week: pretérito.
+{De joven}, (yo) _ siempre en moto.|ir|0|i|De joven + siempre: a habit.
+{Ayer} (tú) _ más café que de costumbre.|beber|1|p|Ayer + one finished day.
+{Siempre} mi tío _ chistes en las cenas de familia.|contar|2|i|Siempre marks a habit.
+{Ayer} (yo) _ una pizza congelada porque no tenía tiempo.|comer|0|p|Ayer + one finished action.
+{Anoche} mis vecinos _ una fiesta hasta las tres.|hacer|4|p|Anoche = one finished night.
+{El martes} (nosotros) _ en un bar nuevo del centro.|cenar|3|p|El martes = one specific day.
+{De repente} Alicia _ y todos nos callamos.|entrar|2|p|De repente + a sudden event.
+{Hace dos días} (tú) me _ por teléfono, ¿no?|llamar|1|p|Hace dos días = a point in the past.
+{Por fin} (yo) _ las vacaciones que quería.|tomar|0|p|Por fin = the moment it finally happened.
+{El otro día} Miguel _ una cosa muy graciosa.|decir|2|p|El otro día = one occasion.
+{Esta mañana} (yo) _ tarde al trabajo.|llegar|0|p|Esta mañana = one finished event today.
+{Ayer} mis padres _ de compras toda la tarde.|ir|4|p|Ayer + a finished stretch of time.
+{Una vez} (nosotros) _ a un famoso en un restaurante.|ver|3|p|Una vez = a single occasion.
+{El año pasado} (tú) _ de trabajo, ¿verdad?|cambiar|1|p|El año pasado = a finished, specific time.
+{Anoche} Lucía _ a su madre por videollamada.|llamar|2|p|Anoche = one finished night.
+{Cuando era pequeño}, (yo) _ siempre el mismo cuento.|pedir|0|i|Cuando era pequeño + siempre: a habit.
+{Mientras} (nosotros) _ el desayuno, sonó el teléfono.|preparar|3|i|Preparing breakfast was in progress when the phone rang.
+{Todos los domingos} mis tíos _ a comer a casa.|venir|4|i|Todos los domingos marks a habit.`;
+const REFL=["me","te","se","nos","se"];
+function cueWhy(cue,tense){
+  const c=cue.toLowerCase().replace(/[,.]/g,"").trim(), C=cue.replace(/[,.]/g,"").trim();
+  if(tense==="pret"){
+    if(/^una vez/.test(c)) return "Una vez means one single occasion, so the action is a completed event.";
+    if(/^(de repente|de pronto)/.test(c)) return "De repente introduces a sudden, one-off event.";
+    if(/^por fin/.test(c)) return "Por fin marks the moment something finally happened: a completed event.";
+    return `${C} points to a specific moment that is over, so this is a completed event.`;
+  }
+  if(/^mientras/.test(c)) return "Mientras sets up an action that was in progress, so it takes the imperfecto.";
+  if(/^(siempre|normalmente|a menudo|a veces|cada |todos? |todas? |los (lunes|martes|miércoles|jueves|viernes|sábados|domingos|fines)|por las (mañanas|tardes)|por la (mañana|tarde)|en (verano|invierno))/.test(c)) return `${C} marks a habit or something repeated, so it takes the imperfecto.`;
+  if(/^(antes|de (pequeñ|niñ|joven)|cuando (era|éramos|tenía|vivía|íbamos|estudiábamos)|en (aquella|esa|aquel|mi) |en su juventud|por aquel|entonces)/.test(c)) return `${C} describes how things used to be, so it takes the imperfecto.`;
+  if(/^(hacía|eran?|estaba|había|llovía)/.test(c)) return "Weather, time of day and scene-setting always take the imperfecto.";
+  if(/^cuando/.test(c)) return "The cuando clause only gives the time. What was going on around then is background, so it takes the imperfecto.";
+  return "Background, description or something in progress takes the imperfecto.";
+}
+function bankItems(txt,tense,r){
+  const out=txt.split("\n").filter(Boolean).map(line=>{
+    const [s0,inf0,p0,t0,why0]=line.split("|"), p=+p0, tn=t0?(t0==="p"?"pret":"imp"):tense, base=inf0.replace(/se$/,"");
+    let sent=s0; if(inf0.endsWith("se")&&!new RegExp("\\b(me|te|se|nos) _").test(sent)) sent=sent.replace("_",REFL[p]+" _");
+    const f=PFX(base), other=tn==="pret"?"imp":"pret", ans=f[tn][p], alt=f[other][p];
+    const it=parseHand([sent,base,ans,alt,tn,why0||cueWhy((sent.match(/\{([^}]+)\}/)||[,""])[1],tn)]);
+    it.p=p; it.refl=inf0.endsWith("se");
+    const extra=shuf([0,1,2,3,4].flatMap(q=>[f.pret[q],f.imp[q]]).filter(w=>w!==ans&&w!==alt),r);
+    const tw=[ans,alt]; for(const w of extra){ if(tw.length<4&&!tw.includes(w)) tw.push(w) }
+    it.tileWords=tw; return it;
+  });
+  return out;
+}
 const POOL={
   pron:{do:genPron("do",DAYS*10,101),io:genPron("io",DAYS*10,202),both:genPron("both",DAYS*5,303)},
-  past:{pret:genPast("pret",DAYS*10,404),imp:genPast("imp",DAYS*10,505),mix:[]}
+  past:{pret:shuf(bankItems(BANK_PRET,"pret",rng(41)),rng(404)),imp:shuf(bankItems(BANK_IMP,"imp",rng(42)),rng(505)),mix:[]}
 };
-(()=>{ // mixed past: hand-written sentences spread over the days, the rest generated
-  const r=rng(606), hand=HAND.map(parseHand), gp=genPast("pret",DAYS*5,707,true), gi=genPast("imp",DAYS*5,808,true);
-  let a=0,b=0;
+(()=>{ // mixed past: realistic sentences where the clue alone decides the tense, five a day (2–3 of each tense)
+  const r=rng(606), key=it=>JSON.stringify(it.tokens), used=new Set([...POOL.past.pret,...POOL.past.imp].map(key));
+  const all=shuf([...HAND.map(parseHand),...bankItems(BANK_MIX,"pret",rng(43))],r).filter(it=>{const k=key(it); if(used.has(k)) return false; used.add(k); return true});
+  const P=all.filter(i=>i.tense==="pret"), I=all.filter(i=>i.tense==="imp");
   for(let d=0;d<DAYS;d++){
-    const day=hand.filter((_,i)=>i%DAYS===d);
-    while(day.length<5) day.push((day.length+d)%2?gp[a++]:gi[b++]);
-    POOL.past.mix.push(...shuf(day,r));
+    const want=d%2?3:2, day=[];
+    for(let k=0;k<5;k++){const src=(k<want?P.length:I.length)?(k<want?P:I):(P.length?P:I); day.push(src.shift())}
+    POOL.past.mix.push(...shuf(day.filter(Boolean),r));
   }
 })();
 const ADV=ADV_SRC.map(parseAdv);
@@ -1176,7 +1955,7 @@ function renderPast(item,mode,hl,slot){
     for(let i=0;i<ws.length;i++){let w=ws[i]; while(DET.has(w.toLowerCase())&&i+1<ws.length) w+=" "+ws[++i]; out.push(w)}
     return out.map(w=>`<div class="w"><span class="t${subj||/^\([a-záéíóúñ\/ ]+\)$/i.test(w)?" subj":""}">${esc(w)}</span></div>`).join("")};
   return `<div class="sentence">${item.tokens.map((tk,ti)=>{
-    if(typeof tk==="string") return words(tk,item.p!=null&&ti===1);
+    if(typeof tk==="string") return words(tk,item.subjTok===ti);
     const suf=esc(tk.suf||"");
     if(tk.trig){
       if(mode==="top") return `<div class="w"><span class="t"><span class="chip ${item.tense}" data-from="${item.tense}">${esc(tk.trig)}</span>${suf}</span></div>`;
@@ -1234,6 +2013,7 @@ function renderQ(restore){
   const prompt=(isPast?(info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(PPROMPT[info.key]||PPROMPT.two))+` <span class="tapnote">Tap any word for its meaning.</span>`;
   $("drill").innerHTML=`
     <div class="meta"><span class="pill ${info.pillCls}">${esc(info.pill)}</span>${info.counter}</div>
+    <div class="qpush" aria-hidden="true"></div>
     ${q}
     <p class="prompt">${prompt}</p>
     ${m==="tiles"
@@ -1669,18 +2449,7 @@ function showGapGloss(el){
   glossEl=d; glossFor=el;
 }
 // ================= easy stories: tap pretérito or imperfecto, one sentence at a time =================
-const XF={ser:{pret:["fui","fuiste","fue","fuimos","fueron"],imp:["era","eras","era","éramos","eran"]},
- haber:{pret:["hubo","hubo","hubo","hubo","hubo"],imp:["había","había","había","había","había"]},
- "reír":{pret:["reí","reíste","rió","reímos","rieron"],imp:["reía","reías","reía","reíamos","reían"]},
- morir:{pret:["morí","moriste","murió","morimos","murieron"],imp:["moría","morías","moría","moríamos","morían"]},
- detener:{pret:["detuve","detuviste","detuvo","detuvimos","detuvieron"],imp:["detenía","detenías","detenía","deteníamos","detenían"]},
- "oír":{pret:["oí","oíste","oyó","oímos","oyeron"],imp:["oía","oías","oía","oíamos","oían"]},
- querer:{pret:["quise","quisiste","quiso","quisimos","quisieron"],imp:["quería","querías","quería","queríamos","querían"]},
- saber:{pret:["supe","supiste","supo","supimos","supieron"],imp:["sabía","sabías","sabía","sabíamos","sabían"]},
- servir:{pret:["serví","serviste","sirvió","servimos","sirvieron"],imp:["servía","servías","servía","servíamos","servían"]},
- tocar:{pret:["toqué","tocaste","tocó","tocamos","tocaron"],imp:["tocaba","tocabas","tocaba","tocábamos","tocaban"]},
- llover:{pret:["llovió","llovió","llovió","llovió","llovió"],imp:["llovía","llovía","llovía","llovía","llovía"]}};
-const PFX=inf=>XF[inf]||pastForms(inf);
+
 // who is doing the action, where yo and él share the same imperfecto form (0 = yo, 2 = él/ella)
 const EASY_P={p1:{1:2,4:2},p2:{0:0,1:0,3:2},p3:{1:0,2:2,5:2,6:2,7:2,9:2},p4:{1:2},p5:{0:0,1:0,3:0,5:0,7:2},p6:{1:2,2:2,4:2,5:2,6:2,7:0},p7:{1:0,2:0,4:2},p8:{0:2,1:2,2:2,3:2,4:2,5:2},p9:{1:2},p10:{1:0,2:0,3:0,4:0},p11:{1:2,2:2,6:2},p12:{1:2},p13:{1:2,3:2,4:2},p14:{1:2,2:0,3:0},p15:{2:2,3:2},p16:{1:2,2:2,3:2,8:2}};
 function easyCards(st){
