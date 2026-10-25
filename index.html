@@ -65,6 +65,12 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,1
 .tag{font-size:.64rem;letter-spacing:.04em;text-transform:uppercase;font-weight:600;white-space:nowrap}
 .tag.do{color:var(--do)} .tag.io{color:var(--io)} .tag.pret{color:var(--pret)} .tag.imp{color:var(--imp)}
 .w.pw .t{padding-top:clamp(6px,1.2vh,10px)}
+.w .t.subj{font-size:clamp(.88rem,2.1vh,1rem);font-style:italic;color:var(--muted);padding-top:clamp(5px,1.4vh,9px)}
+.slot{vertical-align:middle;transition:background .15s,border-color .15s}
+.slot.empty::before{content:attr(data-ph)}
+.slot:not(.empty){border-style:solid;border-color:transparent;padding:0;background:none}
+.slot .tile{font-style:normal;font-size:inherit;padding:0 10px;border-radius:8px;border-bottom-width:2px;cursor:grab}
+.slot.over{border-color:var(--cc);background:var(--tile)}
 .blank{display:inline-block;border:1.5px dashed var(--muted);border-radius:8px;padding:0 10px;color:var(--muted);font-style:italic;font-weight:500}
 .trigq{border-bottom:2px dotted var(--muted)}
 .prompt{margin:0;font-weight:600;font-size:.95rem}
@@ -372,7 +378,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:13</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:24</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -456,7 +462,7 @@ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function shuf(a,r=Math.random){for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const pick=(a,r)=>a[Math.floor(r()*a.length)];
-const DAYS=14;
+const DAYS=30;
 const P=["yo","tú","él/ella","nosotros","ellos/ellas"];
 const NAMES=new Set(["Ana","Pedro","Elena","María","Carlos","Lucía","Lima","Portugal","Madrid"]);
 const SUBJ_S=["Ana","Pedro","Mi madre","Elena"], SUBJ_P=["Mis padres","Ellos","Mis compañeros","Ellas"];
@@ -661,7 +667,29 @@ const HAND=[
   ["{Ayer} _ mucho frío.","hacer","hizo","hacía","pret","Ayer is a specific, finished day, so hizo sums it up.",[["hacía","Also correct. Hacía describes what the weather was like yesterday; hizo sums it up as a finished fact. Both are natural."]]],
   ["{Cuando era pequeño}, (yo) _ ser piloto.","querer","quería","quise","imp","Cuando era pequeño describes a past period: how things used to be."],
   ["El concierto _ a las nueve {y terminó a las doce}.","empezar","empezó","empezaba","pret","A sequence of completed events: it started, then it finished."],
-  ["{Mientras} (nosotros) _, alguien llamó a la puerta.","cenar","cenábamos","cenamos","imp","Dinner was in progress when someone knocked.",[["estábamos cenando",PROG]]]
+  ["{Mientras} (nosotros) _, alguien llamó a la puerta.","cenar","cenábamos","cenamos","imp","Dinner was in progress when someone knocked.",[["estábamos cenando",PROG]]],
+  ["{Mientras} el médico _ a Pedro, la enfermera preparaba las medicinas.","examinar","examinaba","examinó","imp","Two actions going on in parallel: both imperfecto.",[["estaba examinando",PROG]]],
+  ["{Ayer} (nosotros) _ al cine con Ana.","ir","fuimos","íbamos","pret","Ayer + a finished outing: one completed event."],
+  ["{Todos los veranos} (nosotros) _ a la playa.","ir","íbamos","fuimos","imp","Todos los veranos marks a repeated habit."],
+  ["Mi madre _ los platos {cuando sonó el timbre}.","lavar","lavaba","lavó","imp","The washing was in progress. The doorbell is the interruption.",[["estaba lavando",PROG]]],
+  ["{De repente}, el perro _ a ladrar.","empezar","empezó","empezaba","pret","De repente = a sudden single event."],
+  ["{Cuando} (yo) _ niño, tenía miedo a la oscuridad.","ser","era","fui","imp","Cuando era niño describes a stage of life, so the imperfecto."],
+  ["{Ayer} Carmen _ una carta a su hermana.","escribir","escribió","escribía","pret","Ayer + a completed action."],
+  ["{Mientras} (tú) _ la ensalada, yo ponía la mesa.","preparar","preparabas","preparaste","imp","Two actions at the same time: both imperfecto.",[["estabas preparando",PROG]]],
+  ["(Nosotros) _ a Sevilla {el año pasado}.","viajar","viajamos","viajábamos","pret","El año pasado is a finished, specific time."],
+  ["{Eran las ocho} y los niños todavía _.","dormir","dormían","durmieron","imp","The time sets the scene, and the children were still asleep: a situation in progress.",[["estaban durmiendo",PROG]]],
+  ["{Anoche} (yo) _ muy mal.","dormir","dormí","dormía","pret","Anoche = one finished night: pretérito."],
+  ["Mi vecino {siempre} _ la música muy alta.","poner","ponía","puso","imp","Siempre marks a habit."],
+  ["{Cuando} (nosotros) _ al restaurante, ya no quedaban mesas.","llegar","llegamos","llegábamos","pret","Arriving is one finished event. Ya no quedaban mesas describes the situation."],
+  ["{Hacía mucho viento} y (yo) _ frío.","tener","tenía","tuve","imp","Weather and physical sensations in a scene take the imperfecto."],
+  ["{Una vez}, mi hermano _ un pez enorme.","pescar","pescó","pescaba","pret","Una vez = a single occasion."],
+  ["{De niña}, Lucía _ en el patio con sus primos todos los días.","jugar","jugaba","jugó","imp","De niña describes a past period of life: how things used to be."],
+  ["{Ayer} (tú) _ tarde a la reunión.","llegar","llegaste","llegabas","pret","Ayer + one arrival: pretérito."],
+  ["(Yo) _ al fútbol {cuando era joven}.","jugar","jugaba","jugué","imp","Cuando era joven: a habit from a period of life."],
+  ["{Mientras} (nosotros) _ a casa, empezó a llover.","volver","volvíamos","volvimos","imp","The trip home was in progress when the rain began.",[["estábamos volviendo",PROG]]],
+  ["{Esa noche} (yo) _ una pesadilla horrible.","tener","tuve","tenía","pret","Esa noche = one specific night: having a nightmare is an event."],
+  ["{Antes}, mi abuelo _ el periódico cada mañana.","leer","leía","leyó","imp","Antes + cada mañana: a past habit."],
+  ["{Ayer} (ellos) _ la casa en dos horas.","limpiar","limpiaron","limpiaban","pret","Ayer + en dos horas: a finished action with a clear end."]
 ];
 // meaning-change verbs and "always" cases, used in the endless drill
 const HAND2=[
@@ -734,7 +762,7 @@ function parseHand([s,inf,ans,alt,tense,why,alsoOk=[]]){
     extra:alsoOk.map(([a,nt])=>({raw:plain(a),note:nt})),altOk:alsoOk.some(a=>plain(a[0])===plain(alt))};
 }
 
-// ================= courses + 14-day pools =================
+// ================= courses + 30-day pools =================
 const COURSES={
   pron:{name:"Object pronouns",short:"Pronouns",sub:"lo · la · le · les · se",cc:"do",parts:[
     {key:"do",n:10,name:"Direct objects",pill:"Part 1 · Direct",rule:`Replace <b class="do-t">what</b> is acted on with <b class="do-t">lo · la · los · las</b>. Match the noun’s gender and number.`,ex:"Compro las flores → Las compro"},
@@ -750,7 +778,7 @@ const POOL={
   pron:{do:genPron("do",DAYS*10,101),io:genPron("io",DAYS*10,202),both:genPron("both",DAYS*5,303)},
   past:{pret:genPast("pret",DAYS*10,404),imp:genPast("imp",DAYS*10,505),mix:[]}
 };
-(()=>{ // mixed past: hand-written sentences spread over the 14 days, the rest generated
+(()=>{ // mixed past: hand-written sentences spread over the days, the rest generated
   const r=rng(606), hand=HAND.map(parseHand), gp=genPast("pret",DAYS*5,707,true), gi=genPast("imp",DAYS*5,808,true);
   let a=0,b=0;
   for(let d=0;d<DAYS;d++){
@@ -1075,7 +1103,7 @@ function renderCourse(c){
     :`<div><h2 class="hello">${C.name}</h2><p class="sub">${Object.keys(D.done).length} of ${DAYS} days complete${has(tk)?" · done today ✓":""}</p></div>`;
   $("drill").innerHTML=`
     ${head}
-    <div><p class="label" style="margin-bottom:8px">14-day programme · tap a day</p><div class="days14">${grid}</div></div>
+    <div><p class="label" style="margin-bottom:8px">${DAYS}-day programme · tap a day</p><div class="days14">${grid}</div></div>
     <div class="plan"><p class="label">Day ${selDay}${sel?` · best result`:" · plan"}</p>${plan}</div>
     <div><p class="label" style="margin-bottom:8px">This week</p>${weekHTML(ring)}</div>
     <div class="stats">
@@ -1139,14 +1167,15 @@ function renderShort(item){
       :`<div class="w"><span class="t">${esc(t)}</span></div>`}).join("")}</div>`;
 }
 // past sentences. mode: q (question), top (feedback: clue coloured), bottom (feedback: answer filled in)
-function renderPast(item,mode,hl){
+function renderPast(item,mode,hl,slot){
   // keep an article with its noun (la tele), so tapping gives the noun, not the pronoun
   const DET=new Set(["el","la","los","las","un","una","unos","unas","al","del","mi","mis","tu","tus","su","sus"]);
-  const words=s=>{const ws=s.split(" ").filter(Boolean), out=[];
+  // the subject (yo, nosotros, mi madre…) is shown small and in italics so the eye goes to the verb
+  const words=(s,subj)=>{const ws=s.split(" ").filter(Boolean), out=[];
     for(let i=0;i<ws.length;i++){let w=ws[i]; while(DET.has(w.toLowerCase())&&i+1<ws.length) w+=" "+ws[++i]; out.push(w)}
-    return out.map(w=>`<div class="w"><span class="t">${esc(w)}</span></div>`).join("")};
-  return `<div class="sentence">${item.tokens.map(tk=>{
-    if(typeof tk==="string") return words(tk);
+    return out.map(w=>`<div class="w"><span class="t${subj||/^\([a-záéíóúñ\/ ]+\)$/i.test(w)?" subj":""}">${esc(w)}</span></div>`).join("")};
+  return `<div class="sentence">${item.tokens.map((tk,ti)=>{
+    if(typeof tk==="string") return words(tk,item.p!=null&&ti===1);
     const suf=esc(tk.suf||"");
     if(tk.trig){
       if(mode==="top") return `<div class="w"><span class="t"><span class="chip ${item.tense}" data-from="${item.tense}">${esc(tk.trig)}</span>${suf}</span></div>`;
@@ -1156,6 +1185,7 @@ function renderPast(item,mode,hl){
     }
     if(mode==="bottom"||mode==="done") return `<div class="w"><span class="t"><span class="chip ${item.tense}" data-to="${item.tense}">${esc(item.ans)}</span>${suf}</span><span class="tag ${item.tense}">${item.p!=null?P[item.p]:esc(item.inf)}</span></div>`;
     if(mode==="top") return `<div class="w"><span class="t"><span class="blank">___</span>${suf}</span></div>`;
+    if(slot) return `<div class="w"><span class="t"><span class="blank slot empty" id="answer" data-ph="${esc(item.inf)}" aria-label="Your answer"></span>${suf}</span></div>`;
     return `<div class="w"><span class="t"><span class="blank">${esc(item.inf)}</span>${suf}</span></div>`;
   }).join("")}</div>`;
 }
@@ -1197,7 +1227,8 @@ function renderQ(restore){
     info={key:c.k,pillCls:c.pill,pill:c.label,counter:`<span class="streakchip${drill.streak>=5?" hot":""}">streak ${drill.streak}${cb>1?` · combo ×${cb}`:""}</span>`}}
   else{const pt=parts()[part]; info={key:pt.key,pillCls:pt.key,pill:pt.pill,counter:`<span class="label">${pos-partStart(part)+1} / ${pt.n}</span>`}}
   const isPast=item.kind==="past";
-  const q=isPast?renderPast(item,"q",info.key!=="mix"):renderFull(item.full,S.view==="pics"?"pics":"tags");
+  const inSlot=isPast&&m==="tiles";
+  const q=isPast?renderPast(item,"q",info.key!=="mix",inSlot):renderFull(item.full,S.view==="pics"?"pics":"tags");
   const PPROMPT={do:"Replace the <b class=\"do-t\">direct object</b> with a pronoun:",io:"Replace the <b class=\"io-t\">indirect object</b> with a pronoun:",both:"Replace <b>both objects</b> with pronouns:",two:"Replace the objects with pronouns:"};
   const prompt=(isPast?(info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(PPROMPT[info.key]||PPROMPT.two))+` <span class="tapnote">Tap any word for its meaning.</span>`;
   $("drill").innerHTML=`
@@ -1205,7 +1236,7 @@ function renderQ(restore){
     ${q}
     <p class="prompt">${prompt}</p>
     ${m==="tiles"
-      ?`<div class="answer empty" id="answer" data-ph="${isPast?"Tap the right form":"Drag or tap words here"}" aria-label="Your answer"></div><div class="bank" id="bank"></div>`
+      ?`${inSlot?"":`<div class="answer empty" id="answer" data-ph="Drag or tap words here" aria-label="Your answer"></div>`}<div class="bank" id="bank"></div>`
       :`<form id="f" autocomplete="off" onsubmit="return false"><div id="ans" ${FIELD_ATTRS} enterkeyhint="done" data-ph="${isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></div></form>`}
     <p class="hint" id="hint" hidden>${hintText(item)}</p>`;
   $("actions").innerHTML=`<button class="ghost" type="button" id="hintBtn">Hint</button><button class="ghost" type="button" id="skip">Answer</button><button type="button" class="grow" id="checkBtn" ${m==="tiles"?"disabled":""}>Check</button>`;
@@ -1259,16 +1290,17 @@ function bindTile(el){
       if(!fl){tap(id,inAns);return}
       fl.remove();
       if(inside(ansEl,ev.clientX,ev.clientY)){
-        built=built.filter(x=>x!==id);
-        built.splice(insertIndex(ansEl,ev.clientX,ev.clientY,id),0,id);
+        if(oneSlot()) built=[id];
+        else{built=built.filter(x=>x!==id); built.splice(insertIndex(ansEl,ev.clientX,ev.clientY,id),0,id)}
       }else if(inAns){built=built.filter(x=>x!==id)}
       drawTiles();
     };
     window.addEventListener("pointermove",move); window.addEventListener("pointerup",up); window.addEventListener("pointercancel",up);
   });
 }
-function tap(id,inAns){if(answered)return;built=inAns?built.filter(x=>x!==id):built.concat(id);drawTiles()}
-function inside(el,x,y){const r=el.getBoundingClientRect();return x>=r.left-10&&x<=r.right+10&&y>=r.top-14&&y<=r.bottom+14}
+const oneSlot=()=>cur().item.kind==="past";
+function tap(id,inAns){if(answered)return;built=inAns?built.filter(x=>x!==id):(oneSlot()?[id]:built.concat(id));drawTiles()}
+function inside(el,x,y){const r=el.getBoundingClientRect(), px=el.classList.contains("slot")?30:10, py=el.classList.contains("slot")?30:14;return x>=r.left-px&&x<=r.right+px&&y>=r.top-py&&y<=r.bottom+py}
 function insertIndex(ansEl,x,y,dragId){
   const els=[...ansEl.querySelectorAll(".tile")].filter(t=>+t.dataset.id!==dragId);
   for(let i=0;i<els.length;i++){const r=els[i].getBoundingClientRect();
