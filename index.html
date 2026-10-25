@@ -259,6 +259,9 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .opt:disabled{cursor:default}
 .enote{font-size:.85rem;line-height:1.4;color:var(--muted);display:flex;flex-direction:column;gap:3px;margin-top:6px}
 .enote:empty{display:none}
+.bad-t{color:var(--bad)}
+.enext{display:block;width:100%;margin-top:10px;font:inherit;font-size:.95rem;font-weight:600;padding:9px 14px;line-height:1.3;border-radius:11px;border:1.5px solid var(--pret);background:var(--pret);color:#fff;cursor:pointer}
+.enext:active{transform:translateY(1px)}
 .enote div{display:flex;gap:8px;align-items:baseline}
 .composer{display:flex;flex-direction:column;gap:6px;width:100%}
 .cmeta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.85rem;color:var(--muted)}
@@ -369,7 +372,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:05</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:13</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -985,6 +988,33 @@ function chrome(){
 }
 $("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else renderMenu()};
 $("quit").onclick=()=>{if(screen==="dq"){endDrill();return} justDone=null;renderCourse(course)};
+// swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
+(function(){
+  let sx=0,sy=0,on=false,dx=0,cue=null;
+  const goBack=()=>{
+    const ov=$("ov"); if(ov&&!ov.hidden){$("closeOv").click();return}
+    if(!$("quit").hidden){$("quit").click();return}
+    if(!$("backBtn").hidden) $("backBtn").click();
+  };
+  const mkCue=()=>{cue=document.createElement("div");cue.setAttribute("aria-hidden","true");
+    cue.style.cssText="position:fixed;left:0;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;opacity:0;pointer-events:none;z-index:99;transform:translateX(-50px);will-change:transform,opacity";
+    cue.textContent="‹";document.body.appendChild(cue)};
+  document.addEventListener("touchstart",e=>{
+    const t=e.touches[0]; on=e.touches.length===1&&t.clientX<=26; if(!on) return;
+    sx=t.clientX; sy=t.clientY; dx=0; if(!cue) mkCue();
+  },{passive:true});
+  document.addEventListener("touchmove",e=>{
+    if(!on) return; const t=e.touches[0]; dx=t.clientX-sx; const dy=Math.abs(t.clientY-sy);
+    if(dy>Math.max(40,dx*0.8)&&dx<30){on=false; cue.style.opacity=0; return}
+    const k=Math.max(0,Math.min(dx,90)); cue.style.opacity=Math.min(1,k/60);
+    cue.style.transform=`translateX(${-50+k*0.9}px)`;
+  },{passive:true});
+  const end=fire=>{ if(!on) return; on=false;
+    if(cue){cue.style.transition="transform .2s,opacity .2s";cue.style.opacity=0;cue.style.transform="translateX(-50px)";setTimeout(()=>{if(cue)cue.style.transition=""},220)}
+    if(fire&&dx>70){haptic(10);goBack()} };
+  document.addEventListener("touchend",()=>end(true),{passive:true});
+  document.addEventListener("touchcancel",()=>end(false),{passive:true});
+})();
 
 function weekHTML(ringFor){
   const tk=todayKey();
@@ -1630,21 +1660,193 @@ function easyCards(st){
 // ================= tap-mode stories: everyday spoken Spanish, written for this app =================
 // gap: {right|other:p or i:infinitive} — right is the natural verb; add ":both" when either tense reads naturally
 const TAP_STORIES=[
- {id:"t1",title:"Un día de lluvia",en:"The bus that never came",text:`Ayer {salí|salía:p:salir} de casa tarde. Mi hermana {estaba|estuvo:i:estar} en el baño y {tardaba|tardó:i:tardar} una eternidad. Total, que cuando por fin {llegué|llegaba:p:llegar} a la parada, {llovía|llovió:i:llover} a cántaros y no {había|hubo:i:haber} nadie. Yo {esperaba|esperé:i:esperar} y {miraba|miré:i:mirar} el reloj cada dos minutos. De repente, un señor me {dijo|decía:p:decir}: “Hoy no hay autobuses, hay huelga”. ¡Qué rabia! {Saqué|Sacaba:p:sacar} el móvil y {pedí|pedía:p:pedir} un taxi. El taxista {era|fue:i:ser} muy simpático y {hablaba|habló:i:hablar} de fútbol todo el camino. {Llegué|Llegaba:p:llegar} a la oficina una hora tarde, pero mi jefe todavía no {estaba|estuvo:i:estar} allí. ¡Menuda suerte!`},
- {id:"t2",title:"La sorpresa",en:"A birthday nobody forgot",text:`Marta {estaba|estuvo:i:estar} triste porque nadie le {escribió|escribía:p:escribir} por su cumpleaños. A las ocho {decidió|decidía:p:decidir} ir a casa de su prima. Cuando {abrió|abría:p:abrir} la puerta, {oyó|oía:p:oír} un grito: “¡Sorpresa!”. Toda la familia {estaba|estuvo:i:estar} allí y su novio {tenía|tuvo:i:tener} una tarta enorme en las manos. Marta {lloró|lloraba:p:llorar} de la emoción. Después todos {cantaron|cantaban:p:cantar} y {bailaron|bailaban:p:bailar} hasta las dos de la mañana.`},
+ {id:"t1",title:"Un día de lluvia",en:"The bus that never came",text:`Ayer {salí|salía:p:salir} de casa tarde. Mi hermana {estaba|estuvo:i:estar} en el baño y {tardaba|tardó:i:tardar:both} una eternidad. Total, que cuando por fin {llegué|llegaba:p:llegar} a la parada, {llovía|llovió:i:llover} a cántaros y no {había|hubo:i:haber} nadie. Yo {esperaba|esperé:i:esperar} y {miraba|miré:i:mirar} el reloj cada dos minutos. De repente, un señor me {dijo|decía:p:decir}: “Hoy no hay autobuses, hay huelga”. ¡Qué rabia! {Saqué|Sacaba:p:sacar} el móvil y {pedí|pedía:p:pedir} un taxi. El taxista {era|fue:i:ser} muy simpático y {hablaba|habló:i:hablar:both} de fútbol todo el camino. {Llegué|Llegaba:p:llegar} a la oficina una hora tarde, pero mi jefe todavía no {estaba|estuvo:i:estar} allí. ¡Menuda suerte!`},
+ {id:"t2",title:"La sorpresa",en:"A birthday nobody forgot",text:`Marta {estaba|estuvo:i:estar} triste porque nadie le {escribió|escribía:p:escribir} por su cumpleaños. A las ocho {decidió|decidía:p:decidir} ir a casa de su prima. Cuando {abrió|abría:p:abrir} la puerta, {oyó|oía:p:oír} un grito: “¡Sorpresa!”. Toda la familia {estaba|estuvo:i:estar} allí y su novio {tenía|tuvo:i:tener} una tarta enorme en las manos. Marta {lloró|lloraba:p:llorar:both} de la emoción. Después todos {cantaron|cantaban:p:cantar} “Cumpleaños feliz” y {comieron|comían:p:comer} tarta.`},
  {id:"t3",title:"El móvil perdido",en:"Where is my phone?!",text:`{Estaba|Estuve:i:estar} en el metro cuando de repente {noté|notaba:p:notar} que no {tenía|tuve:i:tener} el móvil. Primero {pensé|pensaba:p:pensar} que {estaba|estuvo:i:estar} en la mochila, pero no. Entonces {recordé|recordaba:p:recordar}: ¡la cafetería! {Corrí|Corría:p:correr} hasta allí. Cuando {llegué|llegaba:p:llegar}, el camarero {limpiaba|limpió:i:limpiar} las mesas y {tenía|tuvo:i:tener} mi móvil en la mano. “¿Buscas esto?”, me {preguntó|preguntaba:p:preguntar}. ¡Mi móvil! Le {di|daba:p:dar} las gracias tres veces y le {compré|compraba:p:comprar} un café.`},
- {id:"t4",title:"El gato en el árbol",en:"Neighbours, firefighters and a very angry cat",text:`{Eran|Fueron:i:ser} las siete de la tarde y {hacía|hizo:i:hacer} fresco. Mi vecina {lloraba|lloró:i:llorar} porque su gato {estaba|estuvo:i:estar} en lo alto de un árbol y no {podía|pudo:i:poder} bajar. Yo {salí|salía:p:salir} con una escalera, pero {era|fue:i:ser} demasiado corta. Entonces {llamamos|llamábamos:p:llamar} a los bomberos. {Llegaron|Llegaban:p:llegar} en diez minutos. Un bombero {subió|subía:p:subir} al árbol y {bajó|bajaba:p:bajar} con el gato en los brazos. El gato lo {miró|miraba:p:mirar} un segundo y le {dio|daba:p:dar} un arañazo. Todos {nos reímos|nos reíamos:p:reírse}.`},
+ {id:"t4",title:"El gato en el árbol",en:"Neighbours, firefighters and a very angry cat",text:`{Eran|Fueron:i:ser} las siete de la tarde y {hacía|hizo:i:hacer} fresco. Mi vecina {lloraba|lloró:i:llorar} porque su gato {estaba|estuvo:i:estar} en lo alto de un árbol y no {podía|pudo:i:poder} bajar. Yo {salí|salía:p:salir} con una escalera, pero {era|fue:i:ser} demasiado corta. Entonces {llamamos|llamábamos:p:llamar} a los bomberos. {Llegaron|Llegaban:p:llegar} en diez minutos. Un bombero {subió|subía:p:subir} al árbol y {bajó|bajaba:p:bajar} con el gato en los brazos. El gato lo {miró|miraba:p:mirar} un segundo y le {dio|daba:p:dar} un arañazo. Todos {nos reímos|nos reíamos:p:reírse:both}.`},
  {id:"t5",title:"Veranos en el pueblo",en:"Childhood summers at grandma's",text:`Cuando yo {era|fui:i:ser} pequeño, {pasaba|pasé:i:pasar} todos los veranos en el pueblo de mi abuela. Cada mañana {me levantaba|me levanté:i:levantarse} temprano y {desayunaba|desayuné:i:desayunar} pan con tomate. Por la tarde {jugaba|jugué:i:jugar} al fútbol con mis primos en la plaza. Un día, la pelota {rompió|rompía:p:romper} la ventana del bar. ¡Todos {salimos|salíamos:p:salir} corriendo! Pero el dueño nos {vio|veía:p:ver} y nos {llamó|llamaba:p:llamar}. Mi abuela {pagó|pagaba:p:pagar} la ventana y esa noche no nos {dejó|dejaba:p:dejar} ver la tele.`},
  {id:"t6",title:"Una noche sin luz",en:"Power cut, cards and a secret",text:`Mi hermano y yo {veíamos|vimos:i:ver} una serie cuando, de repente, {se fue|se iba:p:irse} la luz. Todo {estaba|estuvo:i:estar} oscuro y {había|hubo:i:haber} mucho silencio. Mi hermano {buscó|buscaba:p:buscar} una vela en la cocina, pero no {encontró|encontraba:p:encontrar} ninguna. Entonces {usamos|usábamos:p:usar} la linterna del móvil. Mientras {jugábamos|jugamos:i:jugar} a las cartas, mi hermano me {contó|contaba:p:contar} un secreto enorme. Cuando la luz {volvió|volvía:p:volver}, {eran|fueron:i:ser} las doce y él ya {dormía|durmió:i:dormir} en el sofá.`},
  {id:"t7",title:"Mi primer día en Madrid",en:"New city, new flatmate",text:`Cuando {llegué|llegaba:p:llegar} a Madrid, {hacía|hizo:i:hacer} un calor terrible y yo no {conocía|conocí:i:conocer} a nadie. Mi piso {estaba|estuvo:i:estar} en un barrio muy tranquilo y mi compañero de piso {se llamaba|se llamó:i:llamarse} Iván. Esa noche Iván me {invitó|invitaba:p:invitar} a cenar y {pedimos|pedíamos:p:pedir} una pizza enorme. Mientras {comíamos|comimos:i:comer}, él me {contaba|contó:i:contar} todo sobre el barrio. Yo no {entendía|entendí:i:entender} la mitad porque {hablaba|habló:i:hablar} muy rápido. Al final {me quedé|me quedaba:p:quedarse} dormido en el sofá.`},
  {id:"t8",title:"El restaurante nuevo",en:"Tacos, noise and free dessert",text:`El viernes mis amigos y yo {fuimos|íbamos:p:ir} a un restaurante nuevo. {Había|Hubo:i:haber} mucha gente y la música {estaba|estuvo:i:estar} muy alta. El camarero nos {dio|daba:p:dar} una mesa al lado de la cocina. {Pedimos|Pedíamos:p:pedir} tacos para todos. La comida {olía|olió:i:oler} genial, pero {tardó|tardaba:p:tardar} cuarenta minutos. Cuando por fin {llegó|llegaba:p:llegar}, {estaba|estuvo:i:estar} fría. Mi amigo Luis se lo {dijo|decía:p:decir} al camarero y el chico nos {trajo|traía:p:traer} el postre gratis.`},
  {id:"t9",title:"El perro del vecino",en:"Churro and the sausage",text:`Mi vecino {tenía|tuvo:i:tener} un perro enorme que se {llamaba|llamó:i:llamarse} Churro, y Churro siempre {robaba|robó:i:robar} cosas: calcetines, zapatos, de todo. Un domingo {hicimos|hacíamos:p:hacer} una barbacoa en el jardín. Yo {ponía|puse:i:poner} la mesa cuando {oí|oía:p:oír} un ruido. {Miré|Miraba:p:mirar} y lo {vi|veía:p:ver}: Churro {tenía|tuvo:i:tener} todos los chorizos en la boca. ¡{Salí|Salía:p:salir} corriendo detrás de él! Pero {era|fue:i:ser} muy rápido. Mi vecino se {rió|reía:p:reírse} muchísimo y esa noche todos {comimos|comíamos:p:comer} ensalada.`},
  {id:"t10",title:"Mi abuelo y la guitarra",en:"Three chords and a lesson",text:`Mi abuelo {tocaba|tocó:i:tocar} la guitarra todas las noches. {Se sentaba|Se sentó:i:sentarse} en el balcón, {cerraba|cerró:i:cerrar} los ojos y {cantaba|cantó:i:cantar} canciones de su pueblo. Yo {tenía|tuve:i:tener} diez años y no me {gustaba|gustó:i:gustar} esa música. Pero un día él me {regaló|regalaba:p:regalar} una guitarra pequeña y me {enseñó|enseñaba:p:enseñar} tres acordes. Esa noche {toqué|tocaba:p:tocar} con él por primera vez. Hoy toco su guitarra y pienso mucho en él.`},
- {id:"t11",title:"Una cita desastrosa",en:"The worst (best?) date ever",text:`Con Pablo {quedé|quedaba:p:quedar} a las nueve en un restaurante italiano. Yo {estaba|estuve:i:estar} muy nerviosa y {llevaba|llevé:i:llevar} mi vestido favorito. Él {llegó|llegaba:p:llegar} media hora tarde y ni siquiera {pidió|pedía:p:pedir} perdón. Mientras {cenábamos|cenamos:i:cenar}, no {dejaba|dejó:i:dejar} de mirar el móvil. De repente, un camarero {tiró|tiraba:p:tirar} una copa de vino encima de Pablo. ¡Qué momento! Yo {intentaba|intenté:i:intentar} no reírme, pero no {pude|podía:p:poder}. Pablo {se fue|se iba:p:irse} sin decir nada y yo {terminé|terminaba:p:terminar} el postre sola. Fue la mejor cita de mi vida.`},
+ {id:"t11",title:"Una cita desastrosa",en:"The worst (best?) date ever",text:`Con Pablo {quedé|quedaba:p:quedar} a las nueve en un restaurante italiano. Yo {estaba|estuve:i:estar} muy nerviosa y {llevaba|llevé:i:llevar} mi vestido favorito. Él {llegó|llegaba:p:llegar} media hora tarde y ni siquiera {pidió|pedía:p:pedir} perdón. Mientras {cenábamos|cenamos:i:cenar}, no {dejaba|dejó:i:dejar} de mirar el móvil. De repente, un camarero {tiró|tiraba:p:tirar} una copa de vino encima de Pablo. ¡Qué momento! Yo {intentaba|intenté:i:intentar:both} no reírme, pero no {pude|podía:p:poder}. Pablo {se fue|se iba:p:irse} sin decir nada y yo {terminé|terminaba:p:terminar} el postre sola. Fue la mejor cita de mi vida.`},
  {id:"t12",title:"El examen de conducir",en:"Rain, roundabouts and a stern examiner",text:`Aquel día {llovía|llovió:i:llover} y yo {tenía|tuve:i:tener} mucho miedo. El examinador {era|fue:i:ser} un hombre serio y nunca {sonreía|sonrió:i:sonreír}. {Salí|Salía:p:salir} del parking, {giré|giraba:p:girar} a la derecha y {paré|paraba:p:parar} en el semáforo. Pero en la rotonda {me puse|me ponía:p:ponerse} nervioso y no {vi|veía:p:ver} un coche. El examinador {frenó|frenaba:p:frenar} con su pedal y me {gritó|gritaba:p:gritar}. Al final me {suspendió|suspendía:p:suspender}. La semana siguiente lo {intenté|intentaba:p:intentar} otra vez y {aprobé|aprobaba:p:aprobar}.`},
- {id:"t13",title:"¿Te acuerdas de aquel viaje?",en:"Remember that road trip?",text:`¿Te acuerdas de aquel viaje a Valencia? {Salimos|Salíamos:p:salir} de Madrid a las seis de la mañana y tú {dormías|dormiste:i:dormir} en el coche. Yo {conducía|conduje:i:conducir} y {escuchaba|escuché:i:escuchar} la radio. A mitad de camino {nos quedamos|nos quedábamos:p:quedarse} sin gasolina. ¡Qué desastre! Tú {te despertaste|te despertabas:p:despertarse} y me {preguntaste|preguntabas:p:preguntar}: “¿Dónde estamos?”. Yo no {sabía|supe:i:saber}. Un chico nos {ayudó|ayudaba:p:ayudar} con su coche y al final {llegamos|llegábamos:p:llegar} a la playa a las doce.`}
+ {id:"t13",title:"¿Te acuerdas de aquel viaje?",en:"Remember that road trip?",text:`¿Te acuerdas de aquel viaje a Valencia? {Salimos|Salíamos:p:salir} de Madrid a las seis de la mañana. Mientras yo {conducía|conduje:i:conducir} y {escuchaba|escuché:i:escuchar} la radio, tú {dormías|dormiste:i:dormir} en el asiento de atrás. A mitad de camino {nos quedamos|nos quedábamos:p:quedarse} sin gasolina. ¡Qué desastre! Tú {te despertaste|te despertabas:p:despertarse} y me {preguntaste|preguntabas:p:preguntar}: “¿Dónde estamos?”. Yo no {sabía|supe:i:saber}. Un chico nos {ayudó|ayudaba:p:ayudar} con su coche y al final {llegamos|llegábamos:p:llegar} a la playa a las doce.`}
 ];
 Object.assign(WORD_EN,Object.fromEntries(Object.entries({"eternidad":"an eternity, ages","total":"so, anyway (spoken)","parada":"stop (bus stop)","cántaros":"a cántaros: pouring rain","reloj":"watch, clock","minutos":"minutes","repente":"de repente: suddenly","me":"me, to me; myself","hoy":"today","hay":"there is / there are","autobuses":"buses","huelga":"strike","qué":"what; how","rabia":"anger, frustration","taxista":"taxi driver","simpático":"friendly, nice","hora":"hour","todavía":"still, yet","allí":"there","menuda":"menuda suerte: what luck!","marta":"Marta (a name)","triste":"sad","porque":"because","su":"his, her, their","cumpleaños":"birthday","grito":"shout, scream","sorpresa":"surprise","novio":"boyfriend","enorme":"huge","manos":"hands","emoción":"emotion, excitement","mañana":"morning; tomorrow","metro":"underground, subway","primero":"first, at first","mochila":"backpack","entonces":"then, so","cafetería":"café","mano":"hand","buscas":"you look for (buscar)","esto":"this","veces":"times (tres veces: three times)","siete":"seven","fresco":"cool, chilly","alto":"high; tall","árbol":"tree","bajar":"to come down, get down","escalera":"ladder; stairs","demasiado":"too, too much","corta":"short","bomberos":"firefighters","bombero":"firefighter","brazos":"arms","segundo":"second","arañazo":"scratch","veranos":"summers","tomate":"tomato","primos":"cousins","plaza":"square","pelota":"ball","bar":"bar, pub","corriendo":"running","dueño":"owner","nos":"us, to us","esa":"that","serie":"TV series","oscuro":"dark","silencio":"silence","ninguna":"none, not any","linterna":"torch, flashlight","cartas":"cards; letters","ya":"already, by then","sofá":"sofa","madrid":"Madrid","calor":"heat","terrible":"terrible","tranquilo":"quiet, calm","compañero":"mate, partner (compañero de piso: flatmate)","iván":"Iván (a name)","sobre":"about; on","mitad":"half","final":"end (al final: in the end)","dormido":"asleep","viernes":"Friday","nuevo":"new","lado":"side (al lado de: next to)","tacos":"tacos","genial":"great, brilliant","cuarenta":"forty","fría":"cold","amigo":"friend","luis":"Luis (a name)","chico":"guy, boy","gratis":"free (no cost)","vecino":"neighbour","churro":"Churro (the dog's name; also a fried pastry)","cosas":"things","calcetines":"socks","domingo":"Sunday","barbacoa":"barbecue","chorizos":"chorizo sausages","boca":"mouth","detrás":"behind","ensalada":"salad","noches":"nights (todas las noches: every night)","balcón":"balcony","ojos":"eyes","pequeña":"small, little","acordes":"chords","primera":"first","vez":"time (por primera vez: for the first time)","toco":"I play (tocar)","pienso":"I think (pensar)","pablo":"Pablo (a name)","nerviosa":"nervous","favorito":"favourite","media":"half (media hora: half an hour)","ni":"not even; nor","siquiera":"ni siquiera: not even","perdón":"sorry; pardon","copa":"glass (of wine)","encima":"on top, over","momento":"moment","reírme":"to laugh (reírse)","sin":"without","nada":"nothing","sola":"alone","mejor":"best, better","cita":"date; appointment","aquel":"that (over there, back then)","miedo":"fear (tener miedo: to be scared)","examinador":"examiner","hombre":"man","serio":"serious, stern","nunca":"never","parking":"car park","derecha":"right (a la derecha: to the right)","semáforo":"traffic light","rotonda":"roundabout","pedal":"pedal","siguiente":"next","otra":"another (otra vez: again)","acuerdas":"te acuerdas: you remember (acordarse)","viaje":"trip","valencia":"Valencia (city)","gasolina":"petrol, gas","desastre":"disaster","dónde":"where","estamos":"we are (estar)","está":"is","vestido":"dress","una":"a, one","jefe":"boss","taxi":"taxi","camarero":"waiter","comida":"food; meal","postre":"dessert","música":"music","gente":"people","mesa":"table","vela":"candle","cocina":"kitchen","luz":"light; electricity","pueblo":"village, small town","abuela":"grandmother","abuelo":"grandfather","guitarra":"guitar","canciones":"songs","ventana":"window","tele":"TV","hermano":"brother","hermana":"sister","prima":"cousin (female)","tarta":"cake","familia":"family","baño":"bathroom","oficina":"office","fútbol":"football, soccer","camino":"way, road","lluvia":"rain","playa":"beach","radio":"radio","coche":"car","móvil":"mobile phone","gato":"cat","perro":"dog","jardín":"garden","ruido":"noise"}).filter(([k])=>!(k in WORD_EN))));
+// one explanation per gap, in story order: why the right form fits THIS sentence
+const TAP_WHY={
+t1:[
+"‘Ayer’ + leaving is one finished action that starts the story: salí. Salía would mean ‘I was leaving’ or ‘I used to leave’.",
+"Where your sister was at that moment is background, not an event: estaba en el baño. Estuvo would make it a closed block of time.",
+"Both work. Tardaba paints the ongoing situation that made you late; tardó just reports, as a finished fact, that she took ages.",
+"‘Cuando por fin llegué’: arriving is one single moment, so pretérito. Llegaba would mean ‘I was arriving’.",
+"Weather describes the scene: llovía a cántaros. Llovió would announce the rain as a finished event.",
+"‘No había nadie’ describes what the stop looked like. Había is for describing what exists in a scene; hubo means something happened.",
+"You were in the middle of waiting while other things went on: esperaba. Esperé would mean the wait is over and done.",
+"‘Cada dos minutos’ = a repeated action while you waited, so imperfecto: miraba. Repetition and habit are imperfecto.",
+"‘De repente’ + one man saying one sentence = a single event that interrupts the waiting: dijo.",
+"The news makes you act. Taking out the phone is the next step in the chain, so pretérito: saqué.",
+"Another step in the chain: take out the phone, then order a taxi. Each finished step moves the story on: pedí.",
+"This describes the driver (‘muy simpático’). Descriptions of people use imperfecto: era. Fue would be an event.",
+"Both work. Hablaba paints him as a chatty driver; habló de fútbol todo el camino reports it as one finished event.",
+"Arriving at the office is one moment in the story: llegué. Llegaba would be ‘I was arriving’.",
+"‘Todavía no’ describes his situation at that moment: estaba allí. Estuvo would mean he was there for a finished stretch."],
+t2:[
+"How Marta felt is a state, background to the story: estaba triste. The reason follows with ‘porque’.",
+"‘Nadie le escribió’: on that one day, nobody sent a message. A specific event that did or didn't happen is pretérito. Escribía would mean ‘used to write’.",
+"‘A las ocho’ = a decision at a specific moment: decidió.",
+"‘Cuando abrió la puerta’: one action that triggers what comes next, so pretérito: abrió.",
+"She hears the shout right after opening the door: a sudden event, oyó. Oía would be hearing something continuously.",
+"Describing the scene when she arrived: toda la familia estaba allí. A situation, not an event, so imperfecto.",
+"What her boyfriend was holding at that moment is scene description: tenía una tarta. Tuvo would mean he got one.",
+"Both work. Lloró = she burst into tears (an event). Lloraba = she was crying (a picture of the scene).",
+"‘Después’ shows a sequence of finished actions: first the surprise, then everyone sang. Pretérito: cantaron.",
+"Another step after singing: they ate cake. Completed action in a sequence: comieron."],
+t3:[
+"You were in the middle of being on the metro when something happened: estaba is the interrupted background, noté the interruption.",
+"‘De repente’ = a sudden single moment of realising: noté. Notaba would be ‘was noticing’.",
+"It describes a state at that moment: ‘no tenía el móvil’ = I didn't have it. No tuve would mean ‘I didn't get it’.",
+"‘Primero’ starts a sequence of thoughts: first thought, then another. A thought that occurs is pretérito: pensé.",
+"Where the phone supposedly was is a situation: ‘estaba en la mochila’. Estuvo would mean a finished stay.",
+"‘Entonces’ marks the exact moment the memory came back: recordé. Recordaba would be ‘I was remembering’.",
+"The next step in the chain: realise, remember, run. A finished action: corrí.",
+"‘Cuando llegué’: the moment of arriving, one event, pretérito.",
+"What the waiter was in the middle of doing when you arrived: limpiaba las mesas. Limpió would mean he finished cleaning once.",
+"What he was holding when you walked in is background: tenía mi móvil en la mano. Tuvo would mean he received it.",
+"He says one thing right after you arrive. Reporting a single question: me preguntó.",
+"‘Tres veces’ = a counted number of times, so pretérito: di. Counted, finished actions use pretérito.",
+"A finished action, last step in the story: le compré un café."],
+t4:[
+"Telling the time in the past always uses imperfecto: eran las siete.",
+"Weather is scene description: hacía fresco. Hizo would present the weather as a finished event.",
+"‘Porque’ explains the situation: she was upset because her cat was stuck. A feeling in progress is imperfecto: lloraba.",
+"Where the cat was is the situation: estaba en lo alto de un árbol. Estuvo would be a finished stay.",
+"‘No podía bajar’ = he was unable to get down, an ongoing state. No pudo would mean he tried once and failed.",
+"‘Yo salí’: one action that starts the response. Salía would be ‘I was going out’ or ‘used to go out’.",
+"Describing the ladder: ‘era demasiado corta’. Descriptions use imperfecto. Fue would be an event.",
+"‘Entonces’ + a decision: you decide to call, once. Pretérito: llamamos. Llamábamos would mean ‘we used to call’.",
+"‘En diez minutos’ gives a limit and the arrival is one finished event: llegaron.",
+"A sequence of finished actions: the firefighter climbed up (subió) and then came down.",
+"The second step of the sequence: he came down with the cat. Finished action: bajó.",
+"‘Un segundo’: a short action in a sequence of events, pretérito: miró.",
+"One sudden action: the cat scratched him once. Dio un arañazo is a single event.",
+"Both work. Nos reímos = everyone burst out laughing (event). Nos reíamos = we were laughing (the scene)."],
+t5:[
+"Describing yourself at an age or stage of life uses imperfecto: ‘cuando yo era pequeño’.",
+"‘Todos los veranos’ = a repeated habit in your childhood: pasaba. Pasé would be one single summer.",
+"‘Cada mañana’ = repeated routine: me levantaba. Me levanté would mean one particular morning.",
+"Same morning routine: desayunaba. Habit in the past uses imperfecto.",
+"‘Por la tarde’ continues the routine of those summers: jugaba al fútbol. Jugué would be one particular match.",
+"‘Un día’ breaks the routine: a one-time event, pretérito: rompió. Rompía would be ‘used to break’.",
+"One reaction to the broken window: they all ran off. Pretérito: salimos.",
+"The sequence goes on: the owner saw them. Finished event: vio.",
+"Another step: he called them over. Pretérito: llamó.",
+"One-time event after the day's incident: Mi abuela pagó la ventana.",
+"‘Esa noche’ = one specific night: no nos dejó ver la tele. Dejaba would mean it happened regularly."],
+t6:[
+"Watching the series was in progress when the power went out: veíamos is the background, se fue the interruption.",
+"‘De repente’ = the power went out at one moment: se fue. Se iba would be ‘was going out’, an ongoing change.",
+"Describing the scene after the blackout: todo estaba oscuro. A situation, so imperfecto.",
+"‘Había mucho silencio’ describes how the room was. Había is for describing what's there; hubo means something happened.",
+"One action: he went to look for a candle. Pretérito: buscó. Buscaba would be ‘was looking’.",
+"The result of the search: ‘pero no encontró ninguna’. Finding or not finding is a finished event.",
+"‘Entonces’ = you decide and do something at that moment: usamos la linterna.",
+"‘Mientras’ introduces the action that was in progress: jugábamos. Another event interrupts it.",
+"The interruption: he told me a secret, once. Pretérito: me contó.",
+"‘Cuando la luz volvió’: one moment, pretérito.",
+"Telling the time in the past: eran las doce. Always imperfecto.",
+"‘Ya dormía’: at that moment he was already asleep, a state. Durmió would mean he slept for a finished period."],
+t7:[
+"‘Cuando llegué’: the moment of arriving. A single event, pretérito.",
+"Weather description: hacía un calor terrible. Descriptions use imperfecto.",
+"‘No conocía a nadie’ = I didn't know anyone, a state. Conocí would mean ‘I met’, which doesn't work here.",
+"Where the flat was: ‘estaba en un barrio tranquilo’. A description of the place, imperfecto.",
+"Names and descriptions use imperfecto: se llamaba Iván. Se llamó would be unusual here.",
+"‘Esa noche’ = one particular night, and one finished action: Iván me invitó.",
+"‘Pedimos una pizza’: you decided and ordered, one finished action. Pedíamos would mean ‘we used to order’.",
+"‘Mientras’ = while something else was going on: comíamos. Two actions happening together are imperfecto.",
+"Both actions run side by side: while we ate, he was telling me things. Contaba is the ongoing action.",
+"‘No entendía la mitad’: understanding is a state during the evening. Entendí would mean ‘I understood (at once)’.",
+"‘Porque hablaba muy rápido’: the reason is a description of how he spoke. Habló would be one finished act.",
+"‘Al final’ = the last event: I ended up asleep. Me quedé dormido is a one-time change."],
+t8:[
+"‘El viernes’ = one specific day, a finished event: fuimos. Íbamos would be ‘we used to go’.",
+"‘Había mucha gente’ describes the scene. Había for what existed; hubo would mean something happened.",
+"‘La música estaba muy alta’: description of the scene, imperfecto.",
+"One action: the waiter gave us a table. Finished event: nos dio.",
+"You decided and ordered once. Pretérito: pedimos.",
+"Smell is a description of the food: olía genial. Olió would be a single sniff event.",
+"‘Cuarenta minutos’ = a measured amount of time with a clear end: tardó. Tardaba would be ongoing.",
+"‘Cuando por fin llegó’: the moment the food arrived. One event, pretérito.",
+"Describing the food when it arrived: estaba fría. A state, so imperfecto.",
+"Luis spoke to the waiter once. A single event: se lo dijo.",
+"The result: the waiter brought dessert. A finished action: nos trajo."],
+t9:[
+"Background about the neighbour: tenía un perro enorme. Possession and description use imperfecto.",
+"Describing the dog's name: se llamaba. Description, imperfecto.",
+"‘Siempre robaba’: a habit. Repeated behaviour is imperfecto.",
+"‘Un domingo’ = one specific day and a single event: hicimos una barbacoa.",
+"You were in the middle of setting the table when something happened: ponía is the ongoing action, oí the interruption.",
+"The interruption: one sound, one moment. Pretérito: oí.",
+"Two quick steps in a chain: miré, then vi. Both are finished actions: miré.",
+"The second step: I saw him. Pretérito: vi.",
+"What the dog had in his mouth at that moment: tenía todos los chorizos. A state, imperfecto.",
+"Your reaction: you ran after him. A finished action: salí corriendo.",
+"Describing the dog's quality: era muy rápido. Descriptions are imperfecto.",
+"The neighbour's reaction: laughed. One event, pretérito: se rió.",
+"‘Esa noche’ = one particular night: todos comimos ensalada."],
+t10:[
+"‘Todas las noches’ = a repeated habit: tocaba. Tocó would be one single night.",
+"The same evening routine: se sentaba, repeated every night.",
+"Another action in the nightly routine: cerraba los ojos. Imperfecto for repeated actions.",
+"The routine continues: cantaba canciones de su pueblo. Habitual action, imperfecto.",
+"Age in the past always uses imperfecto: yo tenía diez años.",
+"A feeling you had during that period: no me gustaba esa música. Ongoing attitude, imperfecto.",
+"‘Pero un día’ breaks the routine: one event, pretérito: me regaló.",
+"Next step after the gift: he taught me three chords. Finished action: me enseñó.",
+"‘Esa noche … por primera vez’: one specific first-time event, pretérito: toqué."],
+t11:[
+"‘A las nueve’ fixes a specific moment for a finished action: quedé con Pablo (I arranged to meet him).",
+"How you felt is a state: estaba nerviosa. Estuve would be a finished block of time.",
+"What you were wearing is description: llevaba mi vestido favorito. Llevé would mean you carried it somewhere once.",
+"‘Media hora tarde’: he arrived once, a finished event: llegó.",
+"‘Ni siquiera pidió perdón’: he did not apologise on that occasion. A single missed event is pretérito.",
+"‘Mientras’ introduces the action that was in progress: cenábamos. Another thing happens in the middle.",
+"‘No dejaba de mirar el móvil’: he kept checking his phone throughout the dinner, a continuous or repeated action.",
+"‘De repente’ = a sudden single event: el camarero tiró una copa.",
+"Both work. Intentaba = I was trying (ongoing effort); intenté = I made one attempt. Then ‘pero no pude’ gives the result.",
+"‘No pude’ = I tried and did not manage, on that occasion. No podía would mean in general I was not able to.",
+"‘Sin decir nada’: he left once. A single event: se fue.",
+"Last event in the chain: I finished the dessert alone. Pretérito: terminé."],
+t12:[
+"Weather sets the scene: aquel día llovía. Description, imperfecto.",
+"A feeling at that time: tenía mucho miedo. Tuve would be ‘I got scared’ (a sudden change).",
+"Describing the examiner: era un hombre serio. Descriptions of people use imperfecto.",
+"‘Nunca sonreía’: never = describes a habit. Repeated or habitual behaviour, imperfecto.",
+"First step in a chain of manoeuvres: salí del parking. Finished actions in order: pretérito.",
+"Second step: giré a la derecha. Each finished step moves the story on.",
+"Third step: paré en el semáforo. The series of finished actions: pretérito.",
+"‘Me puse nervioso’ = I became nervous, a change at that moment. Me ponía would mean ‘I used to get nervous’.",
+"‘No vi un coche’: one single failure to see, with consequences: pretérito vi.",
+"The examiner reacted by braking once: frenó. A single, immediate event.",
+"Next event right after: he shouted at me. Finished action: gritó.",
+"‘Al final’ = outcome of the exam: me suspendió. Result of a one-time event.",
+"‘La semana siguiente’ = a specific occasion: lo intenté otra vez. Intentaba would mean ‘I was trying’.",
+"The result of that attempt: aprobé. A finished action, pretérito."],
+t13:[
+"‘A las seis de la mañana’ = a specific time for a finished event: salimos de Madrid.",
+"‘Mientras’ = two things going on at the same time: yo conducía (and you slept). Ongoing action, imperfecto.",
+"Second ongoing action while driving: escuchaba la radio.",
+"‘Mientras … tú dormías’: you were asleep during the drive, a state in progress.",
+"‘A mitad de camino’: a sudden event interrupts the drive: nos quedamos sin gasolina.",
+"You woke up at one moment: te despertaste. Te despertabas would be ‘you used to wake up’.",
+"One question, once: me preguntaste. The quote shows the question asked right then.",
+"‘Yo no sabía’: my knowledge state at that time. Supe would mean ‘I found out’.",
+"‘Un chico nos ayudó’: one person helping on one occasion, finished event.",
+"‘Al final’ = the last event: llegamos a la playa. A finished action."]
+};
 const TAP_RE=/\{([^|{}]+)\|([^:{}]+):([pi]):([^:{}]+)(?::(both))?\}/g;
 
 let easy=null;
@@ -1686,18 +1888,28 @@ function easyTap(e){
     if(o===b) o.classList.add(ok?"ok":"bad"); else if(!ok&&isRight) o.classList.add("ok","shown"); else o.classList.add("dim");
   });
   haptic(ok?14:[50,40,50]);
-  const tn=g.tense==="pret"?"pretérito":"imperfecto";
-  card.querySelector(".enote").insertAdjacentHTML("beforeend",`<div><span class="dot ${g.tense}"></span><span><b>${esc(g.right)}</b> · ${tn}: ${g.tense==="pret"?"a completed event that moves the story on":"background, description, habit or something in progress"}${g.bothOk?`. <i>${esc(g.other)}</i> also works here.`:""}</span></div>`);
+  const tn=g.tense==="pret"?"pretérito":"imperfecto", why=(TAP_WHY[easy.id]||[])[gi];
+  const generic=g.tense==="pret"?"a completed event that moves the story on":"background, description, habit or something in progress";
+  const alsoOk=g.bothOk?` <i>${esc(g.other)}</i> also works here.`:"";
+  card.querySelector(".enote").insertAdjacentHTML("beforeend",`<div><span class="dot ${g.tense}"></span><span>${ok?"":`<b class="bad-t">${esc(b.dataset.v)}</b> doesn't fit here. `}<b>${esc(g.right)}</b> · ${tn}. ${why?esc(why):generic+"."}${why&&g.bothOk?"":alsoOk}</span></div>`);
   easyProgress();
   if(c.gaps.every(x=>easy.res[x.i])){
     const allOk=c.gaps.every(x=>easy.res[x.i].ok);
-    setTimeout(()=>{
+    const advance=()=>{
       card.classList.remove("cur"); card.classList.add("done");
+      const nb=card.querySelector(".enext"); if(nb) nb.remove();
       easy.cur++;
       if(easy.cur>=easy.cards.length){easyFinish();return}
       document.querySelector(`.ecard[data-c="${easy.cur}"]`).classList.add("cur");
       easyScroll(false);
-    },allOk?850:1700);
+    };
+    if(allOk) setTimeout(advance,1100);
+    else {
+      // a wrong answer: stay on the sentence until the person has read the explanation
+      card.insertAdjacentHTML("beforeend",`<button type="button" class="enext">Got it, next sentence</button>`);
+      card.querySelector(".enext").onclick=advance;
+      requestAnimationFrame(()=>{const m=$("drill"), r=card.querySelector(".enext").getBoundingClientRect(), mr=m.getBoundingClientRect(); if(r.bottom>mr.bottom-8) m.scrollBy({top:r.bottom-mr.bottom+16,behavior:"smooth"})});
+    }
   }
 }
 function easyFinish(){
