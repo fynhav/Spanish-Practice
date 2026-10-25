@@ -216,6 +216,31 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .gp.fixed{background:#FFF1D6;border-color:#C7902A;color:#8A5A0B}
 .gp.cur.bad{outline-color:var(--bad)}
 .gp.tapped{box-shadow:0 0 0 2px var(--line)}
+/* opening screen */
+.splash{position:fixed;inset:0;z-index:200;background:var(--paper);display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 24px) max(24px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 24px) max(24px,env(safe-area-inset-left,0px));transition:opacity .45s ease,transform .45s ease}
+.splash.out{opacity:0;transform:scale(1.03);pointer-events:none}
+.sp-in{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.sp-logo{width:76px;height:76px;border-radius:20px;background:var(--do);color:var(--paper);font-family:var(--f-display);font-size:3rem;line-height:76px;position:relative;animation:pop-in .5s ease-out}
+.sp-logo::after{content:"";position:absolute;width:13px;height:13px;border-radius:50%;background:var(--io);top:12px;right:13px}
+.sp-name{font-family:var(--f-display);font-size:1.6rem}
+.sp-streak{font-size:.95rem;color:var(--muted);min-height:1.3em}
+.sp-streak b{font-family:var(--f-display);font-size:2.2rem;color:var(--io);font-weight:400;display:block;line-height:1.1}
+.sp-week{display:flex;gap:8px;justify-content:center}
+.sp-week span{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.66rem;font-weight:700;letter-spacing:.05em;color:var(--muted)}
+.sp-week i{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);opacity:0;animation:fade .3s forwards}
+.sp-week i.on{background:var(--io);border-color:var(--io)}
+.sp-week i.today{border-style:dashed;border-color:var(--io)}
+.sp-rows{width:100%;display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.sp-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;text-align:left;font-size:.88rem}
+.sp-row .sm{height:7px;border-radius:7px;background:var(--line);grid-column:1/-1;overflow:hidden}
+.sp-row .sm i{display:block;height:100%;width:0;border-radius:7px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.sp-row span:nth-child(2){color:var(--muted);font-variant-numeric:tabular-nums}
+.sp-bar{width:100%;height:4px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:8px}
+.sp-bar i{display:block;height:100%;width:0;background:var(--ink);border-radius:4px;transition:width .25s linear}
+.sp-msg{font-size:.78rem;color:var(--muted)}
+@keyframes pop-in{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.splash,.sp-row .sm i,.sp-bar i{transition:none}.sp-logo{animation:none}}
 .feed{display:flex;flex-direction:column;gap:16px;padding-block:6px 46vh}
 .ecard{font-size:1.12rem;line-height:2.05;padding:12px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);opacity:.32;transition:opacity .35s ease,box-shadow .35s ease}
 .ecard.cur{opacity:1;box-shadow:0 6px 22px rgba(42,38,32,.09);border-color:var(--pret)}
@@ -289,6 +314,17 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 @media(prefers-reduced-motion:reduce){.pop{animation:none;opacity:0}.progress i{transition:none}.sheet{animation:none}.float{transform:none}.links path{animation:none;stroke-dashoffset:0;opacity:1}}
 </style>
 
+<div class="splash" id="splash" aria-live="polite">
+  <div class="sp-in">
+    <div class="sp-logo" aria-hidden="true">ñ</div>
+    <div class="sp-name">Práctica diaria</div>
+    <div class="sp-streak" id="spStreak"></div>
+    <div class="sp-week" id="spWeek"></div>
+    <div class="sp-rows" id="spRows"></div>
+    <div class="sp-bar"><i id="spBar"></i></div>
+    <div class="sp-msg" id="spMsg">Loading your progress…</div>
+  </div>
+</div>
 <div class="app" id="app">
   <div class="topbar">
     <button type="button" class="iconbtn" id="backBtn" hidden>‹ Menu</button>
@@ -331,7 +367,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 16:50</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 17:00</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -977,8 +1013,8 @@ function renderMenu(){
       <span class="cs"><span class="now">${(ST.drill.log[tk]||0).toLocaleString()} pts today</span> · best ${(ST.drill.best||0).toLocaleString()}</span>
     </button>
     <button type="button" class="course stories" id="storyCard">
-      <span><span class="cn">Stories</span><br><span class="cs">Read a paragraph, type the missing words</span></span><span class="chev" aria-hidden="true">›</span>
-      <span class="cs"><span class="now">${Object.keys(ST.stories.best).filter(k=>STORIES.some(x=>x.id===k)).length} of ${STORIES.length} done</span>${(ST.stories.log[tk]||0)?` · ${ST.stories.log[tk]} today`:""}</span>
+      <span><span class="cn">Stories</span><br><span class="cs">Short paragraphs: tap or type the missing words</span></span><span class="chev" aria-hidden="true">›</span>
+      <span class="cs"><span class="now">${(()=>{const ids=new Set([...STORIES.map(x=>x.id),...STORIES.filter(x=>x.kind==="past").map(x=>"e:"+x.id)]); return `${Object.keys(ST.stories.best).filter(k=>ids.has(k)).length} of ${ids.size} done`})()}</span>${(ST.stories.log[tk]||0)?` · ${ST.stories.log[tk]} today`:""}</span>
     </button>
     <div class="stats two">
       <div class="stat"><b>${streak(has)}</b><span>day streak</span></div>
@@ -1776,6 +1812,34 @@ function drawLinks(){
 window.addEventListener("resize",()=>{const s=$("linkBox")&&$("linkBox").querySelector("svg.links");if(s){drawLinks();s.querySelectorAll("path").forEach(p=>{p.style.animation="none";p.style.opacity=1;p.style.strokeDashoffset=0})}});
 
 renderMenu();
+// ================= opening screen: progress at a glance while the app loads =================
+(function splash(){
+  const sp=$("splash"); if(!sp) return;
+  const tk=todayKey(), wk=weekDays().map(dkey);
+  const has=k=>ST.pron.log[k]!=null||ST.past.log[k]!=null||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0;
+  const str=streak(has);
+  $("spStreak").innerHTML=str?`<b>${str}</b>day streak${has(tk)?" · done today":" · keep it going today"}`:(has(tk)?"Nice work today":"Ready for today’s practice");
+  $("spWeek").innerHTML=wk.map((k,i)=>`<span><i class="${has(k)?"on":""}${k===tk?" today":""}" style="animation-delay:${.08*i}s"></i>${LBL[i].slice(0,1)}</span>`).join("");
+  const storyIds=new Set([...STORIES.map(x=>x.id),...STORIES.filter(x=>x.kind==="past").map(x=>"e:"+x.id)]);
+  const storyDone=Object.keys(ST.stories.best).filter(k=>storyIds.has(k)).length;
+  const rows=[
+    ["Object pronouns",Object.keys(ST.pron.done).length,DAYS,"do"],
+    ["Past tense",Object.keys(ST.past.done).length,DAYS,"pret"],
+    ["Stories",storyDone,storyIds.size,"both"]];
+  $("spRows").innerHTML=rows.map(([n,v,t,c])=>`<div class="sp-row"><span>${n}</span><span>${v} / ${t}${n==="Stories"?"":" days"}</span><div class="sm"><i data-w="${t?v/t*100:0}" style="background:var(--${c})"></i></div></div>`).join("")+
+    ((ST.drill.best||0)?`<div class="sp-row"><span>Endless drill best</span><span>${(ST.drill.best||0).toLocaleString()} pts</span></div>`:"");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>sp.querySelectorAll(".sm i").forEach(i=>i.style.width=Math.max(2,+i.dataset.w)+"%")));
+  // the bar fills over about 1.6 s; it waits a little for account sync, but never longer than 3 s
+  let pct=0, closed=false; const bar=$("spBar"), msg=$("spMsg"), t0=Date.now();
+  const close=()=>{if(closed) return; closed=true; clearInterval(tick); bar.style.width="100%"; sp.classList.add("out"); setTimeout(()=>sp.remove(),480)};
+  const tick=setInterval(()=>{
+    const el=Date.now()-t0, synced=dbState!=="connecting";
+    pct=Math.min(synced?100:90, el/1600*100); bar.style.width=pct+"%";
+    if(el>500) msg.textContent=synced?(dbCol?"Progress synced":"Ready"):"Syncing your progress…";
+    if((pct>=100&&el>=1600)||el>3000) setTimeout(close,250);
+  },50);
+  sp.addEventListener("click",close);
+})();
 </script>
 
 <script>
