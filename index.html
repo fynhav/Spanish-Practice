@@ -216,6 +216,23 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .gp.fixed{background:#FFF1D6;border-color:#C7902A;color:#8A5A0B}
 .gp.cur.bad{outline-color:var(--bad)}
 .gp.tapped{box-shadow:0 0 0 2px var(--line)}
+.feed{display:flex;flex-direction:column;gap:16px;padding-block:6px 46vh}
+.ecard{font-size:1.12rem;line-height:2.05;padding:12px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);opacity:.32;transition:opacity .35s ease,box-shadow .35s ease}
+.ecard.cur{opacity:1;box-shadow:0 6px 22px rgba(42,38,32,.09);border-color:var(--pret)}
+.ecard.done{opacity:.6}
+.ecard .t{cursor:pointer;border-radius:5px}
+.ecard .t.tapped{background:var(--line)}
+.pick{display:inline-flex;gap:6px;vertical-align:middle;margin:0 2px;flex-wrap:wrap}
+.opt{font:inherit;font-size:1rem;font-weight:600;padding:2px 12px;line-height:1.55;border-radius:9px;border:1.5px solid var(--line);border-bottom-width:3px;background:var(--tile);color:var(--ink);cursor:pointer}
+.opt:active{transform:translateY(1px)}
+.ecard:not(.cur) .opt{pointer-events:none}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);opacity:1}
+.opt.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through;opacity:1}
+.opt.dim{opacity:.3}
+.opt:disabled{cursor:default}
+.enote{font-size:.85rem;line-height:1.4;color:var(--muted);display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.enote:empty{display:none}
+.enote div{display:flex;gap:8px;align-items:baseline}
 .composer{display:flex;flex-direction:column;gap:6px;width:100%}
 .cmeta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.85rem;color:var(--muted)}
 .cmeta b{color:var(--ink)}
@@ -314,7 +331,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 16:10</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 16:50</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -905,9 +922,9 @@ function streak(has){
   return n;
 }
 const isDrill=()=>screen==="dsetup"||screen==="dq"||screen==="dsum";
-const isStory=()=>screen==="slist"||screen==="story";
+const isStory=()=>screen==="slist"||screen==="story"||screen==="easy";
 function setCourseColour(c){
-  const k=isStory()?(storyKind==="past"?"pret":"both"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
+  const k=isStory()?(storyKind==="pron"?"both":"pret"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
   s.setProperty("--cc",`var(--${k})`); s.setProperty("--cc-soft",`var(--${k}-soft)`);
 }
 function chrome(){
@@ -917,7 +934,7 @@ function chrome(){
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
   $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()); $("quit").hidden=!(inS||screen==="dq");
-  $("backBtn").textContent=screen==="story"?"‹ Stories":"‹ Menu";
+  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":"‹ Menu";
   $("title").textContent=isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
   $("progress").hidden=!inS;
   $("score").textContent=inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
@@ -928,7 +945,7 @@ function chrome(){
   }
   setCourseColour(course);
 }
-$("backBtn").onclick=()=>{drillOn=false; if(screen==="story") renderStoryList(); else renderMenu()};
+$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else renderMenu()};
 $("quit").onclick=()=>{if(screen==="dq"){endDrill();return} justDone=null;renderCourse(course)};
 
 function weekHTML(ringFor){
@@ -1338,7 +1355,7 @@ document.addEventListener("click",e=>{
   if(e.target.closest(".gloss")) return;
   const gapEl=e.target.closest(".gp.done");
   if(gapEl){ if(glossFor===gapEl){closeGloss();return} showGapGloss(gapEl); return }
-  const el=e.target.closest(".sentence .chip.in")||e.target.closest(".sentence .t")||e.target.closest(".story .t");
+  const el=e.target.closest(".sentence .chip.in")||e.target.closest(".sentence .t")||e.target.closest(".story .t")||e.target.closest(".etext .t");
   if(!el||e.target.closest(".tile")){closeGloss();return}
   if(glossFor===el){closeGloss();return}
   showGloss(el);
@@ -1391,21 +1408,22 @@ function parseStory(st){
 Object.assign(VERB_EN,{haber:"there to be (había = there was/were)",mirar:"to look at",parecer:"to seem",llevar:"to wear; to carry, take",entrar:"to go in, enter",probar:"to try, taste","oír":"to hear",levantar:"levantarse: to get up","reír":"reírse: to laugh",decidir:"to decide",echar:"echar de menos: to miss",pasear:"to walk, stroll",detener:"to stop, arrest",pasar:"to spend (time); to pass",romper:"to break",subir:"to go up, climb",aplaudir:"to clap",desayunar:"to have breakfast",aprender:"to learn",encontrar:"to find",marcar:"to score",pitar:"to blow the whistle",gritar:"to shout",morir:"to die",cantar:"to sing"});
 Object.assign(WORD_EN,{hermana:"sister",gente:"people",museo:"museum",cuadros:"paintings",tienda:"shop",pueblo:"village, town",barco:"boat",pescar:"to fish",mojados:"wet",chocolate:"hot chocolate",caliente:"hot",entrevista:"interview",nervioso:"nervous",empresa:"company",directora:"director (f)",traje:"suit",azul:"blue",seria:"serious",puesto:"job, position",paisaje:"landscape, view",señor:"man, gentleman",mayor:"older",antiguo:"old",famoso:"famous",vida:"life",vela:"candle",ruido:"noise","extraño":"strange",gato:"cat",chica:"girl","rápido":"fast",nuevos:"new",arroz:"rice",supermercado:"supermarket",cerrado:"closed",divertida:"fun",bajita:"short",pelo:"hair",blanco:"white",delantal:"apron",equipo:"team",gol:"goal",goles:"goals","árbitro":"referee","alegría":"joy",nadie:"nobody",parques:"parks",lleno:"full",camarera:"waitress",bolso:"handbag",suerte:"luck","policía":"police officer",esquina:"corner","tíos":"uncle and aunt","jardín":"garden","río":"river","cómics":"comics",brazo:"arm",sala:"room, venue",gente:"people",escenario:"stage",medianoche:"midnight","malecón":"seafront promenade",ceviche:"ceviche",experiencia:"experience",prima:"cousin (f)",ceremonia:"ceremony",iglesia:"church",novia:"bride; girlfriend",vestido:"dress",emocionada:"emotional, moved",novios:"bride and groom",vals:"waltz",invitados:"guests","tío":"uncle",discurso:"speech",invierno:"winter",collar:"collar",comida:"food",carteles:"posters","niña":"girl",regalos:"presents",carta:"menu; letter",propina:"tip",camarero:"waiter",planes:"plans",rueda:"wheel",pinchada:"flat (tyre)","difíciles":"difficult",perfectos:"perfect",nevera:"fridge",invitaciones:"invitations","salón":"living room",luces:"lights",apagadas:"switched off",chaqueta:"jacket",escaparate:"shop window",dependienta:"shop assistant (f)",papel:"paper",guantes:"gloves","depósito":"(fuel) tank",gracias:"thanks",bibliotecaria:"librarian (f)",vacaciones:"holidays",plantas:"plants",cajón:"drawer",enseguida:"straight away",calma:"calm",muchísimo:"a great deal",dentro:"inside",fuera:"outside"});
 STORIES.forEach(st=>parseStory(st).gaps.forEach(g=>{if(g.type==="verb") g.answers.forEach(a=>{if(!a.includes(" ")) addForm(a,{inf:g.inf,t:g.tense==="pret"?"pretérito":"imperfecto"})})}));
-let storyKind="past", storyId=null, storyChecked=false, storyAttempts={};
-const storyGroups=[["past","Past tense","Pick pretérito or imperfecto for each verb"],["pron","Object pronouns","Type lo, la, le, se lo, me la…"]];
+let storyKind="easy", storyId=null, storyChecked=false, storyAttempts={};
+const storyGroups=[["easy","Past · tap"],["past","Past · type"],["pron","Pronouns"]];
 function renderStoryList(kind){
   if(kind) storyKind=kind;
   screen="slist"; course=null; drillOn=false; $("fb").hidden=true; chrome();
-  const list=STORIES.filter(x=>x.kind===storyKind);
+  const list=STORIES.filter(x=>x.kind===(storyKind==="easy"?"past":storyKind));
+  const intro={easy:"Tap mode: read one sentence at a time and tap pretérito or imperfecto. No typing.",past:"Type mode: type every verb into the story.",pron:"Type the object pronouns into the story."}[storyKind];
   $("drill").innerHTML=`
-    <div><h2 class="hello">Stories</h2><p class="sub">Each story is a short paragraph with gaps. Type into every gap, then check.</p></div>
+    <div><h2 class="hello">Stories</h2><p class="sub">${intro}</p></div>
     <div class="seg" id="segStory">${storyGroups.map(([k,l])=>`<button type="button" data-v="${k}" aria-pressed="${k===storyKind}">${l}</button>`).join("")}</div>
-    <div class="slist">${list.map(st=>{const n=parseStory(st).gaps.length, b=ST.stories.best[st.id];
-      return `<button type="button" class="srow" data-id="${st.id}"><span class="st">${esc(st.title)}</span><span class="sc${b===n?" full":""}">${b!=null?`${b}/${n}`:`${n} gaps`}</span><span class="se">${esc(st.en)}</span></button>`}).join("")}</div>
+    <div class="slist">${list.map(st=>{const n=parseStory(st).gaps.length, b=ST.stories.best[(storyKind==="easy"?"e:":"")+st.id];
+      return `<button type="button" class="srow" data-id="${st.id}"><span class="st">${esc(st.title)}</span><span class="sc${b===n?" full":""}">${b!=null?`${b}/${n}`:`${n} ${storyKind==="easy"?"verbs":"gaps"}`}</span><span class="se">${esc(st.en)}</span></button>`}).join("")}</div>
     <p class="syncline"></p>`;
   $("actions").innerHTML="";
   $("segStory").onclick=e=>{const b=e.target.closest("button"); if(b) renderStoryList(b.dataset.v)};
-  document.querySelectorAll(".srow").forEach(b=>b.onclick=()=>renderStory(b.dataset.id));
+  document.querySelectorAll(".srow").forEach(b=>b.onclick=()=>storyKind==="easy"?renderEasy(b.dataset.id):renderStory(b.dataset.id));
   updateSync();
 }
 function storyWords(txt){
@@ -1538,6 +1556,109 @@ function showGapGloss(el){
   d.style.top=top+"px"; d.style.left=Math.min(Math.max(12,b.left+b.width/2-gr.width/2),window.innerWidth-gr.width-12)+"px";
   glossEl=d; glossFor=el;
 }
+// ================= easy stories: tap pretérito or imperfecto, one sentence at a time =================
+const XF={ser:{pret:["fui","fuiste","fue","fuimos","fueron"],imp:["era","eras","era","éramos","eran"]},
+ haber:{pret:["hubo","hubo","hubo","hubo","hubo"],imp:["había","había","había","había","había"]},
+ "reír":{pret:["reí","reíste","rió","reímos","rieron"],imp:["reía","reías","reía","reíamos","reían"]},
+ morir:{pret:["morí","moriste","murió","morimos","murieron"],imp:["moría","morías","moría","moríamos","morían"]},
+ detener:{pret:["detuve","detuviste","detuvo","detuvimos","detuvieron"],imp:["detenía","detenías","detenía","deteníamos","detenían"]},
+ "oír":{pret:["oí","oíste","oyó","oímos","oyeron"],imp:["oía","oías","oía","oíamos","oían"]},
+ querer:{pret:["quise","quisiste","quiso","quisimos","quisieron"],imp:["quería","querías","quería","queríamos","querían"]},
+ saber:{pret:["supe","supiste","supo","supimos","supieron"],imp:["sabía","sabías","sabía","sabíamos","sabían"]},
+ servir:{pret:["serví","serviste","sirvió","servimos","sirvieron"],imp:["servía","servías","servía","servíamos","servían"]},
+ tocar:{pret:["toqué","tocaste","tocó","tocamos","tocaron"],imp:["tocaba","tocabas","tocaba","tocábamos","tocaban"]},
+ llover:{pret:["llovió","llovió","llovió","llovió","llovió"],imp:["llovía","llovía","llovía","llovía","llovía"]}};
+const PFX=inf=>XF[inf]||pastForms(inf);
+// who is doing the action, where yo and él share the same imperfecto form (0 = yo, 2 = él/ella)
+const EASY_P={p1:{1:2,4:2},p2:{0:0,1:0,3:2},p3:{1:0,2:2,5:2,6:2,7:2,9:2},p4:{1:2},p5:{0:0,1:0,3:0,5:0,7:2},p6:{1:2,2:2,4:2,5:2,6:2,7:0},p7:{1:0,2:0,4:2},p8:{0:2,1:2,2:2,3:2,4:2,5:2},p9:{1:2},p10:{1:0,2:0,3:0,4:0},p11:{1:2,2:2,6:2},p12:{1:2},p13:{1:2,3:2,4:2},p14:{1:2,2:0,3:0},p15:{2:2,3:2},p16:{1:2,2:2,3:2,8:2}};
+function easyCards(st){
+  const re=new RegExp(GAP_RE.source,"g"), cards=[]; let gi=0, pending="";
+  st.text.split(/(?<=[.!?])\s+/).forEach(sn=>{
+    const segs=[], gaps=[]; let last=0, m; re.lastIndex=0;
+    while((m=re.exec(sn))){
+      if(m.index>last) segs.push(sn.slice(last,m.index));
+      const g={inf:m[1],answers:m[2].split("|"),tense:m[3]==="p"?"pret":"imp",i:gi++};
+      const f=PFX(g.inf), o=g.tense==="pret"?"imp":"pret", lc=g.answers[0].toLowerCase();
+      let p=(EASY_P[st.id]||{})[g.i]; if(p==null) p=Math.max(0,f[g.tense].indexOf(lc));
+      let other=f[o][p]; if(g.answers[0][0]!==lc[0]) other=cap(other);
+      g.right=g.answers[0]; g.other=other; g.otherTense=o; g.bothOk=g.answers.some(a=>norm(a)===norm(other));
+      gaps.push(g); segs.push(g); last=re.lastIndex;
+    }
+    if(last<sn.length) segs.push(sn.slice(last));
+    if(!gaps.length){pending+=sn+" "; return}
+    if(pending){segs.unshift(pending); pending=""}
+    cards.push({segs,gaps});
+  });
+  if(pending&&cards.length) cards[cards.length-1].segs.push(" "+pending.trim());
+  return cards;
+}
+let easy=null;
+function renderEasy(id){
+  const st=STORIES.find(x=>x.id===id); if(!st) return renderStoryList("easy");
+  storyId=id; storyKind="easy"; screen="easy"; $("fb").hidden=true; chrome();
+  $("title").textContent=st.title;
+  const cards=easyCards(st), total=cards.reduce((a,c)=>a+c.gaps.length,0);
+  easy={id,st,cards,total,cur:0,done:0,score:0,res:{}};
+  $("drill").innerHTML=`
+    <div class="meta"><span class="pill pret">Tap mode</span><span class="sub" style="margin:0">${esc(st.en)} · ${total} verbs</span></div>
+    <p class="hint" style="margin:0">Tap the form that fits: <b class="pret-t">pretérito</b> for finished events, <b class="imp-t">imperfecto</b> for background and habits.</p>
+    <div class="feed" id="feed">${cards.map((c,ci)=>`<div class="ecard${ci===0?" cur":""}" data-c="${ci}"><div class="etext">${c.segs.map(sg=>typeof sg==="string"?storyWords(sg):
+      `<span class="pick" data-g="${sg.i}">${shuf([[sg.right,sg.tense],[sg.other,sg.otherTense]]).map(([t,tn])=>`<button type="button" class="opt" data-v="${esc(t)}" data-t="${tn}">${esc(t)}</button>`).join("")}</span><span class="ginf">(${esc(sg.inf)})</span>`).join("")}</div><div class="enote"></div></div>`).join("")}</div>`;
+  $("actions").innerHTML="";
+  easyProgress();
+  $("feed").addEventListener("click",easyTap);
+  requestAnimationFrame(()=>easyScroll(true));
+}
+function easyProgress(){
+  const E=easy; $("score").textContent=`${E.score} / ${E.total}`;
+  const pr=$("progress"); pr.hidden=false; pr.innerHTML=`<span class="p-pret" style="flex:1"><i style="width:${E.done/E.total*100}%"></i></span>`;
+}
+function easyScroll(instant){
+  const m=$("drill"), c=document.querySelector(`.ecard[data-c="${easy.cur}"]`); if(!c) return;
+  const mr=m.getBoundingClientRect(), cr=c.getBoundingClientRect();
+  m.scrollTo({top:m.scrollTop+(cr.top-mr.top)-Math.max(12,(mr.height-cr.height)*0.4),behavior:instant?"auto":"smooth"});
+}
+function easyTap(e){
+  const b=e.target.closest(".opt"); if(!b) return;
+  const card=b.closest(".ecard"); if(+card.dataset.c!==easy.cur) return;
+  const pick=b.closest(".pick"), gi=+pick.dataset.g; if(easy.res[gi]) return;
+  const c=easy.cards[easy.cur], g=c.gaps.find(x=>x.i===gi);
+  const ok=norm(b.dataset.v)===norm(g.right)||(g.bothOk&&norm(b.dataset.v)===norm(g.other));
+  easy.res[gi]={ok}; easy.done++; if(ok) easy.score++;
+  pick.querySelectorAll(".opt").forEach(o=>{
+    o.disabled=true;
+    const isRight=norm(o.dataset.v)===norm(g.right)||(g.bothOk&&norm(o.dataset.v)===norm(g.other));
+    if(o===b) o.classList.add(ok?"ok":"bad"); else if(!ok&&isRight) o.classList.add("ok","shown"); else o.classList.add("dim");
+  });
+  haptic(ok?14:[50,40,50]);
+  const tn=g.tense==="pret"?"pretérito":"imperfecto";
+  card.querySelector(".enote").insertAdjacentHTML("beforeend",`<div><span class="dot ${g.tense}"></span><span><b>${esc(g.right)}</b> · ${tn}: ${g.tense==="pret"?"a completed event that moves the story on":"background, description, habit or something in progress"}${g.bothOk?`. <i>${esc(g.other)}</i> also works here.`:""}</span></div>`);
+  easyProgress();
+  if(c.gaps.every(x=>easy.res[x.i])){
+    const allOk=c.gaps.every(x=>easy.res[x.i].ok);
+    setTimeout(()=>{
+      card.classList.remove("cur"); card.classList.add("done");
+      easy.cur++;
+      if(easy.cur>=easy.cards.length){easyFinish();return}
+      document.querySelector(`.ecard[data-c="${easy.cur}"]`).classList.add("cur");
+      easyScroll(false);
+    },allOk?850:1700);
+  }
+}
+function easyFinish(){
+  const E=easy, st=E.st, n=E.total, tk=todayKey(), T=ST.stories, key="e:"+st.id;
+  T.best[key]=Math.max(T.best[key]||0,E.score); T.log[tk]=(T.log[tk]||0)+1; commit("stories");
+  haptic(E.score===n?[30,40,30,40,80]:20);
+  const list=STORIES.filter(x=>x.kind==="past"), next=list[(list.indexOf(st)+1)%list.length];
+  const fb=$("fb"); fb.className="sheet "+(E.score>=n*0.6?"ok":"bad"); fb.style.maxHeight="45%";
+  fb.innerHTML=`<div class="body"><div class="vrow"><div class="verdict">${E.score===n?"¡Perfecto!":E.score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${E.score} / ${n}</b><span>${T.best[key]>E.score?`best ${T.best[key]}/${n}`:"saved"}</span></div></div>
+    <p class="note" style="color:var(--muted)">Scroll up to reread the story. Ready to type the verbs yourself? Try this story in Type mode.</p></div>
+    <div class="foot" style="display:flex;gap:8px"><button type="button" id="eType" style="flex:1;background:var(--card);color:var(--ink);border-color:var(--line)">Type mode</button><button type="button" id="eNext" style="flex:2">Next story</button></div>`;
+  fb.hidden=false; $("drill").style.paddingBottom=(fb.offsetHeight+12)+"px";
+  $("eType").onclick=()=>renderStory(st.id);
+  $("eNext").onclick=()=>renderEasy(next.id);
+}
+
 // ================= endless drill =================
 let drill={points:0,streak:0,bestStreak:0,answered:0,correct:0,recent:[],item:null,cat:null,lastGain:null,startBest:0};
 function renderDrillSetup(){
