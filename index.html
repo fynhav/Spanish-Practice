@@ -66,10 +66,11 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,1
 .tag.do{color:var(--do)} .tag.io{color:var(--io)} .tag.pret{color:var(--pret)} .tag.imp{color:var(--imp)}
 .w.pw .t{padding-top:clamp(6px,1.2vh,10px)}
 .w .t.subj{font-size:clamp(.88rem,2.1vh,1rem);font-style:italic;color:var(--muted);padding-top:clamp(5px,1.4vh,9px)}
-.slot{vertical-align:middle;transition:background .15s,border-color .15s}
-.slot.empty::before{content:attr(data-ph)}
-.slot:not(.empty){border-style:solid;border-color:transparent;padding:0;background:none}
-.slot .tile{font-style:normal;font-size:inherit;padding:0 10px;border-radius:8px;border-bottom-width:2px;cursor:grab}
+.slot{position:relative;box-sizing:border-box;text-align:center;vertical-align:middle;transition:background .15s,border-color .15s}
+.slot::before{content:attr(data-ph)}
+.slot:not(.empty){border-style:solid;border-color:transparent;background:none}
+.slot:not(.empty)::before{visibility:hidden}
+.slot .tile{position:absolute;inset:-1.5px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:inherit;padding:0;border-radius:8px;border-bottom-width:2px;cursor:grab}
 .slot.over{border-color:var(--cc);background:var(--tile)}
 .blank{display:inline-block;border:1.5px dashed var(--muted);border-radius:8px;padding:0 10px;color:var(--muted);font-style:italic;font-weight:500}
 .trigq{border-bottom:2px dotted var(--muted)}
@@ -378,7 +379,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:24</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:30</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1245,7 +1246,7 @@ function renderQ(restore){
   $("accents").hidden=m!=="type";
   if(m==="tiles"){
     if(tilesFor!==pos){tiles=makeTiles(item); built=[]; tilesFor=pos}
-    drawTiles();
+    drawTiles(); lockSlot();
     $("checkBtn").onclick=()=>{if(!answered&&built.length) check(built.map(id=>tiles.find(x=>x.id===id).t).join(" "))};
   }else{
     const ans=$("ans");
@@ -1259,6 +1260,7 @@ function renderQ(restore){
   if(wasAnswered&&last) showFeedback(last.val,last.ok);
 }
 
+window.addEventListener("resize",()=>{try{lockSlot()}catch(e){}});
 function drawTiles(){
   const a=$("answer"), b=$("bank");
   a.innerHTML=built.map(id=>`<button type="button" class="tile" data-id="${id}" data-in="1">${esc(tiles.find(x=>x.id===id).t)}</button>`).join("");
@@ -1299,6 +1301,16 @@ function bindTile(el){
   });
 }
 const oneSlot=()=>cur().item.kind==="past";
+// the gap keeps one fixed size (the widest answer it may hold), so the sentence never reflows when a word is picked
+function lockSlot(){
+  const a=$("answer"); if(!a||!a.classList.contains("slot")) return;
+  a.style.width="";
+  const cands=[...document.querySelectorAll("#bank .tile")].map(t=>[t.textContent,"600","normal"]).concat([[a.dataset.ph||"","500","italic"]]);
+  const pr=document.createElement("span"); pr.style.cssText="position:absolute;visibility:hidden;white-space:nowrap;padding:0;border:0";
+  a.appendChild(pr); let w=0;
+  cands.forEach(([t,fw,fs])=>{pr.style.fontWeight=fw; pr.style.fontStyle=fs; pr.textContent=t; w=Math.max(w,pr.getBoundingClientRect().width)});
+  pr.remove(); a.style.width=Math.ceil(w+24)+"px";
+}
 function tap(id,inAns){if(answered)return;built=inAns?built.filter(x=>x!==id):(oneSlot()?[id]:built.concat(id));drawTiles()}
 function inside(el,x,y){const r=el.getBoundingClientRect(), px=el.classList.contains("slot")?30:10, py=el.classList.contains("slot")?30:14;return x>=r.left-px&&x<=r.right+px&&y>=r.top-py&&y<=r.bottom+py}
 function insertIndex(ansEl,x,y,dragId){
