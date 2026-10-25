@@ -289,7 +289,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 13:30</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 14:15</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1020,10 +1020,11 @@ function renderPast(item,mode,hl){
     const suf=esc(tk.suf||"");
     if(tk.trig){
       if(mode==="top") return `<div class="w"><span class="t"><span class="chip ${item.tense}" data-from="${item.tense}">${esc(tk.trig)}</span>${suf}</span></div>`;
+      if(mode==="done") return `<div class="w"><span class="t"><span class="chip ${item.tense}">${esc(tk.trig)}</span>${suf}</span></div>`;
       if(mode==="q"&&hl) return `<div class="w"><span class="t"><span class="trigq">${esc(tk.trig)}</span>${suf}</span></div>`;
       return words(tk.trig+(tk.suf||""));
     }
-    if(mode==="bottom") return `<div class="w"><span class="t"><span class="chip ${item.tense}" data-to="${item.tense}">${esc(item.ans)}</span>${suf}</span><span class="tag ${item.tense}">${item.p!=null?P[item.p]:esc(item.inf)}</span></div>`;
+    if(mode==="bottom"||mode==="done") return `<div class="w"><span class="t"><span class="chip ${item.tense}" data-to="${item.tense}">${esc(item.ans)}</span>${suf}</span><span class="tag ${item.tense}">${item.p!=null?P[item.p]:esc(item.inf)}</span></div>`;
     if(mode==="top") return `<div class="w"><span class="t"><span class="blank">___</span>${suf}</span></div>`;
     return `<div class="w"><span class="t"><span class="blank">${esc(item.inf)}</span>${suf}</span></div>`;
   }).join("")}</div>`;
@@ -1173,7 +1174,10 @@ function whyPast(item){
   const l1=item.why
     ?`<div><span class="dot ${item.tense}"></span><span><b class="${item.tense}-t">${tn}</b>: ${esc(item.why)}</span></div>`
     :`<div><span class="dot ${item.tense}"></span><span><b>${esc(item.trig)}</b> → ${esc(item.reason)} → <b class="${item.tense}-t">${tn}</b></span></div>`;
-  return l1+`<div><span class="dot"></span><span><b>${esc(item.inf)}</b>${item.p!=null?` + ${P[item.p]}`:""} → <b class="${item.tense}-t">${esc(item.ans)}</b>. ${item.altOk?`The ${on} <i>${esc(item.alt)}</i> also works here.`:`The ${on} would be <i>${esc(item.alt)}</i>.`}</span></div>`;
+  const irr=item.tense==="pret"&&OVR[item.inf]&&OVR[item.inf].pret?`<div><span class="dot pret"></span><span>Irregular in the pretérito: <i>${OVR[item.inf].pret.join(", ")}</i></span></div>`
+    :item.tense==="imp"&&OVR[item.inf]&&OVR[item.inf].imp?`<div><span class="dot imp"></span><span>One of only three irregular imperfectos: <i>${OVR[item.inf].imp.join(", ")}</i></span></div>`
+    :item.tense==="pret"&&YO[item.inf]&&item.p===0?`<div><span class="dot pret"></span><span>Spelling change for yo, to keep the sound: <i>${YO[item.inf]}</i></span></div>`:"";
+  return l1+irr+`<div><span class="dot"></span><span><b>${esc(item.inf)}</b>${item.p!=null?` + ${P[item.p]}`:""} → <b class="${item.tense}-t">${esc(item.ans)}</b>. ${item.altOk?`The ${on} <i>${esc(item.alt)}</i> also works here.`:`The ${on} would be <i>${esc(item.alt)}</i>.`}</span></div>`;
 }
 function showFeedback(val,ok){
   const {item}=cur();
@@ -1200,12 +1204,12 @@ function showFeedback(val,ok){
       ${g?`<div class="gain"><b>${g.pts>0?"+":g.pts<0?"−":""}${Math.abs(g.pts)}</b><span>${esc(g.why)}</span></div>`:""}
       ${!ok&&val!==null?`<div>You wrote: <i>${esc(val)}</i></div>`:""}
       <div>Answer: <b>${esc(item.display)}</b>${!ok&&item.extra&&item.extra.length?`<span style="color:var(--muted)"> · also accepted: ${item.extra.filter(e=>!e.note.startsWith("Accepted:")).slice(0,2).map(e=>`<i>${esc(e.raw)}</i>`).join(", ")}</span>`:""}</div>
-      <div class="link" id="linkBox">
-        ${isPast?renderPast(item,"top"):renderFull(item.full,"plain")}
+      ${isPast?`<div class="link">${renderPast(item,"done")}</div>`:`<div class="link" id="linkBox">
+        ${renderFull(item.full,"plain")}
         <div class="gap"></div>
-        ${isPast?renderPast(item,"bottom"):renderShort(item)}
+        ${renderShort(item)}
         <svg class="links" aria-hidden="true"></svg>
-      </div>
+      </div>`}
       <div class="why">${isPast?whyPast(item):whyPron(item)}</div>
       ${ok&&val!==null&&item.extra?(()=>{const x=item.extra.find(e=>e.raw===plain(val)||norm(e.raw)===norm(val));return x?`<p class="note"><b>${esc(x.note)}</b></p>`:""})():""}
       ${item.note?`<p class="note">${esc(item.note)}</p>`:""}
