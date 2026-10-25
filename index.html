@@ -83,9 +83,11 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,1
 .tile.r-imp{background:var(--imp-soft);color:var(--imp);border-color:var(--imp)}
 .float{position:fixed;z-index:50;pointer-events:none;box-shadow:0 8px 20px rgba(42,38,32,.2);transform:rotate(-2deg)}
 .locked .tile{pointer-events:none}
-/* typing boxes are one-line textareas: Safari never offers contact AutoFill on a textarea */
-#ans{display:block;width:100%;font:inherit;font-size:1.1rem;line-height:1.4;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--tile);color:var(--ink);resize:none;overflow:hidden;height:calc(1.4em + 27px);white-space:nowrap}
+/* typing boxes are editable text, not form fields, so iOS never offers contact AutoFill on them */
+#ans{display:block;width:100%;font:inherit;font-size:1.1rem;line-height:1.4;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--tile);color:var(--ink);min-height:calc(1.4em + 27px);white-space:nowrap;overflow-x:auto;cursor:text;-webkit-user-select:text;user-select:text}
 #ans:focus{outline:none;border-color:var(--cc)}
+#ans:empty::before{content:attr(data-ph);color:var(--muted);pointer-events:none}
+.sb:empty::before{content:"\200b"}
 /* actions */
 .actions{flex:none;display:flex;gap:8px;padding-block:10px 14px;border-top:1px solid var(--line)}
 .actions:empty{display:none}
@@ -206,7 +208,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .story .t{cursor:pointer;border-radius:5px}
 .story .t.tapped{background:var(--line)}
 .gapw{white-space:nowrap}
-.sb{display:inline-block;vertical-align:baseline;resize:none;overflow:hidden;white-space:nowrap;height:calc(1.3em + 4px);font:inherit;font-size:16px;line-height:1.3;border:0;border-bottom:2px solid var(--cc);background:var(--cc-soft);border-radius:6px 6px 0 0;padding:1px 6px;margin:0 2px;text-align:center;color:var(--ink);min-width:3.5ch;max-width:60vw}
+.sb{display:inline-block;vertical-align:baseline;white-space:nowrap;cursor:text;-webkit-user-select:text;user-select:text;font:inherit;font-size:16px;line-height:1.3;border:0;border-bottom:2px solid var(--cc);background:var(--cc-soft);border-radius:6px 6px 0 0;padding:1px 6px;margin:0 2px;text-align:center;color:var(--ink);min-width:3.5ch;max-width:60vw;overflow:hidden}
 .sb:focus{outline:2px solid var(--cc);outline-offset:1px}
 .sb.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
 .sb.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
@@ -287,6 +289,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 13:30</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -720,8 +723,19 @@ function haptic(pattern){
   const n=Array.isArray(pattern)?Math.ceil(pattern.length/2):1;
   for(let k=0;k<n;k++){ if(k===0) hapticEl.click(); else setTimeout(()=>{try{hapticEl.click()}catch(e){}},k*110) }
 }
+function makeField(el,onEnter){
+  Object.defineProperty(el,"value",{configurable:true,get(){return el.textContent.replace(/\u00a0/g," ")},set(v){el.textContent=v}});
+  Object.defineProperty(el,"readOnly",{configurable:true,get(){return el.getAttribute("contenteditable")!=="true"},set(v){el.setAttribute("contenteditable",v?"false":"true")}});
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault(); onEnter&&onEnter()}});
+  el.addEventListener("beforeinput",e=>{if(e.inputType==="insertParagraph"||e.inputType==="insertLineBreak"){e.preventDefault(); onEnter&&onEnter()}});
+  el.addEventListener("paste",e=>{e.preventDefault(); const t=(e.clipboardData?e.clipboardData.getData("text"):"").replace(/\s+/g," "); document.execCommand("insertText",false,t)});
+  el.addEventListener("input",()=>{if(el.querySelector("br,div,p")) el.textContent=el.textContent});
+  return el;
+}
+const FIELD_ATTRS=`contenteditable="true" role="textbox" lang="es" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text"`;
 function insertChar(ch){
   const ae=document.activeElement, i=ae&&ae.matches&&ae.matches(".sb,#ans")?ae:$("ans"); if(!i||i.readOnly) return;
+  if(i.isContentEditable){ i.focus({preventScroll:true}); if(!document.execCommand("insertText",false,ch)){ i.textContent+=ch; i.dispatchEvent(new Event("input",{bubbles:true})) } return }
   const a=i.selectionStart??i.value.length, b=i.selectionEnd??a;
   i.value=i.value.slice(0,a)+ch+i.value.slice(b);
   i.setSelectionRange(a+ch.length,a+ch.length); i.focus({preventScroll:true});
@@ -1061,7 +1075,7 @@ function renderQ(restore){
     <p class="prompt">${prompt}</p>
     ${m==="tiles"
       ?`<div class="answer empty" id="answer" data-ph="${isPast?"Tap the right form":"Drag or tap words here"}" aria-label="Your answer"></div><div class="bank" id="bank"></div>`
-      :`<form id="f" autocomplete="off"><textarea id="ans" rows="1" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" data-form-type="other" placeholder="${isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></textarea></form>`}
+      :`<form id="f" autocomplete="off" onsubmit="return false"><div id="ans" ${FIELD_ATTRS} enterkeyhint="done" data-ph="${isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></div></form>`}
     <p class="hint" id="hint" hidden>${hintText(item)}</p>`;
   $("actions").innerHTML=`<button class="ghost" type="button" id="hintBtn">Hint</button><button class="ghost" type="button" id="skip">Answer</button><button type="button" class="grow" id="checkBtn" ${m==="tiles"?"disabled":""}>Check</button>`;
   $("hintBtn").onclick=()=>{if(!answered&&$("hint").hidden){$("hint").hidden=false; hintUsed=true}};
@@ -1072,11 +1086,11 @@ function renderQ(restore){
     drawTiles();
     $("checkBtn").onclick=()=>{if(!answered&&built.length) check(built.map(id=>tiles.find(x=>x.id===id).t).join(" "))};
   }else{
-    const ans=$("ans"); ans.value=typed;
+    const ans=$("ans");
     const go=()=>{if(answered||!ans.value.trim())return;check(ans.value)};
+    makeField(ans,go); ans.value=typed;
     $("f").onsubmit=e=>{e.preventDefault();go()};
-    ans.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();go()}});
-    ans.addEventListener("input",()=>{if(/\n/.test(ans.value)){ans.value=ans.value.replace(/\n/g,"");go()}});
+
     $("checkBtn").onclick=go;
     if(!restore) ans.focus({preventScroll:true});
   }
@@ -1356,7 +1370,7 @@ function renderStory(id){
     if(typeof sg==="string") return storyWords(sg);
     const w=Math.max(sg.answers[0].length,3)+2;
     const label=sg.type==="verb"?`(${sg.inf})`:`(= ${sg.hint})`;
-    return `<span class="gapw"><textarea class="sb" rows="1" id="g${sg.i}" data-i="${sg.i}" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-form-type="other" enterkeyhint="${sg.i<gaps.length-1?"next":"done"}" style="width:${w}ch" aria-label="Gap ${sg.i+1} ${esc(label)}">${esc(draft[sg.i]||"")}</textarea><span class="ginf">${esc(label)}</span></span>`;
+    return `<span class="gapw"><span class="sb" ${FIELD_ATTRS} id="g${sg.i}" data-i="${sg.i}" enterkeyhint="${sg.i<gaps.length-1?"next":"done"}" style="min-width:${w}ch" aria-label="Gap ${sg.i+1} ${esc(label)}">${esc(draft[sg.i]||"")}</span><span class="ginf">${esc(label)}</span></span>`;
   }).join("");
   $("drill").innerHTML=`
     <div class="meta"><span class="pill ${st.kind==="past"?"pret":"both"}">${st.kind==="past"?"Past tense":"Pronouns"}</span><span class="label">${gaps.length} gaps</span></div>
@@ -1367,10 +1381,8 @@ function renderStory(id){
   $("accents").hidden=false;
   const inputs=[...document.querySelectorAll("#storyText .sb")];
   inputs.forEach((inp,k)=>{
-    inp.addEventListener("input",()=>{
-      if(/\n/.test(inp.value)){inp.value=inp.value.replace(/\n/g,""); if(inputs[k+1]) inputs[k+1].focus(); else checkStory()}
-      const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal()});
-    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault(); if(inputs[k+1]) inputs[k+1].focus(); else checkStory()}});
+    makeField(inp,()=>{if(inputs[k+1]) inputs[k+1].focus(); else checkStory()});
+    inp.addEventListener("input",()=>{const d=ST.storyDraft[id]=ST.storyDraft[id]||{}; d[k]=inp.value; saveLocal()});
   });
   // while a gap has the keyboard, hide Clear / Check story to give the paragraph room
   const stEl=$("storyText");
@@ -1558,6 +1570,6 @@ renderMenu();
 </script>
 
 <script>
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}))}
 </script>
 </body></html>
