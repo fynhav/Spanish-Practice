@@ -58,6 +58,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,1
 .w .t{font-size:clamp(1.1rem,2.6vh,1.35rem);padding:2px}
 .chip{border-radius:8px;padding:2px 9px !important;font-weight:600}
 .chip.pic{font-size:clamp(1.6rem,4vh,2.1rem) !important;line-height:1.2;padding:2px 10px !important}
+.chip.hl{background:#EFE8D6;color:var(--ink);box-shadow:inset 0 -2px 0 var(--muted)}
 .chip.do{background:var(--do-soft);color:var(--do);box-shadow:inset 0 -2px 0 var(--do)}
 .chip.io{background:var(--io-soft);color:var(--io);box-shadow:inset 0 -2px 0 var(--io)}
 .chip.pret{background:var(--pret-soft);color:var(--pret);box-shadow:inset 0 -2px 0 var(--pret)}
@@ -66,6 +67,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,2vh,1
 .tag.do{color:var(--do)} .tag.io{color:var(--io)} .tag.pret{color:var(--pret)} .tag.imp{color:var(--imp)}
 .w.pw .t{padding-top:clamp(6px,1.2vh,10px)}
 .w .t.subj{font-size:clamp(.88rem,2.1vh,1rem);font-style:italic;color:var(--muted);padding-top:clamp(5px,1.4vh,9px)}
+main>*{flex-shrink:0}
 .qpush{flex:1 1 0;min-height:0;margin:0}
 .slot{position:relative;box-sizing:border-box;text-align:center;vertical-align:middle;transition:background .15s,border-color .15s}
 .slot::before{content:attr(data-ph)}
@@ -383,7 +385,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 18:48</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-25 · 19:10</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -470,7 +472,8 @@ const pick=(a,r)=>a[Math.floor(r()*a.length)];
 const DAYS=30;
 const P=["yo","tú","él/ella","nosotros","ellos/ellas"];
 const NAMES=new Set(["Ana","Pedro","Elena","María","Carlos","Lucía","Lima","Portugal","Madrid"]);
-const SUBJ_S=["Ana","Pedro","Mi madre","Elena"], SUBJ_P=["Mis padres","Ellos","Mis compañeros","Ellas"];
+// subjects that make sense with the scene: family subjects stay away from clients, colleagues only turn up with clients
+const SUBJ_S=["Ana","Pedro","Elena","Mi madre"], SUBJ_P=["Ellos","Ellas","Mis padres","Mis amigos"], SUBJ_SW=["Ana","Pedro","Elena"], SUBJ_PW=["Ellos","Ellas","Mis compañeros"];
 
 // ================= object pronoun content =================
 const ar=s=>[s+"o",s+"as",s+"a",s+"amos",s+"an"], er=s=>[s+"o",s+"es",s+"e",s+"emos",s+"en"], ir=s=>[s+"o",s+"es",s+"e",s+"imos",s+"en"];
@@ -502,26 +505,26 @@ const DOV=[
 ];
 // [present forms, [[thing, gender, number, picture]...]] — the thing stays in part 2, becomes lo/la in part 3
 const IOV=[
-  [["doy","das","da","damos","dan"],[["un regalo","m","s","🎁"],["las llaves","f","p","🔑🔑"],["el dinero","m","s","💶"],["una flor","f","s","🌹"]]],
-  [ar("regal"),[["un libro","m","s","📕"],["una bicicleta","f","s","🚲"],["los juguetes","m","p","🧸🧸"],["flores","f","p","💐"]]],
-  [ir("escrib"),[["una carta","f","s","✉️"],["un mensaje","m","s","💬"],["los correos","m","p","📧📧"],["postales","f","p","💌💌"]]],
-  [ar("mand"),[["las fotos","f","p","🖼️🖼️"],["un paquete","m","s","📦"],["la invitación","f","s","💌"],["los documentos","m","p","📄📄"]]],
-  [ar("explic"),[["la lección","f","s","📖"],["el problema","m","s","❓"],["las reglas","f","p","📏"],["los ejercicios","m","p","📝📝"]]],
-  [["cuento","cuentas","cuenta","contamos","cuentan"],[["un secreto","m","s","🤫"],["la historia","f","s","📖"],["los planes","m","p","🗓️"],["un chiste","m","s","😂"]]],
-  [["digo","dices","dice","decimos","dicen"],[["la verdad","f","s","✅"],["la respuesta","f","s","💡"],["los nombres","m","p","🏷️"],["un secreto","m","s","🤫"]]],
-  [ar("prest"),[["el coche","m","s","🚗"],["la bicicleta","f","s","🚲"],["los apuntes","m","p","📒📒"],["dinero","m","s","💶"]]],
-  [ar("enseñ"),[["las fotos","f","p","🖼️🖼️"],["el piso","m","s","🏢"],["la ciudad","f","s","🏙️"],["los cuadros","m","p","🖼️"]]],
-  [ar("compr"),[["un helado","m","s","🍦"],["una camiseta","f","s","👕"],["los zapatos","m","p","👟👟"],["unas flores","f","p","💐"]]],
-  [["sirvo","sirves","sirve","servimos","sirven"],[["la sopa","f","s","🍲"],["el café","m","s","☕"],["los postres","m","p","🍰🍰"],["las bebidas","f","p","🥤🥤"]]],
-  [["devuelvo","devuelves","devuelve","devolvemos","devuelven"],[["el libro","m","s","📕"],["las llaves","f","p","🔑🔑"],["el dinero","m","s","💶"],["la chaqueta","f","s","🧥"]]],
-  [["traigo","traes","trae","traemos","traen"],[["un café","m","s","☕"],["la cuenta","f","s","🧾"],["los platos","m","p","🍽️🍽️"],["una tarta","f","s","🎂"]]],
-  [ar("prepar"),[["la cena","f","s","🍝"],["un té","m","s","🍵"],["los bocadillos","m","p","🥪🥪"],["una sorpresa","f","s","🎉"]]],
-  [["ofrezco","ofreces","ofrece","ofrecemos","ofrecen"],[["un té","m","s","🍵"],["ayuda","f","s","🤝"],["los dulces","m","p","🍬🍬"],["una silla","f","s","🪑"]]],
-  [["pido","pides","pide","pedimos","piden"],[["un favor","m","s","🙏"],["la sal","f","s","🧂"],["los datos","m","p","📋"],["ayuda","f","s","🤝"]]],
-  [er("le"),[["un cuento","m","s","📖"],["la carta","f","s","✉️"],["las noticias","f","p","🗞️🗞️"],["los poemas","m","p","📜📜"]]],
-  [["muestro","muestras","muestra","mostramos","muestran"],[["el camino","m","s","🧭"],["las fotos","f","p","🖼️🖼️"],["la casa","f","s","🏠"],["los resultados","m","p","📊"]]]
+  [["doy","das","da","damos","dan"],[["un regalo","m","s","🎁","Ma hna ab am ni"],["las llaves","f","p","🔑🔑","hno vc Ca am"],["el dinero","m","s","💶","hno Ca ni am"],["una flor","f","s","🌹","Ma Lu hna vc"]]],
+  [ar("regal"),[["un libro","m","s","📕","Ca hna am Lu"],["una bicicleta","f","s","🚲","ni hno hna Lu"],["los juguetes","m","p","🧸🧸","ni hno hna"],["flores","f","p","💐","Ma ab vc Lu"]]],
+  [ir("escrib"),[["una carta","f","s","✉️","ab Ma hno pf"],["un mensaje","m","s","💬","am Ca Lu hno"],["los correos","m","p","📧📧","cl pf Ca"],["postales","f","p","💌💌","ab am hna Lu"]]],
+  [ar("mand"),[["las fotos","f","p","🖼️🖼️","ab am Ma Ca"],["un paquete","m","s","📦","hna Ca ab cl"],["la invitación","f","s","💌","am vc Ma ch"],["los documentos","m","p","📄📄","cl pf Ca"]]],
+  [ar("explic"),[["la lección","f","s","📖","ni hna am Lu"],["el problema","m","s","❓","pf Ca cl hno"],["las reglas","f","p","📏","ni am hno ch"],["los ejercicios","m","p","📝📝","ni hna ch Lu"]]],
+  [["cuento","cuentas","cuenta","contamos","cuentan"],[["un secreto","m","s","🤫","am hna Lu Ma"],["la historia","f","s","📖","ni ab hno am"],["los planes","m","p","🗓️","am ab Ma hna"],["un chiste","m","s","😂","am ni Ca hno"]]],
+  [["digo","dices","dice","decimos","dicen"],[["la verdad","f","s","✅","Ma Ca ab am"],["la respuesta","f","s","💡","pf Ca ni ch"],["la dirección","f","s","📍","Ca Ma vc pf"],["un secreto","m","s","🤫","am hna Lu Ma"]]],
+  [ar("prest"),[["el coche","m","s","🚗","hno Ca am hna"],["la bicicleta","f","s","🚲","ni hna vc am"],["los apuntes","m","p","📒📒","am ch Ca hna"],["dinero","m","s","💶","hno am Ca hna"]]],
+  [ar("enseñ"),[["las fotos","f","p","🖼️🖼️","ab am Ma vc"],["el piso","m","s","🏢","am hna ab cl"],["la ciudad","f","s","🏙️","am ab Ma cl"],["los cuadros","m","p","🖼️","am vc ab Ma"]]],
+  [ar("compr"),[["un helado","m","s","🍦","ni hno hna Ma"],["una camiseta","f","s","👕","hno hna Ca Ma"],["los zapatos","m","p","👟👟","ni hna hno Lu"],["unas flores","f","p","💐","Ma ab vc Lu"]]],
+  [["sirvo","sirves","sirve","servimos","sirven"],[["la sopa","f","s","🍲","ni ab am hno"],["el café","m","s","☕","cl am ab vc"],["los postres","m","p","🍰🍰","ni cl am ab"],["las bebidas","f","p","🥤🥤","cl am ni ch"]]],
+  [["devuelvo","devuelves","devuelve","devolvemos","devuelven"],[["el libro","m","s","📕","Ca pf vc Ma"],["las llaves","f","p","🔑🔑","vc hno hna Ca"],["el dinero","m","s","💶","Ca hno am Ma"],["la chaqueta","f","s","🧥","hna Lu Ca Ma"]]],
+  [["traigo","traes","trae","traemos","traen"],[["un café","m","s","☕","Ma Ca hna cl"],["la cuenta","f","s","🧾","cl am ab Ca"],["los platos","m","p","🍽️🍽️","cl am ab ni"],["una tarta","f","s","🎂","ab Ma am vc"]]],
+  [ar("prepar"),[["la cena","f","s","🍝","am hna ab ni"],["un té","m","s","🍵","Ma ab vc Ca"],["los bocadillos","m","p","🥪🥪","ni am ch hno"],["una sorpresa","f","s","🎉","Ma hna ab Ca"]]],
+  [["ofrezco","ofreces","ofrece","ofrecemos","ofrecen"],[["un té","m","s","🍵","vc ab cl am"],["ayuda","f","s","🤝","vc ab am Ma"],["los dulces","m","p","🍬🍬","ni am vc ab"],["una silla","f","s","🪑","ab vc cl Lu"]]],
+  [["pido","pides","pide","pedimos","piden"],[["un favor","m","s","🙏","Ca vc am hna"],["la sal","f","s","🧂","Ca hno hna am"],["los datos","m","p","📋","cl pf Ca"],["ayuda","f","s","🤝","am hno vc pf"]]],
+  [er("le"),[["un cuento","m","s","📖","ni hna hno ab"],["la carta","f","s","✉️","ab Ma Ca hna"],["las noticias","f","p","🗞️🗞️","ab am hna Ca"],["los poemas","m","p","📜📜","Ma Lu ab hna"]]],
+  [["muestro","muestras","muestra","mostramos","muestran"],[["el camino","m","s","🧭","Ca am cl ch"],["las fotos","f","p","🖼️🖼️","ab am Ma vc"],["la casa","f","s","🏠","am ab cl hna"],["los resultados","m","p","📊","cl pf Ca am"]]]
 ];
-const RECIP=[["a María","f","s","👩"],["a Carlos","m","s","👨"],["a mi hermana","f","s","👧"],["a mi hermano","m","s","👦"],["a los niños","m","p","🧒🧒"],["a las chicas","f","p","👧👧"],["al profesor","m","s","👨‍🏫"],["a la vecina","f","s","👩‍🦳"],["a los clientes","m","p","🧑‍💼🧑‍💼"],["a mis abuelos","m","p","👴👵"],["a Lucía","f","s","👩‍🦰"],["a mis amigos","m","p","🧑🧑"]];
+const RC={Ma:["a María","f","s","👩"],Ca:["a Carlos","m","s","👨"],hna:["a mi hermana","f","s","👧"],hno:["a mi hermano","m","s","👦"],ni:["a los niños","m","p","🧒🧒"],ch:["a las chicas","f","p","👧👧"],pf:["al profesor","m","s","👨‍🏫"],vc:["a la vecina","f","s","👩‍🦳"],cl:["a los clientes","m","p","🧑‍💼🧑‍💼"],ab:["a mis abuelos","m","p","👴👵"],Lu:["a Lucía","f","s","👩‍🦰"],am:["a mis amigos","m","p","🧑🧑"]};
 
 const dop=o=>(o[1]==="m"?"lo":"la")+(o[2]==="p"?"s":"");
 function objTok(o,r){const m=o[0].match(/^(al?) (.+)$/);return {t:m?m[2]:o[0],pre:m?m[1]:"",r,g:o[1],n:o[2],pic:o[3],lead:"",suf:""}}
@@ -529,14 +532,14 @@ const noun=w=>(w.pre?w.pre+" ":"")+w.t;
 
 function makePron(kind,[forms,o],r){
   let p=Math.floor(r()*5), subj="";
-  for(let k=0;k<8;k++){subj=p===2?pick(SUBJ_S,r):p===4?pick(SUBJ_P,r):""; if(!subj||!o[0].toLowerCase().includes(subj.toLowerCase().replace(/^mis? /,""))) break}
+  const rc=kind==="do"?null:RC[pick(o[4].split(" "),r)], work=rc&&rc[0]==="a los clientes", clash=x=>x.toLowerCase().includes(subj.toLowerCase().replace(/^mis? /,""));
+  for(let k=0;k<12;k++){subj=p===2?pick(work?SUBJ_SW:SUBJ_S,r):p===4?pick(work?SUBJ_PW:SUBJ_P,r):""; if(!subj||!(clash(o[0])||(rc&&clash(rc[0])))) break}
   const v=forms[p], lead=subj?[subj]:[], sl=lead.map(s=>[s]);
   let full,short,note;
   if(kind==="do"){
     const tok=objTok(o,"do"); full=[...lead,v,tok]; short=[...sl,[dop(o),"do"],[v]];
     if(tok.pre) note=`${cap(noun(tok))} receives the action directly, so it takes ${dop(o)}. The personal “a” only marks a person; it doesn’t make it indirect.`+(/padres|abuelos/.test(o[0])?" Mixed groups take the masculine plural.":"");
   }else{
-    const rc=pick(RECIP,r);
     if(kind==="io"){full=[...lead,v,o[0],objTok(rc,"io")]; short=[...sl,[rc[2]==="p"?"les":"le","io"],[v],[o[0]]]}
     else {full=[...lead,v,objTok(o,"do"),objTok(rc,"io")]; short=[...sl,["se","io"],[dop(o),"do"],[v]]}
   }
@@ -1933,6 +1936,10 @@ const G={m:"masc.",f:"fem."}, N={s:"sing.",p:"plural"};
 function renderFull(words,mode){
   return `<div class="sentence">${words.map(w=>{
     if(typeof w==="string") return `<div class="w"><span class="t">${esc(w)}</span></div>`;
+    if(mode==="blind"||mode==="blindpics"){
+      return (mode==="blindpics"&&w.pre?`<div class="w pw"><span class="t">${esc(w.pre)}</span></div>`:"")+
+        `<div class="w"><span class="t chip hl${mode==="blindpics"?" pic":""}" data-w="${esc(noun(w))}"${mode==="blindpics"?' role="img" aria-label="object picture"':""}>${mode==="blindpics"?w.pic:esc(noun(w))}</span></div>`;
+    }
     if(mode==="pics"){
       return (w.pre?`<div class="w pw"><span class="t">${esc(w.pre)}</span></div>`:"")+
         `<div class="w"><span class="t chip pic ${w.r}" data-w="${esc(noun(w))}" role="img" aria-label="${w.r==="do"?"direct":"indirect"} object picture">${w.pic}</span><span class="tag ${w.r}">${w.r==="do"?"Direct":"Indirect"}</span></div>`;
@@ -2011,11 +2018,15 @@ function renderQ(restore){
   else{const pt=parts()[part]; info={key:pt.key,pillCls:pt.key,pill:pt.pill,counter:`<span class="label">${pos-partStart(part)+1} / ${pt.n}</span>`}}
   const isPast=item.kind==="past";
   const inSlot=isPast&&m==="tiles";
-  const q=isPast?renderPast(item,"q",info.key!=="mix",inSlot):renderFull(item.full,S.view==="pics"?"pics":"tags");
-  const PPROMPT={do:"Replace the <b class=\"do-t\">direct object</b> with a pronoun:",io:"Replace the <b class=\"io-t\">indirect object</b> with a pronoun:",both:"Replace <b>both objects</b> with pronouns:",two:"Replace the objects with pronouns:"};
-  const prompt=(isPast?(info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(PPROMPT[info.key]||PPROMPT.two))+` <span class="tapnote">Tap any word for its meaning.</span>`;
+  // in the endless drill nothing in the question says which type it is: no category label, no colours, no direct/indirect tags
+  const blind=drillOn, pics=S.view==="pics";
+  const q=isPast?renderPast(item,"q",!blind&&info.key!=="mix",inSlot):renderFull(item.full,blind?(pics?"blindpics":"blind"):(pics?"pics":"tags"));
+  const nObj=isPast?0:item.full.filter(w=>typeof w!=="string").length;
+  const PPROMPT={do:"Replace the <b class=\"do-t\">direct object</b> with a pronoun:",io:"Replace <b>only</b> the <b class=\"io-t\">indirect object</b> (highlighted) with a pronoun:",both:"Replace <b>both</b> highlighted objects with pronouns:"};
+  const ppn=nObj>1?"Replace <b>both</b> highlighted phrases with pronouns:":"Replace <b>only</b> the highlighted words with a pronoun:";
+  const prompt=(isPast?(blind||info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(blind||info.key==="two"?ppn:(PPROMPT[info.key]||ppn)))+` <span class="tapnote">Tap any word for its meaning.</span>`;
   $("drill").innerHTML=`
-    <div class="meta"><span class="pill ${info.pillCls}">${esc(info.pill)}</span>${info.counter}</div>
+    <div class="meta">${blind?"<span style=\"flex:1\"></span>":`<span class="pill ${info.pillCls}">${esc(info.pill)}</span>`}${info.counter}</div>
     <div class="qpush" aria-hidden="true"></div>
     ${q}
     <p class="prompt">${prompt}</p>
@@ -2304,7 +2315,7 @@ function parseStory(st){
 }
 
 Object.assign(VERB_EN,{haber:"there to be (había = there was/were)",mirar:"to look at",parecer:"to seem",llevar:"to wear; to carry, take",entrar:"to go in, enter",probar:"to try, taste","oír":"to hear",levantar:"levantarse: to get up","reír":"reírse: to laugh",decidir:"to decide",echar:"echar de menos: to miss",pasear:"to walk, stroll",detener:"to stop, arrest",pasar:"to spend (time); to pass",romper:"to break",subir:"to go up, climb",aplaudir:"to clap",desayunar:"to have breakfast",aprender:"to learn",encontrar:"to find",marcar:"to score",pitar:"to blow the whistle",gritar:"to shout",morir:"to die",cantar:"to sing"});
-Object.assign(WORD_EN,{hermana:"sister",gente:"people",museo:"museum",cuadros:"paintings",tienda:"shop",pueblo:"village, town",barco:"boat",pescar:"to fish",mojados:"wet",chocolate:"hot chocolate",caliente:"hot",entrevista:"interview",nervioso:"nervous",empresa:"company",directora:"director (f)",traje:"suit",azul:"blue",seria:"serious",puesto:"job, position",paisaje:"landscape, view",señor:"man, gentleman",mayor:"older",antiguo:"old",famoso:"famous",vida:"life",vela:"candle",ruido:"noise","extraño":"strange",gato:"cat",chica:"girl","rápido":"fast",nuevos:"new",arroz:"rice",supermercado:"supermarket",cerrado:"closed",divertida:"fun",bajita:"short",pelo:"hair",blanco:"white",delantal:"apron",equipo:"team",gol:"goal",goles:"goals","árbitro":"referee","alegría":"joy",nadie:"nobody",parques:"parks",lleno:"full",camarera:"waitress",bolso:"handbag",suerte:"luck","policía":"police officer",esquina:"corner","tíos":"uncle and aunt","jardín":"garden","río":"river","cómics":"comics",brazo:"arm",sala:"room, venue",gente:"people",escenario:"stage",medianoche:"midnight","malecón":"seafront promenade",ceviche:"ceviche",experiencia:"experience",prima:"cousin (f)",ceremonia:"ceremony",iglesia:"church",novia:"bride; girlfriend",vestido:"dress",emocionada:"emotional, moved",novios:"bride and groom",vals:"waltz",invitados:"guests","tío":"uncle",discurso:"speech",invierno:"winter",collar:"collar",comida:"food",carteles:"posters","niña":"girl",regalos:"presents",carta:"menu; letter",propina:"tip",camarero:"waiter",planes:"plans",rueda:"wheel",pinchada:"flat (tyre)","difíciles":"difficult",perfectos:"perfect",nevera:"fridge",invitaciones:"invitations","salón":"living room",luces:"lights",apagadas:"switched off",chaqueta:"jacket",escaparate:"shop window",dependienta:"shop assistant (f)",papel:"paper",guantes:"gloves","depósito":"(fuel) tank",gracias:"thanks",bibliotecaria:"librarian (f)",vacaciones:"holidays",plantas:"plants",cajón:"drawer",enseguida:"straight away",calma:"calm",muchísimo:"a great deal",dentro:"inside",fuera:"outside"});
+Object.assign(WORD_EN,{"dirección":"address",hermana:"sister",gente:"people",museo:"museum",cuadros:"paintings",tienda:"shop",pueblo:"village, town",barco:"boat",pescar:"to fish",mojados:"wet",chocolate:"hot chocolate",caliente:"hot",entrevista:"interview",nervioso:"nervous",empresa:"company",directora:"director (f)",traje:"suit",azul:"blue",seria:"serious",puesto:"job, position",paisaje:"landscape, view",señor:"man, gentleman",mayor:"older",antiguo:"old",famoso:"famous",vida:"life",vela:"candle",ruido:"noise","extraño":"strange",gato:"cat",chica:"girl","rápido":"fast",nuevos:"new",arroz:"rice",supermercado:"supermarket",cerrado:"closed",divertida:"fun",bajita:"short",pelo:"hair",blanco:"white",delantal:"apron",equipo:"team",gol:"goal",goles:"goals","árbitro":"referee","alegría":"joy",nadie:"nobody",parques:"parks",lleno:"full",camarera:"waitress",bolso:"handbag",suerte:"luck","policía":"police officer",esquina:"corner","tíos":"uncle and aunt","jardín":"garden","río":"river","cómics":"comics",brazo:"arm",sala:"room, venue",gente:"people",escenario:"stage",medianoche:"midnight","malecón":"seafront promenade",ceviche:"ceviche",experiencia:"experience",prima:"cousin (f)",ceremonia:"ceremony",iglesia:"church",novia:"bride; girlfriend",vestido:"dress",emocionada:"emotional, moved",novios:"bride and groom",vals:"waltz",invitados:"guests","tío":"uncle",discurso:"speech",invierno:"winter",collar:"collar",comida:"food",carteles:"posters","niña":"girl",regalos:"presents",carta:"menu; letter",propina:"tip",camarero:"waiter",planes:"plans",rueda:"wheel",pinchada:"flat (tyre)","difíciles":"difficult",perfectos:"perfect",nevera:"fridge",invitaciones:"invitations","salón":"living room",luces:"lights",apagadas:"switched off",chaqueta:"jacket",escaparate:"shop window",dependienta:"shop assistant (f)",papel:"paper",guantes:"gloves","depósito":"(fuel) tank",gracias:"thanks",bibliotecaria:"librarian (f)",vacaciones:"holidays",plantas:"plants",cajón:"drawer",enseguida:"straight away",calma:"calm",muchísimo:"a great deal",dentro:"inside",fuera:"outside"});
 STORIES.forEach(st=>parseStory(st).gaps.forEach(g=>{if(g.type==="verb") g.answers.forEach(a=>{if(!a.includes(" ")) addForm(a,{inf:g.inf,t:g.tense==="pret"?"pretérito":"imperfecto"})})}));
 let storyKind="easy", storyId=null, storyChecked=false, storyAttempts={};
 const storyGroups=[["easy","Past · tap"],["past","Past · type"],["pron","Pronouns"]];
