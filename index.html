@@ -355,6 +355,16 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .actions:has(.vlite){justify-content:space-between;padding-inline:14px}
 .actions .vlite{background:none;border:0;box-shadow:none;min-height:44px;flex:none;padding:0 10px;font-size:1rem;font-weight:600;color:var(--muted)}
 .actions .vlite.h{color:var(--cc)}
+.vtabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.vtabs::-webkit-scrollbar{display:none}
+.vtabs button{flex:none;background:var(--card);color:var(--ink);border:1.5px solid var(--line);padding:8px 13px;font-size:.9rem;border-radius:20px;font-weight:600}
+.vtabs button[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:#fff}
+.vfocus{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0 10px;text-align:center}
+.vfocus .ic{font-size:2.5rem;line-height:1.1}.vfocus .pr{color:var(--muted);font-size:1rem}
+.vfocus .fm{font-size:2.3rem;font-weight:700;line-height:1.15}.vfocus .eg{font-size:1rem;min-height:1.3em}
+button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;font-size:1.02rem;color:inherit;cursor:pointer}
+.vrow.un .fm{color:#CFC6B0;letter-spacing:.25em}
+.vstep{color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums}
 .vsec{display:flex;flex-direction:column;gap:10px}
 .vtiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .vtile{display:flex;flex-direction:column;gap:3px;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 12px 11px;font-weight:400;min-width:0;position:relative;overflow:hidden;padding-top:15px}
@@ -490,7 +500,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-27 · 23:48</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-27 · 23:52</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1884,7 +1894,7 @@ function streak(has){
 const isDrill=()=>screen==="dsetup"||screen==="dq"||screen==="dsum";
 const isStory=()=>screen==="slist"||screen==="story"||screen==="easy";
 function setCourseColour(c){
-  const k=isV()?(screen==="vq"&&V.q[V.i]?VTK[V.q[V.i].tk].cc:(VTK[V.tense]||{cc:"mix"}).cc):isStory()?(storyKind==="pron"?"both":"pret"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
+  const k=isV()?(screen==="vlearn"&&V.ln?VTK[V.ln.tk].cc:screen==="vq"&&V.q[V.i]?VTK[V.q[V.i].tk].cc:(VTK[V.tense]||{cc:"mix"}).cc):isStory()?(storyKind==="pron"?"both":"pret"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
   s.setProperty("--cc",`var(--${k})`); s.setProperty("--cc-soft",`var(--${k}-soft)`);
 }
 function chrome(){
@@ -1894,7 +1904,7 @@ function chrome(){
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
   $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq");
-  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":"‹ Menu";
+  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":"‹ Menu";
   $("title").textContent=isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
   $("progress").hidden=!(inS||screen==="vq"); $("openRules").hidden=$("openSettings").hidden=screen==="vq";
   $("score").textContent=screen==="vq"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
@@ -1906,9 +1916,9 @@ function chrome(){
   }
   setCourseColour(course);
 }
-$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else renderMenu()};
+$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else renderMenu()};
 $("quit").onclick=()=>{if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} justDone=null;renderCourse(course)};
-function vTitle(){return screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
+function vTitle(){return screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
 // swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
 (function(){
   let sx=0,sy=0,on=false,dx=0,cue=null;
@@ -3135,7 +3145,7 @@ function vMenuBind(){
 }
 // ---------- state ----------
 const V={tense:"pres",q:[],i:0,score:0,answered:false,wrong:[],last:null,search:"",scroll:0,verb:null,fromList:true,tries:0};
-const isV=()=>screen==="vset"||screen==="vq"||screen==="vsum"||screen==="vlist"||screen==="vverb";
+const isV=()=>screen==="vlearn"||screen==="vset"||screen==="vq"||screen==="vsum"||screen==="vlist"||screen==="vverb";
 const vCol=()=>V.tense&&V.tense!=="mix"?V.tense:"mix";
 const vSet=()=>ST.verbs.set;
 function vPers(v){const b=v.fl.includes("1")?[2]:v.fl.includes("3")?[2,5]:[0,1,2,3,4,5]; return vSet().vos?b:b.filter(p=>p!==4)}
@@ -3167,8 +3177,9 @@ function renderVSetup(tense){
     <div><p class="label" style="margin-bottom:8px">Include vosotros (Spain)?</p>
       <div class="vchips" id="vVos"><button type="button" data-v="1" aria-pressed="${S2.vos}">Yes</button><button type="button" data-v="0" aria-pressed="${!S2.vos}">No</button></div></div>`;
   $("drill").style.cssText=""; $("drill").scrollTop=0;
-  $("actions").innerHTML=`<button type="button" class="ghost" id="vBr">Browse verbs</button><button type="button" class="grow" id="vGo">Start · 10 questions</button>`;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="vBr">Browse</button><button type="button" class="ghost" id="vLn">📖 Learn</button><button type="button" class="grow" id="vGo">Start quiz</button>`;
   $("vBr").onclick=()=>renderVList();
+  $("vLn").onclick=()=>{const tk=isMix?"pres":V.tense, pool=VBX.slice(0,S2.range), f=pool.findIndex(v=>vOk(v,tk)&&!((vM(tk,v.inf)||{b:0}).b>=2)); vLearn(f<0?0:f,tk,"setup")};
   $("vGo").onclick=()=>{if(isMix&&!S2.mix.length) return; vStartRound()};
   const tog=(sel,fn)=>document.querySelectorAll(sel+" button").forEach(b=>b.onclick=()=>{fn(b); vSave(); renderVSetup()});
   tog("#vRange",b=>S2.range=+b.dataset.r); tog("#vMode",b=>S2.mode=b.dataset.m); tog("#vVos",b=>S2.vos=b.dataset.v==="1");
@@ -3334,8 +3345,50 @@ function renderVVerb(i){
       ${v.note[t.k]?`<div class="vnote"><b>Watch out:</b> ${esc(v.note[t.k])}</div>`:""}</div>`}).join("");
   $("drill").innerHTML=`<div class="vbig"><span class="e">${v.ic}</span><div><h2>${esc(v.inf)}</h2><p>${esc(vGloss(v))}</p></div></div>${tables}`;
   $("drill").scrollTop=0;
-  $("actions").innerHTML=`<button type="button" class="ghost" id="vPrev">‹ Previous</button><button type="button" class="ghost grow" id="vNx">Next ›</button>`;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="vPrev">‹ Previous</button><button type="button" class="ghost" id="vLearnB">📖 Learn</button><button type="button" class="ghost grow" id="vNx">Next ›</button>`;
+  $("vLearnB").onclick=()=>vLearn(i,"pres","verb");
   $("vPrev").onclick=()=>renderVVerb((i+VBX.length-1)%VBX.length); $("vNx").onclick=()=>renderVVerb((i+1)%VBX.length);
+}
+
+
+// ---------- learn mode: step through one verb's table, person by person ----------
+function vLearn(vi,tk,from){V.ln={vi,tk,t0:tk,pi:0,from}; renderVLearn()}
+function renderVLearn(){
+  screen="vlearn"; $("fb").hidden=true; const L=V.ln, v=VBX[L.vi];
+  const tenses=VT.filter(t=>vOk(v,t.k)); if(!tenses.some(t=>t.k===L.tk)) L.tk=tenses[0].k;
+  const tk=L.tk, t=VTK[tk], ps=vPers(v); L.pi=Math.max(0,Math.min(L.pi,ps.length-1)); const p=ps[L.pi];
+  chrome();
+  const en=vEn(v,tk,p,false);
+  $("drill").innerHTML=`<div class="vbig" style="gap:12px"><span class="e" style="font-size:2.6rem">${v.ic}</span><div><h2 style="font-size:1.5rem">${esc(v.inf)}</h2><p>${esc(vGloss(v))}</p></div></div>
+    <div class="vtabs" id="vTabs">${tenses.map(x=>`<button type="button" data-k="${x.k}" style="--c:var(--${x.cc})" aria-pressed="${x.k===tk}">${x.n}</button>`).join("")}</div>
+    <div class="vcard">
+      <div class="vhead"><span class="tn">${t.n}</span><span class="ven">${t.en}</span>${tlSVG(tk,true)}</div>
+      <div class="vfocus"><div class="ic">${vIcRow(p)}</div><div class="pr">${vProRow(p)}</div><div class="fm">${vhl(v,tk,p)}</div><div class="eg">${en?"= "+esc(en):""}</div></div>
+      <div class="vtable">${ps.map((x,j)=>`<button type="button" class="vrow${j===L.pi?" me":j>L.pi?" un":""}" data-j="${j}"><span class="ic">${vIcRow(x)}</span><span class="pr">${vProRow(x)}</span><span class="fm">${j<=L.pi?vhl(v,tk,x):"· · ·"}</span></button>`).join("")}</div>
+      ${v.note[tk]&&L.pi>=ps.length-1?`<div class="vnote"><b>Watch out:</b> ${esc(v.note[tk])}</div>`:""}
+    </div>
+    <div class="vstep" style="text-align:center">${L.pi+1} of ${ps.length} · tap a row or press Next</div>`;
+  $("drill").scrollTop=0;
+  const tb=$("vTabs"), on=tb.querySelector('[aria-pressed="true"]'); if(on) tb.scrollLeft=Math.max(0,on.offsetLeft-tb.clientWidth/2+on.offsetWidth/2);
+  tb.querySelectorAll("button").forEach(b=>b.onclick=()=>{L.tk=b.dataset.k; L.pi=0; renderVLearn()});
+  document.querySelectorAll("#drill .vtable .vrow").forEach(b=>b.onclick=()=>{L.pi=+b.dataset.j; renderVLearn()});
+  const ti=tenses.findIndex(x=>x.k===tk), lastP=L.pi>=ps.length-1, lastT=ti>=tenses.length-1, first=ti===0&&L.pi===0;
+  const prev=()=>{if(L.pi>0) L.pi--; else{L.tk=tenses[ti-1].k; L.pi=99} renderVLearn()};
+  if(lastP&&lastT){
+    const more=L.vi<VBX.length-1;
+    $("actions").innerHTML=`<button type="button" class="ghost" id="vLP">‹</button><button type="button" class="ghost" id="vLQ">Quiz me</button><button type="button" class="grow" id="vLN">${more?"Next verb ›":"Done"}</button>`;
+    $("vLP").onclick=prev; $("vLQ").onclick=()=>vQuizVerb(v,tk);
+    $("vLN").onclick=()=>{if(more){L.vi++; L.tk=L.t0; L.pi=0; renderVLearn()} else (L.from==="verb"?renderVVerb(L.vi):renderVSetup())};
+  } else {
+    $("actions").innerHTML=`<button type="button" class="ghost" id="vLP"${first?" disabled":""}>‹ Back</button><button type="button" class="grow" id="vLN">${lastP?"Next tense ›":"Next ›"}</button>`;
+    $("vLP").onclick=prev;
+    $("vLN").onclick=()=>{haptic(8); if(!lastP) L.pi++; else{L.tk=tenses[ti+1].k; L.pi=0} renderVLearn()};
+  }
+}
+function vQuizVerb(v,tk){
+  const ps=vPers(v), q=[]; let bag=[];
+  for(let k=0;k<10;k++){ if(!bag.length) bag=ps.slice().sort(()=>Math.random()-.5); q.push({v,tk,p:bag.pop(),fem:Math.random()<.5}) }
+  V.tense=tk; V.q=q; V.i=0; V.score=0; V.wrong=[]; V.retry=false; V.answered=false; renderVQ();
 }
 
 renderMenu();
