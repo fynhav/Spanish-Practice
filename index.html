@@ -490,7 +490,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-27 · 23:44</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-27 · 23:48</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -3187,7 +3187,11 @@ function vStartRound(){
     const ps=vPers(v).filter(p=>p!==lastP), p=ps.length?ps[Math.floor(Math.random()*ps.length)]:vPers(v)[0]; lastP=p;
     q.push({v,tk,p,fem:Math.random()<.5});
   }
-  V.q=q; V.i=0; V.score=0; V.wrong=[]; V.answered=false; renderVQ();
+  V.q=q; V.i=0; V.score=0; V.wrong=[]; V.retry=false; V.answered=false; renderVQ();
+}
+function vRetry(){
+  const q=V.wrong.map(w=>({...w.q})).sort(()=>Math.random()-.5);
+  V.q=q; V.i=0; V.score=0; V.wrong=[]; V.retry=true; V.answered=false; renderVQ();
 }
 function vOptions(q){
   const {v,tk,p}=q, right=vf(v,tk,p), seen=new Set([right]), out=[];
@@ -3226,7 +3230,7 @@ function renderVQ(){
   const pick=S2.mode==="pick";
   setCourseColour(course);
   $("drill").innerHTML=`
-    <div class="meta"><span class="pill vp" style="background:var(--cc-soft);color:var(--cc)">${t.n.toUpperCase()}${V.tense==="mix"?"":tlSVG(tk,true)}</span><span class="label" style="margin-left:auto">${V.i+1} / ${V.q.length}</span></div>
+    <div class="meta"><span class="pill vp" style="background:var(--cc-soft);color:var(--cc)">${t.n.toUpperCase()}${V.tense==="mix"?"":tlSVG(tk,true)}</span><span class="label" style="margin-left:auto">${V.retry?"Second try · ":""}${V.i+1} / ${V.q.length}</span></div>
     <div class="qpush" aria-hidden="true"></div>
     ${vSceneHTML(q)}
     ${pick?`<div class="vopts" id="vOpts">${vOptions(q).map(o=>`<button type="button" class="vopt" data-o="${esc(o)}">${vOptHL(v,tk,p,o)}</button>`).join("")}</div>`
@@ -3266,7 +3270,7 @@ function vAnswer(val){
   let ok=false, extra="";
   if(val!==null){const m=vMatch(q,val); ok=m.ok; extra=m.note||""}
   const right=vf(v,tk,p);
-  vSetM(tk,v.inf,ok); const L=ST.verbs.log; L[todayKey()]=(L[todayKey()]||0)+1; vSave();
+  if(!V.retry){vSetM(tk,v.inf,ok); const L=ST.verbs.log; L[todayKey()]=(L[todayKey()]||0)+1; vSave()}
   if(ok) V.score++; else V.wrong.push({q,val});
   haptic(ok?20:[70,50,70]);
   $("accents").hidden=true; const inp=$("ans"); if(inp){inp.readOnly=true; inp.blur()}
@@ -3298,11 +3302,13 @@ function renderVSum(){
   const n=V.i+(V.answered?1:0), s=V.score, stars=n?s/n:0;
   $("drill").innerHTML=`<div class="vsum">
     <div class="vcard" style="text-align:center"><div class="vstars">${stars>=.9?"⭐⭐⭐":stars>=.6?"⭐⭐":"⭐"}</div>
-      <div class="vscore" style="color:var(--cc)">${s} / ${n}</div><p class="sub">${stars>=.9?"¡Excelente!":stars>=.6?"¡Muy bien! Keep going.":"Good practice. Those verbs will come back soon."}</p></div>
-    ${V.wrong.length?`<div><p class="label" style="margin-bottom:8px">To remember</p><div class="vmist">${V.wrong.map(({q})=>`<div><span class="e">${q.v.ic}</span><span><b>${vPro(q.p,q.fem)} · ${vhl(q.v,q.tk,q.p)}</b><small>${esc(q.v.inf)} · ${VTK[q.tk].n}${vEn(q.v,q.tk,q.p,q.fem)?" · "+esc(vEn(q.v,q.tk,q.p,q.fem)):""}</small></span></div>`).join("")}</div></div>`:`<p class="sub" style="text-align:center">No mistakes this round.</p>`}
+      <div class="vscore" style="color:var(--cc)">${s} / ${n}</div><p class="sub">${V.retry?(s===n?"All fixed. ¡Genial!":s?"Getting there. Some are still tricky.":"Still tricky. Look at them once more."):stars>=.9?"¡Excelente!":stars>=.6?"¡Muy bien! Keep going.":"Good practice. Those verbs will come back soon."}</p></div>
+    ${V.wrong.length?`<div><p class="label" style="margin-bottom:8px">${V.retry?"Still to remember":"To remember"}</p><div class="vmist">${V.wrong.map(({q})=>`<div><span class="e">${q.v.ic}</span><span><b>${vPro(q.p,q.fem)} · ${vhl(q.v,q.tk,q.p)}</b><small>${esc(q.v.inf)} · ${VTK[q.tk].n}${vEn(q.v,q.tk,q.p,q.fem)?" · "+esc(vEn(q.v,q.tk,q.p,q.fem)):""}</small></span></div>`).join("")}</div></div>`:`<p class="sub" style="text-align:center">No mistakes this round.</p>`}
   </div>`;
-  $("actions").innerHTML=`<button type="button" class="ghost" id="vMenuB">Menu</button><button type="button" class="grow" id="vAgain">Another round</button>`;
-  $("vMenuB").onclick=()=>renderMenu(); $("vAgain").onclick=()=>vStartRound();
+  const nw=V.wrong.length;
+  $("actions").innerHTML=nw?`<button type="button" class="ghost" id="vAgain">New round</button><button type="button" class="grow" id="vFix">Fix ${nw===1?"it":nw+" mistakes"}</button>`
+    :`<button type="button" class="ghost" id="vMenuB">Menu</button><button type="button" class="grow" id="vAgain">Another round</button>`;
+  if($("vMenuB")) $("vMenuB").onclick=()=>renderMenu(); $("vAgain").onclick=()=>vStartRound(); if(nw) $("vFix").onclick=()=>vRetry();
   $("drill").scrollTop=0;
 }
 // ---------- browse ----------
