@@ -333,6 +333,28 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 /* ---------- verb trainer ---------- */
 :root{--pres:#3F7D4E; --pres-soft:#E1EFE3}
 .p-v i{background:var(--cc)}
+.vp{display:inline-flex;align-items:center;gap:8px}
+.vp svg{width:74px;height:26px;flex:none;color:var(--cc)}
+.va{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:4px 0 0}
+.vbig2{font-size:clamp(3.4rem,12vh,6rem);line-height:1.1}
+.vinf{font-family:var(--f-display);font-size:clamp(1.9rem,5vh,2.3rem);line-height:1.1;margin-top:4px}
+.vblank{margin-top:clamp(10px,3vh,22px);display:flex;align-items:center;gap:12px;font-size:1.75rem;font-weight:700;color:var(--cc)}
+.vwho{display:inline-flex;align-items:center;gap:8px}.vwho .ic,.vwho>span{font-size:1.5rem;line-height:1}
+.vgap{display:inline-block;width:8rem;height:1.6rem;border-bottom:3px dashed #B9AE95}
+.vstage{position:relative;padding-top:92px;margin:0 2px}
+.vstage .vtl{display:block;width:100%;height:auto}
+.vbub{position:absolute;top:0;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-bottom:3px solid var(--cc);border-radius:20px;padding:8px 14px;font-size:2.1rem;line-height:1.1;white-space:nowrap}
+.vbub i{font-style:normal;font-size:1.1rem;color:var(--muted)}
+.vbub .ic{font-size:2.1rem}
+.vbub::after{content:"";position:absolute;left:50%;bottom:-13px;width:3px;height:10px;margin-left:-1.5px;background:var(--cc);border-radius:2px}
+@media (max-height:680px){
+ .vstage{padding-top:56px}.vstage .vtl{height:46px}.vbub{font-size:1.35rem;padding:4px 10px}.vbub .ic{font-size:1.35rem}.vbub::after{height:6px;bottom:-9px}
+ .vbig2{font-size:2.6rem}.vinf{font-size:1.5rem;margin-top:0!important}.va .ven{font-size:.82rem}.vblank{margin-top:4px;font-size:1.3rem}.vgap{width:5.5rem;height:1.2rem}
+ .vopt{min-height:46px;padding:6px;font-size:1.05rem}.vopts{gap:7px}.actions{padding-block:4px 8px}
+}
+.actions:has(.vlite){justify-content:space-between;padding-inline:14px}
+.actions .vlite{background:none;border:0;box-shadow:none;min-height:44px;flex:none;padding:0 10px;font-size:1rem;font-weight:600;color:var(--muted)}
+.actions .vlite.h{color:var(--cc)}
 .vsec{display:flex;flex-direction:column;gap:10px}
 .vtiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .vtile{display:flex;flex-direction:column;gap:3px;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 12px 11px;font-weight:400;min-width:0;position:relative;overflow:hidden;padding-top:15px}
@@ -468,7 +490,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-27 · 16:04</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-27 · 23:44</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1874,7 +1896,7 @@ function chrome(){
   $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq");
   $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":"‹ Menu";
   $("title").textContent=isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
-  $("progress").hidden=!(inS||screen==="vq");
+  $("progress").hidden=!(inS||screen==="vq"); $("openRules").hidden=$("openSettings").hidden=screen==="vq";
   $("score").textContent=screen==="vq"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
   if(screen==="vq") $("progress").innerHTML=V.q.map((_,i)=>`<span class="p-v" style="flex:1"><i style="width:${i<V.i||(i===V.i&&V.answered)?100:0}%"></i></span>`).join("");
   if(inS){
@@ -3189,11 +3211,14 @@ function vHint(q){
   if(v.note[tk]) s+=` <b>Watch out:</b> ${esc(v.note[tk])}.`;
   return s;
 }
+const VBX_X={pres:150,pret:92,imp:78,fut:240,cond:240,perf:115,near:190};
 function vSceneHTML(q){
-  const {v,tk,p,fem}=q, t=VTK[tk];
-  return `<div class="vcard">${tlSVG(tk)}<div class="vtimew">${t.tw.slice(0,3).map(x=>`<span>${esc(x)}</span>`).join("")}</div></div>
-    <div class="vscene"><div class="vpic"><span class="who">${vIc(p,fem)}<small>${vPro(p,fem)}</small></span><i>+</i><span class="what">${v.ic}<small>${esc(v.inf)}</small></span></div>
-    <div class="ven">${esc(vGloss(v))}</div></div>`;
+  const {v,tk,p,fem}=q, pick=vSet().mode==="pick", mix=V.tense==="mix";
+  const blank=`<div class="vblank"><span class="vwho">${vIc(p,fem)}<span>${vPro(p,fem)}</span></span>${pick?'<span class="vgap"></span>':""}</div>`;
+  if(!mix) return `<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf">${esc(v.inf)}</div><div class="ven">${esc(vGloss(v))}</div>${blank}</div>`;
+  const x=Math.max(24,Math.min(76,(VBX_X[tk]||150)/3));
+  return `<div class="va"><div class="vstage"><div class="vbub" style="left:${x}%" aria-hidden="true">${vIc(p,fem)}<i>+</i>${v.ic}</div>${tlSVG(tk)}</div>
+    <div class="vinf" style="margin-top:12px">${esc(v.inf)}</div><div class="ven">${esc(vGloss(v))}</div>${blank}</div>`;
 }
 function renderVQ(){
   screen="vq"; chrome(); $("fb").hidden=true; V.answered=false; V.tries=0;
@@ -3201,14 +3226,13 @@ function renderVQ(){
   const pick=S2.mode==="pick";
   setCourseColour(course);
   $("drill").innerHTML=`
-    <div class="meta"><span class="pill" style="background:var(--cc-soft);color:var(--cc)">${t.n}</span><span class="label" style="margin-left:auto">${V.i+1} / ${V.q.length}</span></div>
+    <div class="meta"><span class="pill vp" style="background:var(--cc-soft);color:var(--cc)">${t.n.toUpperCase()}${V.tense==="mix"?"":tlSVG(tk,true)}</span><span class="label" style="margin-left:auto">${V.i+1} / ${V.q.length}</span></div>
     <div class="qpush" aria-hidden="true"></div>
     ${vSceneHTML(q)}
-    <p class="prompt">Which is the <b style="color:var(--cc)">${t.n.toLowerCase()}</b> form for <b>${vPro(p,fem)}</b>?</p>
     ${pick?`<div class="vopts" id="vOpts">${vOptions(q).map(o=>`<button type="button" class="vopt" data-o="${esc(o)}">${vOptHL(v,tk,p,o)}</button>`).join("")}</div>`
           :`<form id="f" autocomplete="off" onsubmit="return false"><div id="ans" ${FIELD_ATTRS} enterkeyhint="done" data-ph="Type the form" aria-label="Your answer"></div></form>`}
     <p class="hint" id="hint" hidden>${vHint(q)}</p>`;
-  $("actions").innerHTML=pick?`<button type="button" class="ghost" id="vHintB">Hint</button><button type="button" class="ghost grow" id="vSkip">I don’t know</button>`
+  $("actions").innerHTML=pick?`<button type="button" class="vlite h" id="vHintB">Hint</button><button type="button" class="vlite" id="vSkip">I don’t know</button>`
     :`<button type="button" class="ghost" id="vHintB">Hint</button><button type="button" class="ghost" id="vSkip">Show</button><button type="button" class="grow" id="vCheck">Check</button>`;
   $("vHintB").onclick=()=>{$("hint").hidden=false};
   $("vSkip").onclick=()=>{if(!V.answered) vAnswer(null)};
