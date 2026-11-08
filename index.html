@@ -365,6 +365,24 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;font-size:1.02rem;color:inherit;cursor:pointer}
 .vrow.un .fm{color:#CFC6B0;letter-spacing:.25em}
 .vstep{color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums}
+.tmcard{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px 12px}
+.tmcard .tt{display:flex;justify-content:space-between;align-items:baseline;font-size:.9rem;color:var(--muted)}
+.tmcard .tt b{color:var(--ink);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.tmbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.tmbar i{display:block;height:100%;width:0;background:var(--pres);border-radius:4px;transition:width .4s}
+.tmcard.done .tt b{color:var(--pres)}
+.cg{position:fixed;inset:0;z-index:300;background:rgba(42,38,32,.45);display:flex;align-items:center;justify-content:center;padding:24px;animation:cgin .25s ease-out;overflow:hidden}
+@keyframes cgin{from{opacity:0}to{opacity:1}}
+.cg .box{position:relative;background:#FFFDF8;border:1px solid var(--line);border-radius:28px;padding:30px 24px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(42,38,32,.25);animation:cgpop .45s cubic-bezier(.2,1.3,.4,1)}
+@keyframes cgpop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.cg .big{font-size:4.2rem;line-height:1}
+.cg h2{font-family:var(--f-display);font-weight:400;font-size:2rem;margin:10px 0 6px}
+.cg p{margin:0 0 6px;font-size:1.1rem;line-height:1.4}
+.cg p.s{color:var(--muted);font-size:.95rem;margin-bottom:18px}
+.cg button{width:100%;background:var(--pres);color:#fff}
+.cg .cf{position:absolute;top:-30px;font-size:1.6rem;animation:cgfall linear forwards;pointer-events:none}
+@keyframes cgfall{to{transform:translateY(110vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.cg .cf{display:none}.cg .box{animation:none}}
 .vsec{display:flex;flex-direction:column;gap:10px}
 .vtiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .vtile{display:flex;flex-direction:column;gap:3px;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 12px 11px;font-weight:400;min-width:0;position:relative;overflow:hidden;padding-top:15px}
@@ -500,7 +518,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-10-27 · 23:52</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-08 · 18:32</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1969,6 +1987,7 @@ function renderMenu(){
   }).join("");
   $("drill").innerHTML=`
     <h2 class="hello">${has(tk)?"Nice work today":"Today’s practice"}</h2>
+    ${timeCardHTML()}
     <div><p class="label" style="margin-bottom:8px">This week <span style="text-transform:none;letter-spacing:0;font-weight:500">· <i class="dot do" style="width:8px;height:8px"></i> pronouns <i class="dot pret" style="width:8px;height:8px"></i> past <i class="dot" style="width:8px;height:8px;background:var(--io)"></i> drill/stories</span></p>${weekHTML(ring)}</div>
     ${cards}
     <button type="button" class="course drill" id="drillCard">
@@ -3390,6 +3409,38 @@ function vQuizVerb(v,tk){
   for(let k=0;k<10;k++){ if(!bag.length) bag=ps.slice().sort(()=>Math.random()-.5); q.push({v,tk,p:bag.pop(),fem:Math.random()<.5}) }
   V.tense=tk; V.q=q; V.i=0; V.score=0; V.wrong=[]; V.retry=false; V.answered=false; renderVQ();
 }
+
+// ================= practice timer: 20 active minutes a day =================
+const GOAL_S=1200, IDLE_MS=60000;
+ST.time=ST.time||{}; ST.time.log=ST.time.log||{}; ST.time.shown=ST.time.shown||{};
+let lastAct=Date.now();
+["pointerdown","touchstart","keydown","input","scroll"].forEach(e=>addEventListener(e,()=>{lastAct=Date.now()},{capture:true,passive:true}));
+const timeToday=()=>ST.time.log[todayKey()]||0;
+const fmtMin=sec=>{const m=Math.floor(sec/60), s=sec%60; return `${m}:${String(s).padStart(2,"0")}`};
+function timeCardHTML(){
+  const t=timeToday(), done=t>=GOAL_S;
+  return `<div class="tmcard${done?" done":""}" id="tmCard"><div class="tt"><span>${done?"Daily goal reached ✓":"Practice time today"}</span><b id="tmTxt">${done?Math.floor(t/60)+" min":fmtMin(t)+" / 20:00"}</b></div><div class="tmbar" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="${Math.min(20,Math.floor(t/60))}" aria-label="Minutes practised today"><i id="tmFill" style="width:${Math.min(100,t/GOAL_S*100)}%"></i></div></div>`;
+}
+function showCongrats(){
+  if(document.getElementById("cg")) return;
+  const d=document.createElement("div"); d.className="cg"; d.id="cg"; d.setAttribute("role","dialog"); d.setAttribute("aria-modal","true"); d.setAttribute("aria-label","Daily goal reached");
+  const em=["🎉","⭐","✨","🎊","💚"], cf=[...Array(22)].map((_,i)=>`<span class="cf" aria-hidden="true" style="left:${Math.random()*96}%;animation-duration:${2.6+Math.random()*2.4}s;animation-delay:${Math.random()*1.6}s">${em[i%em.length]}</span>`).join("");
+  d.innerHTML=`${cf}<div class="box"><div class="big" aria-hidden="true">🎉</div><h2>¡Enhorabuena!</h2><p><b>Congrats, you’ve done your 20 minutes of practice today.</b></p><p class="s">Keep going if you like. Every bit counts.</p><button type="button" id="cgOk">Continue</button></div>`;
+  document.body.appendChild(d);
+  try{haptic(30)}catch(e){}
+  $("cgOk").onclick=()=>d.remove(); $("cgOk").focus&&$("cgOk").focus();
+}
+let tmTicks=0;
+setInterval(()=>{
+  if(document.visibilityState!=="visible"||Date.now()-lastAct>IDLE_MS) return;
+  const k=todayKey(); ST.time.log[k]=(ST.time.log[k]||0)+1; tmTicks++;
+  const t=ST.time.log[k];
+  if(screen==="menu"&&$("tmTxt")){const done=t>=GOAL_S; $("tmTxt").textContent=done?Math.floor(t/60)+" min":fmtMin(t)+" / 20:00"; $("tmFill").style.width=Math.min(100,t/GOAL_S*100)+"%"; $("tmCard").classList.toggle("done",done)}
+  if(t>=GOAL_S&&!ST.time.shown[k]){ST.time.shown[k]=true; saveLocal(); showCongrats()}
+  else if(tmTicks%10===0) saveLocal();
+},1000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden") saveLocal()});
+addEventListener("pagehide",saveLocal);
 
 renderMenu();
 // ================= opening screen: progress at a glance while the app loads =================
