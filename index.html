@@ -427,7 +427,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .vopt.ok{background:var(--ok-soft);border-color:var(--ok)}
 .vopt.bad{background:var(--bad-soft);border-color:var(--bad)}
 .vopt.dim{opacity:.45}
-.vf .st{color:var(--ink)} .vf .en{color:var(--cc);font-weight:700} .vf .pre{color:var(--muted);font-weight:500}
+.vf .st{color:var(--ink)} .vf .ed{color:var(--cc);font-weight:700} .vf .pre{color:var(--muted);font-weight:500}
 .vf .aux{color:var(--cc);font-weight:700}
 .vtable{display:flex;flex-direction:column;gap:2px;margin-top:6px}
 .vrow{display:grid;grid-template-columns:50px 96px minmax(0,1fr);align-items:center;gap:6px;padding:3px 8px;border-radius:10px;font-size:1.02rem}
@@ -531,7 +531,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:13</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:15</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -3192,7 +3192,7 @@ function vhl(v,tk,p){
   for(const c of [...VENDS[tk][p]].sort((a,b)=>b.length-a.length)){ if(w.length>c.length&&w.endsWith(c)){end=c;break} }
   if(tk==="fut"||tk==="cond"){ for(const c of VENDS[tk][p]) if(w.endsWith(c)) end=c }
   const stem=w.slice(0,w.length-end.length);
-  return `<span class="vf">${pre?`<span class="pre">${e(pre)}</span>`:""}<span class="st">${e(stem)}</span>${end?`<span class="en">${e(end)}</span>`:""}</span>`;
+  return `<span class="vf">${pre?`<span class="pre">${e(pre)}</span>`:""}<span class="st">${e(stem)}</span>${end?`<span class="ed">${e(end)}</span>`:""}</span>`;
 }
 // regular (over-regularised) form, used as a believable wrong answer
 function vReg(v,tk,p){
@@ -3353,7 +3353,7 @@ function vOptions(q){
 function vHint(q){
   const {v,tk,p}=q, typ=vBase(v).slice(-2).replace("ír","ir"), t=VTK[tk], pr=vPro(p,q.fem);
   let s;
-  if(VEND[tk]&&VEND[tk][typ]) s=`For <b>${pr}</b> in the ${t.n.toLowerCase()}, <b>-${typ}</b> verbs end in <b class="en" style="color:var(--cc)">-${VEND[tk][typ][p]}</b>.`;
+  if(VEND[tk]&&VEND[tk][typ]) s=`For <b>${pr}</b> in the ${t.n.toLowerCase()}, <b>-${typ}</b> verbs end in <b class="ed" style="color:var(--cc)">-${VEND[tk][typ][p]}</b>.`;
   else if(tk==="fut"||tk==="cond") s=`Keep the whole infinitive <b>${vBase(v)}</b> and add <b style="color:var(--cc)">-${VEND[tk][p]}</b>.`;
   else if(tk==="perf") s=`<b style="color:var(--cc)">${AUX[p]}</b> + the participle (-ado / -ido).`;
   else s=`<b style="color:var(--cc)">${IRP[p]} a</b> + the infinitive.`;
