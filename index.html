@@ -392,8 +392,8 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .cg p{margin:0 0 6px;font-size:1.1rem;line-height:1.4}
 .cg p.s{color:var(--muted);font-size:.95rem;margin-bottom:18px}
 .cg button{width:100%;background:var(--pres);color:#fff}
-.cg .cf{position:absolute;top:-30px;font-size:1.6rem;animation:cgfall linear forwards;pointer-events:none}
-@keyframes cgfall{to{transform:translateY(110vh) rotate(360deg)}}
+.cg .cf{position:absolute;top:-60px;font-family:var(--f-display);font-weight:600;line-height:1;animation:cgfall linear forwards;pointer-events:none;will-change:transform}
+@keyframes cgfall{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(var(--sw),28vh) rotate(calc(var(--rt)*.25))}50%{transform:translate(calc(var(--sw)*-.6),56vh) rotate(calc(var(--rt)*.5))}75%{transform:translate(var(--sw),84vh) rotate(calc(var(--rt)*.75))}100%{transform:translate(0,115vh) rotate(var(--rt))}}
 @media (prefers-reduced-motion:reduce){.cg .cf{display:none}.cg .box{animation:none}}.en{font-size:.95rem;color:var(--muted);line-height:1.35}.en b{color:var(--ink);font-weight:600}.en span{opacity:.7}
 .vsec{display:flex;flex-direction:column;gap:10px}
 .vtiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -530,7 +530,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 00:23</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:11</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -3529,7 +3529,9 @@ function timeCardHTML(){
 function showCongrats(){
   if(document.getElementById("cg")) return;
   const d=document.createElement("div"); d.className="cg"; d.id="cg"; d.setAttribute("role","dialog"); d.setAttribute("aria-modal","true"); d.setAttribute("aria-label","Daily goal reached");
-  const em=["🎉","⭐","✨","🎊","💚"], cf=[...Array(22)].map((_,i)=>`<span class="cf" aria-hidden="true" style="left:${Math.random()*96}%;animation-duration:${2.6+Math.random()*2.4}s;animation-delay:${Math.random()*1.6}s">${em[i%em.length]}</span>`).join("");
+  const LET="ENHORABUENAÑÁÉÍÓÚABCDEFGHIJLMNOPQRSTUVXYZ¡¿", COL=["#7A3E6B","#2F5D9E","#3E7D4F","#C0582F","#B8860B","#9A3B4E"];
+  const cf=[...Array(64)].map((_,i)=>{const c=LET[Math.floor(Math.random()*LET.length)], sz=1.2+Math.random()*2.2;
+    return `<span class="cf" aria-hidden="true" style="left:${Math.random()*96}%;font-size:${sz.toFixed(2)}rem;color:${COL[i%COL.length]};opacity:${(.55+Math.random()*.45).toFixed(2)};--sw:${Math.round(-30+Math.random()*60)}px;--rt:${Math.round(-540+Math.random()*1080)}deg;animation-duration:${(3.2+Math.random()*3.4).toFixed(2)}s;animation-delay:${(Math.random()*2.4).toFixed(2)}s">${c}</span>`}).join("");
   d.innerHTML=`${cf}<div class="box"><div class="big" aria-hidden="true">🎉</div><h2>¡Enhorabuena!</h2><p><b>Congrats, you’ve done your 20 minutes of practice today.</b></p><p class="s">Keep going if you like. Every bit counts.</p><button type="button" id="cgOk">Continue</button></div>`;
   document.body.appendChild(d);
   try{haptic(30)}catch(e){}
