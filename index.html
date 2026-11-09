@@ -531,7 +531,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:15</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:33</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1985,12 +1985,12 @@ function chrome(){
   document.querySelectorAll("#accents .ex").forEach(b=>b.hidden=screen==="story");
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
-  $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq");
+  $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq"||screen==="vm");
   $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":"‹ Menu";
   $("title").textContent=isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
-  $("progress").hidden=!(inS||screen==="vq"); $("openRules").hidden=$("openSettings").hidden=screen==="vq";
-  $("score").textContent=screen==="vq"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
-  if(screen==="vq") $("progress").innerHTML=V.q.map((_,i)=>`<span class="p-v" style="flex:1"><i style="width:${i<V.i||(i===V.i&&V.answered)?100:0}%"></i></span>`).join("");
+  $("progress").hidden=!(inS||screen==="vq"||screen==="vm"); $("openRules").hidden=$("openSettings").hidden=screen==="vq"||screen==="vm";
+  $("score").textContent=screen==="vq"||screen==="vm"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
+  if(screen==="vq"||screen==="vm") $("progress").innerHTML=V.q.map((_,i)=>`<span class="p-v" style="flex:1"><i style="width:${i<V.i||(i===V.i&&V.answered)?100:0}%"></i></span>`).join("");
   if(inS){
     let start=0;
     $("progress").innerHTML=parts().map(p=>{const n=Math.max(0,Math.min(p.n,pos-start));start+=p.n;
@@ -1999,8 +1999,8 @@ function chrome(){
   setCourseColour(course);
 }
 $("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else renderMenu()};
-$("quit").onclick=()=>{if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} justDone=null;renderCourse(course)};
-function vTitle(){return screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
+$("quit").onclick=()=>{if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} justDone=null;renderCourse(course)};
+function vTitle(){return screen==="vmset"||screen==="vm"?"Verb meanings":screen==="vmsum"?"Round done":screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
 // swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
 (function(){
   let sx=0,sy=0,on=false,dx=0,cue=null;
@@ -3129,6 +3129,7 @@ const VB=[["ser","be","🪪","","who or what someone is","soy|eres|es|somos|sois
 const VBALT={"reír|pret|2":["rió"]};
 // ================= Verb trainer: 300+ verbs, 7 tenses, all offline =================
 ST.verbs=ST.verbs||{}; ST.verbs.m=ST.verbs.m||{}; ST.verbs.log=ST.verbs.log||{};
+ST.verbs.mean=ST.verbs.mean||{}; ST.verbs.mset=Object.assign({range:50,dir:"both"},ST.verbs.mset||{});
 ST.verbs.set=Object.assign({range:50,mode:"pick",vos:true,mix:["pres","pret","imp","fut","cond","perf","near"]},ST.verbs.set||{});
 if(ST.verbs.set.range===300) ST.verbs.set.range=VB.length;
 const VBX=VB.map((a,i)=>({i,inf:a[0],e:a[1],ic:a[2],fl:a[3],clar:a[4],f:{pres:a[5].split("|"),pret:a[6].split("|"),imp:a[7].split("|"),fut:a[8].split("|"),cond:a[9].split("|")},pp:a[10],note:a[11]||{},r:a[3].includes("r")}));
@@ -3269,17 +3270,20 @@ function vMenuHTML(){
       <span class="vbar"><i style="width:${s.tot?Math.round(s.n/s.tot*100):0}%"></i></span><span class="tc">${s.n} / ${s.tot} learned</span></button>`};
   return `<div class="vsec"><p class="label" style="margin-top:4px">Verb trainer · ${VB.length} verbs <span style="text-transform:none;letter-spacing:0;font-weight:500">· ${done?`${done} answered today`:"great for beginners"}</span></p>
     <div class="vtiles">${VT.map(tile).join("")}${tile(null)}</div>
+    <button type="button" class="course vbrowse" id="vMean" style="--cc:var(--pret);--cc-soft:var(--pret-soft)">
+      <span><span class="cn">Verb meanings</span><br><span class="cs">Infinitive ↔ English, the most common first</span></span><span class="chev" aria-hidden="true">›</span>
+      <span class="cs"><span class="now">${vmKnown()} / ${VB.length}</span> meanings known</span></button>
     <button type="button" class="course vbrowse" id="vBrowse" style="--cc:var(--pres);--cc-soft:var(--pres-soft)">
       <span><span class="cn">Browse all ${VB.length} verbs</span><br><span class="cs">Pictures and full tables for every tense</span></span><span class="chev" aria-hidden="true">›</span>
       <span class="cs"><span class="now">${all.n} / ${all.tot}</span> verb forms learned</span></button></div>`;
 }
 function vMenuBind(){
   document.querySelectorAll(".vtile").forEach(b=>b.onclick=()=>renderVSetup(b.dataset.t));
-  const bb=$("vBrowse"); if(bb) bb.onclick=()=>renderVList();
+  const bb=$("vBrowse"); if(bb) bb.onclick=()=>renderVList(); const mb=$("vMean"); if(mb) mb.onclick=()=>renderVmSetup();
 }
 // ---------- state ----------
 const V={tense:"pres",q:[],i:0,score:0,answered:false,wrong:[],last:null,search:"",scroll:0,verb:null,fromList:true,tries:0};
-const isV=()=>screen==="vlearn"||screen==="vset"||screen==="vq"||screen==="vsum"||screen==="vlist"||screen==="vverb";
+const isV=()=>screen==="vlearn"||screen==="vset"||screen==="vq"||screen==="vmset"||screen==="vm"||screen==="vmsum"||screen==="vsum"||screen==="vlist"||screen==="vverb";
 const vCol=()=>V.tense&&V.tense!=="mix"?V.tense:"mix";
 const vSet=()=>ST.verbs.set;
 function vPers(v){const b=v.fl.includes("1")?[2]:v.fl.includes("3")?[2,5]:[0,1,2,3,4,5]; return vSet().vos?b:b.filter(p=>p!==4)}
@@ -3454,6 +3458,94 @@ function renderVSum(){
   $("actions").innerHTML=nw?`<button type="button" class="ghost" id="vAgain">New round</button><button type="button" class="grow" id="vFix">Fix ${nw===1?"it":nw+" mistakes"}</button>`
     :`<button type="button" class="ghost" id="vMenuB">Menu</button><button type="button" class="grow" id="vAgain">Another round</button>`;
   if($("vMenuB")) $("vMenuB").onclick=()=>renderMenu(); $("vAgain").onclick=()=>vStartRound(); if(nw) $("vFix").onclick=()=>vRetry();
+  $("drill").scrollTop=0;
+}
+
+// ================= verb meanings: infinitive <-> English, most common first =================
+const vmM=inf=>ST.verbs.mean[inf]||null;
+function vmSet(inf,ok){const o=ST.verbs.mean[inf]||{b:0,n:0}; o.n++; o.b=ok?Math.min(3,o.b+1):0; o.t=Date.now(); ST.verbs.mean[inf]=o}
+const vmKnown=()=>VBX.filter(v=>{const m=vmM(v.inf);return m&&m.b>=2}).length;
+const VM_STOP=new Set("to a an the of or it used like this me no my is are there something someone oneself how who what where helper verb hay in on at up down out off over".split(" "));
+const vmTok=v=>new Set(vGloss(v).toLowerCase().replace(/\(.*?\)/g," ").split(/[^a-záéíóúñ]+/).filter(x=>x&&!VM_STOP.has(x)));
+const VM_SYN=["empezar comenzar","terminar acabar","hablar conversar comunicar","intentar tratar probar","escoger elegir","ver mirar observar notar","ganar conseguir obtener lograr","entender comprender","mandar enviar","usar utilizar","coger tomar","lanzar echar tirar","parar detener","regresar volver","hallar encontrar descubrir averiguar","pelear luchar","amar querer encantar gustar desear","ocurrir suceder pasar","responder contestar","caminar andar","mostrar demostrar enseñar señalar indicar","guardar mantener","pensar creer opinar considerar suponer imaginar","recordar acordarse","descansar relajarse","poner colocar meter","sacar quitar","dar regalar entregar","limpiar lavar","seguir continuar","preguntar pedir","crear producir formar","ayudar apoyar","dejar permitir","quedar quedarse","ir irse","sentir sentirse","tener haber","saber conocer","dormir acostar acostarse","levantar levantarse subir","romper cortar","cerrar apagar","abrir encender","reunir unir juntar","gritar llamar","empujar tirar","vestir vestirse ponerse","reír sonreír","cenar comer almorzar desayunar","beber tomar","viajar visitar","andar caminar correr","tardar durar","significar querer","existir ser estar","resultar parecer","vender comprar","cantar bailar"].map(g=>g.split(" "));
+const vmSyn=(a,b)=>VM_SYN.some(g=>g.includes(a)&&g.includes(b));
+function vmDistract(v,n){
+  const tv=vmTok(v), near=VBX.filter(w=>w.inf!==v.inf&&Math.abs(w.i-v.i)<=90), all=VBX.filter(w=>w.inf!==v.inf);
+  const ok=(w,chosen)=>w.e!==v.e&&!vmSyn(v.inf,w.inf)&&![...vmTok(w)].some(t=>tv.has(t))&&!chosen.some(c=>c.e===w.e||vmSyn(c.inf,w.inf));
+  const out=[], sh=a=>a.slice().sort(()=>Math.random()-.5);
+  for(const pool of [near,all]) for(const w of sh(pool)){if(out.length>=n) break; if(ok(w,out)) out.push(w)}
+  return out;
+}
+function vmDir(v){const d=ST.verbs.mset.dir; if(d==="es"||d==="en") return d; const m=vmM(v.inf); return (!m||m.b<1)&&Math.random()<.7?"es":(Math.random()<.5?"es":"en")}
+function vmBuild(){
+  const range=ST.verbs.mset.range, pool=VBX.slice(0,range), used=new Set(), chosen=[];
+  const fresh=pool.filter(v=>{const m=vmM(v.inf);return !m||m.b<2});          // the most common ones you don't know yet, in order
+  fresh.slice(0,7).forEach(v=>{chosen.push(v);used.add(v.inf)});
+  const rest=pool.filter(v=>!used.has(v.inf));
+  while(chosen.length<10&&rest.length){const v=vWeighted(rest,x=>{const m=vmM(x.inf); return m?[4,2.2,1,.35][m.b]*(Date.now()-m.t<60000?.2:1):3}); chosen.push(v); rest.splice(rest.indexOf(v),1)}
+  return chosen.sort((a,b)=>a.i-b.i).map(v=>({v,dir:vmDir(v),opts:null}));
+}
+function vmStart(){V.tense="mix"; V.q=vmBuild(); V.i=0; V.score=0; V.wrong=[]; V.retry=false; V.answered=false; renderVm()}
+function vmRetry(){V.tense="mix"; V.q=V.wrong.map(w=>({v:w.v,dir:w.dir,opts:null})).sort(()=>Math.random()-.5); V.i=0; V.score=0; V.wrong=[]; V.retry=true; V.answered=false; renderVm()}
+function renderVmSetup(){
+  V.tense="mix"; screen="vmset"; $("fb").hidden=true; chrome(); setCourseColour(course);
+  const S2=ST.verbs.mset, pct=r=>{const vs=VBX.slice(0,r); const n=vs.filter(v=>{const m=vmM(v.inf);return m&&m.b>=2}).length; return Math.round(n/vs.length*100)};
+  const nxt=VBX.find(v=>{const m=vmM(v.inf);return (!m||m.b<2)&&v.i<S2.range});
+  $("drill").innerHTML=`<div class="vcard"><div class="vbig"><span class="e">🔤</span><div><h2>Verb meanings</h2><p>See an infinitive and pick what it means, or the other way round. The most common verbs come first.</p></div></div>
+      <p class="ven" style="margin:10px 0 0">${vmKnown()} of ${VB.length} meanings known${nxt?` · next up: <b>${esc(nxt.inf)}</b>`:""}</p></div>
+    <div><p class="label" style="margin-bottom:8px">Which verbs? <span style="text-transform:none;letter-spacing:0;font-weight:500">· the most useful first</span></p>
+      <div class="vchips" id="vmRange">${VRANGES.map(r=>`<button type="button" data-r="${r}" aria-pressed="${S2.range===r}">${r===VB.length?"All "+r:"Top "+r}<small>${pct(r)}%</small></button>`).join("")}</div></div>
+    <div><p class="label" style="margin-bottom:8px">Which way?</p>
+      <div class="vchips" id="vmDir"><button type="button" data-d="both" aria-pressed="${S2.dir==="both"}">Both ways</button><button type="button" data-d="es" aria-pressed="${S2.dir==="es"}">Spanish → English</button><button type="button" data-d="en" aria-pressed="${S2.dir==="en"}">English → Spanish</button></div></div>`;
+  $("drill").style.cssText=""; $("drill").scrollTop=0;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="vmBr">Browse</button><button type="button" class="grow" id="vmGo">Start quiz</button>`;
+  $("vmBr").onclick=()=>renderVList(); $("vmGo").onclick=()=>vmStart();
+  document.querySelectorAll("#vmRange button").forEach(b=>b.onclick=()=>{S2.range=+b.dataset.r; vSave(); renderVmSetup()});
+  document.querySelectorAll("#vmDir button").forEach(b=>b.onclick=()=>{S2.dir=b.dataset.d; vSave(); renderVmSetup()});
+}
+function renderVm(){
+  screen="vm"; V.tense="mix"; chrome(); setCourseColour(course); $("fb").hidden=true; V.answered=false;
+  const q=V.q[V.i], v=q.v;
+  if(!q.opts){const d=vmDistract(v,3); q.opts=[v,...d].sort(()=>Math.random()-.5)}
+  const es=q.dir==="es";
+  const scene=es?`<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf">${esc(v.inf)}</div><div class="ven">What does it mean?</div></div>`
+    :`<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf" style="font-size:1.9rem;line-height:1.2">${esc(vGloss(v))}</div><div class="ven">Which verb is this?</div></div>`;
+  $("drill").innerHTML=`<div class="meta"><span class="pill vp" style="background:var(--cc-soft);color:var(--cc)">MEANING</span><span class="label" style="margin-left:auto">${V.retry?"Second try · ":""}${V.i+1} / ${V.q.length}</span></div>
+    <div class="qpush" aria-hidden="true"></div>${scene}
+    <div class="vopts" id="vOpts">${q.opts.map(o=>`<button type="button" class="vopt" data-o="${esc(o.inf)}">${esc(es?vGloss(o):o.inf)}</button>`).join("")}</div>`;
+  $("actions").innerHTML=`<button type="button" class="vlite" id="vmSkip">I don’t know</button>`;
+  $("vmSkip").onclick=()=>{if(!V.answered) vmAnswer(null)};
+  document.querySelectorAll(".vopt").forEach(b=>b.onclick=()=>{if(!V.answered) vmAnswer(b.dataset.o)});
+}
+function vmAnswer(val){
+  const q=V.q[V.i], v=q.v; V.answered=true;
+  const ok=val===v.inf;
+  vmSet(v.inf,ok); const L=ST.verbs.log; L[todayKey()]=(L[todayKey()]||0)+1; vSave();
+  if(ok) V.score++; else V.wrong.push(q);
+  haptic(ok?20:[70,50,70]);
+  document.querySelectorAll(".vopt").forEach(b=>{b.disabled=true; if(b.dataset.o===v.inf) b.classList.add("ok"); else if(b.dataset.o===val) b.classList.add("bad"); else b.classList.add("dim")});
+  chrome();
+  const fb=$("fb"); fb.className="sheet top "+(ok?"ok":"bad");
+  fb.innerHTML=`<div class="body"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>
+    <div style="font-size:1.35rem;margin-top:2px"><b>${esc(v.inf)}</b> <span style="color:var(--muted)">=</span> ${esc(vGloss(v))}</div>
+    <p class="note" style="margin:6px 0 0">Present: ${vPers(v).map(p=>`<span style="color:var(--muted)">${vPro(p,false)}</span> <b>${esc(vf(v,"pres",p))}</b>`).join(" · ")}</p></div>`;
+  sizeTopSheet(.5,8); fb.hidden=false; settleTopSheet();
+  const last=V.i+1>=V.q.length;
+  $("actions").innerHTML=`<button type="button" class="grow" id="vNext">${last?"Finish":"Next"}</button>`;
+  $("vNext").onclick=()=>{if(last) renderVmSum(); else{V.i++; renderVm()}};
+  $("vNext").focus({preventScroll:true});
+}
+function vmEnd(){ if(V.i===0&&!V.answered) renderVmSetup(); else renderVmSum() }
+function renderVmSum(){
+  screen="vmsum"; V.tense="mix"; $("fb").hidden=true; chrome(); setCourseColour(course);
+  const n=V.i+(V.answered?1:0), s=V.score, stars=n?s/n:0, nw=V.wrong.length;
+  $("drill").innerHTML=`<div class="vsum"><div class="vcard" style="text-align:center"><div class="vstars">${stars>=.9?"⭐⭐⭐":stars>=.6?"⭐⭐":"⭐"}</div>
+      <div class="vscore" style="color:var(--cc)">${s} / ${n}</div><p class="sub">${V.retry?(s===n?"All fixed. ¡Genial!":s?"Getting there. Some are still tricky.":"Still tricky. Look at them once more."):stars>=.9?"¡Excelente!":stars>=.6?"¡Muy bien! Keep going.":"Good practice. Those verbs will come back soon."}</p>
+      <p class="sub" style="margin-top:4px">${vmKnown()} of ${VB.length} meanings known</p></div>
+    ${nw?`<div><p class="label" style="margin-bottom:8px">${V.retry?"Still to remember":"To remember"}</p><div class="vmist">${V.wrong.map(({v})=>`<div><span class="e">${v.ic}</span><span><b>${esc(v.inf)}</b><small>${esc(vGloss(v))}</small></span></div>`).join("")}</div></div>`:""}</div>`;
+  $("actions").innerHTML=nw?`<button type="button" class="ghost" id="vAgain">New round</button><button type="button" class="grow" id="vFix">Fix ${nw===1?"it":nw+" mistakes"}</button>`
+    :`<button type="button" class="ghost" id="vMenuB">Menu</button><button type="button" class="grow" id="vAgain">Another round</button>`;
+  if($("vMenuB")) $("vMenuB").onclick=()=>renderMenu(); $("vAgain").onclick=()=>vmStart(); if(nw) $("vFix").onclick=()=>vmRetry();
   $("drill").scrollTop=0;
 }
 // ---------- browse ----------
