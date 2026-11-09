@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Práctica diaria</title>
 <meta name="theme-color" content="#FAF6EC">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,6 +27,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%;overscroll-behavior:none}
+html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;overflow:hidden;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
 .app{position:fixed;left:0;right:0;top:var(--vt,0px);height:var(--vh,100%);max-width:632px;margin:0 auto;display:flex;flex-direction:column;
@@ -530,7 +531,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:11</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:13</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -604,6 +605,15 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
   </div>
 </div>
 
+<script>
+/* app, not a web page: no pinch or double-tap zoom anywhere */
+(function(){
+  const stop=e=>e.preventDefault();
+  ["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t,stop,{passive:false}));
+  document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+  document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
+})();
+</script>
 <script>
 // ================= utils =================
 const $=id=>document.getElementById(id);
