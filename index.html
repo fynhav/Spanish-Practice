@@ -27,6 +27,10 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%;overscroll-behavior:none}
+.spk{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--cc,#2f6f6f);display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0;cursor:pointer;vertical-align:middle}
+.spk svg{width:18px;height:18px}.spk.on{background:var(--cc-soft,#e0eeee)}.spk.sm{width:30px;height:30px;margin-left:6px}.spk.sm svg{width:15px;height:15px}
+.vrow .spk{margin-left:auto}.gloss .gw{display:flex;align-items:center}
+.vsel{width:100%;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;padding:0 12px}
 html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;overflow:hidden;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
@@ -528,10 +532,16 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
           <button type="button" data-v="off">Off</button>
         </div>
         <span class="sub">Works on most Android phones. On iPhone it depends on your iOS version.</span></div>
+      <div class="setting" id="listenSet"><span class="label">Listen · read Spanish aloud</span>
+        <div class="seg" id="segAuto"><button type="button" data-v="off">Tap the speaker</button><button type="button" data-v="on">Read answers aloud</button></div>
+        <div class="seg" id="segRate" style="margin-top:6px"><button type="button" data-v="slow">Slow</button><button type="button" data-v="normal">Normal</button></div>
+        <select class="vsel" id="voiceSel" aria-label="Voice" style="margin-top:6px"></select>
+        <button type="button" class="ghost" id="voiceTest" style="margin-top:6px;min-height:40px">Test voice</button>
+        <span class="sub" id="voiceNote">For the most natural voice on iPhone: Settings → Accessibility → Spoken Content → Voices → Spanish, download an Enhanced or Premium voice (for example Mónica or Paulina), then pick it here.</span></div>
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 01:33</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 15:18</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1803,6 +1813,63 @@ $("closeOv").onclick=()=>$("ov").hidden=true;
 $("ov").addEventListener("click",e=>{if(e.target.id==="ov")$("ov").hidden=true});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")$("ov").hidden=true});
 
+// ================= listen: Spanish text read aloud with the best natural voice the phone has =================
+const SPK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+const spkBtn=(text,cls)=>TTS_OK&&text?`<button type="button" class="spk${cls?" "+cls:""}" data-say="${esc(text)}" aria-label="Listen">${SPK_SVG}</button>`:"";
+const TTS_OK=typeof window!=="undefined"&&"speechSynthesis" in window&&typeof SpeechSynthesisUtterance!=="undefined";
+if(!S.auto) S.auto="off"; if(!S.rate) S.rate="normal"; if(S.voice==null) S.voice="";
+const ttsVoices=()=>TTS_OK?speechSynthesis.getVoices().filter(v=>/^es([-_]|$)/i.test(v.lang)):[];
+function ttsScore(v){
+  const n=v.name+" "+(v.voiceURI||""); let sc=0;
+  if(/premium|enhanced|neural|natural|online|siri/i.test(n)) sc+=50;
+  if(/^es[-_]ES/i.test(v.lang)) sc+=6; else if(/^es[-_](MX|US|419)/i.test(v.lang)) sc+=4;
+  if(/m[oó]nica|paulina|jorge|juan|marisol|diego|google|elvira|alvaro|jimena|francisca|angelica|luciana|monica/i.test(n)) sc+=10;
+  if(/compact|eloquence|novelty|whisper|bahh|bells|boing|cellos|trinoids|zarvox|organ|bubbles|jester|albert|fred/i.test(n)) sc-=40;
+  if(v.localService) sc+=1; return sc;
+}
+const ttsPick=()=>{const L=ttsVoices(); if(S.voice){const m=L.find(v=>v.voiceURI===S.voice); if(m) return m} return L.slice().sort((a,b)=>ttsScore(b)-ttsScore(a))[0]||null};
+let ttsBtn=null;
+function speak(text,btn){
+  if(!TTS_OK||!text) return;
+  try{
+    speechSynthesis.cancel(); if(ttsBtn) ttsBtn.classList.remove("on"); ttsBtn=null;
+    const clean=String(text).replace(/\([^)]*\)/g," ").replace(/[_{}\[\]]/g,"").replace(/\s+/g," ").trim(); if(!clean) return;
+    const parts=clean.match(/[^.!?¿¡]+[.!?]*/g)||[clean], v=ttsPick();
+    if(btn){btn.classList.add("on"); ttsBtn=btn}
+    parts.forEach((t,i)=>{
+      const u=new SpeechSynthesisUtterance(t.trim()); if(!u.text) return;
+      u.lang=v?v.lang:"es-ES"; if(v) u.voice=v; u.rate=S.rate==="slow"?.72:.92; u.pitch=1;
+      if(i===parts.length-1) u.onend=u.onerror=()=>{if(btn) btn.classList.remove("on")};
+      speechSynthesis.speak(u);
+    });
+  }catch(e){}
+}
+document.addEventListener("click",e=>{const b=e.target.closest(".spk"); if(!b) return; e.preventDefault(); speak(b.dataset.say,b)},true);
+// iOS only lets speech start from a tap: wake the speech engine on the first one
+document.addEventListener("pointerdown",()=>{if(!TTS_OK||window.__ttsWoke) return; window.__ttsWoke=1; try{const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u)}catch(e){}},{once:true,capture:true});
+function ttsFill(){
+  const sel=$("voiceSel"); if(!sel) return;
+  const L=ttsVoices().sort((a,b)=>ttsScore(b)-ttsScore(a)), best=ttsPick();
+  sel.innerHTML=`<option value="">Automatic${best?` · ${esc(best.name)}`:""}</option>`+L.map(v=>`<option value="${esc(v.voiceURI)}"${S.voice===v.voiceURI?" selected":""}>${esc(v.name)} · ${esc(v.lang)}</option>`).join("");
+  if(!L.length) $("voiceNote").textContent="No Spanish voice found on this device yet. On iPhone: Settings → Accessibility → Spoken Content → Voices → Spanish, download one, then reopen the app.";
+}
+if(TTS_OK){
+  speechSynthesis.addEventListener&&speechSynthesis.addEventListener("voiceschanged",ttsFill);
+  const segs=[["segAuto","auto"],["segRate","rate"]];
+  segs.forEach(([id,key])=>{const seg=$(id), sync=()=>seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S[key])); seg.addEventListener("click",e=>{const b=e.target.closest("button"); if(!b) return; S[key]=b.dataset.v; saveS(); sync()}); sync()});
+  $("voiceSel").addEventListener("change",e=>{S.voice=e.target.value; saveS()});
+  $("voiceTest").onclick=()=>speak("Hola, así suena esta voz. ¿Qué tal estás hoy?",$("voiceTest"));
+  ttsFill();
+}else{ const ls=$("listenSet"); if(ls) ls.style.display="none" }
+// the Spanish sentence for an exercise (answer filled in)
+const flatW=w=>typeof w==="string"?w:(w&&w.parts?w.parts.map(x=>x[0]).join(""):Array.isArray(w)?w[0]:w&&w.t!=null?w.t:"");
+function itemSay(item){
+  if(item.kind==="past") return item.tokens.map(t=>typeof t==="string"?t:t.blank?item.ans+(t.suf||""):t.trig!=null?t.trig+(t.suf||""):t.t||"").join(" ");
+  if(item.short&&item.short.length) return item.short.map(flatW).join(" ");
+  return item.display||"";
+}
+const itemSayQ=item=>item.kind!=="past"&&item.full?item.full.map(w=>typeof w==="string"?w:noun(w)).join(" "):"";
+
 // vibration: the Vibration API where it exists, otherwise the iOS switch-control haptic
 const hapticEl=(()=>{try{const l=document.createElement("label");l.setAttribute("aria-hidden","true");l.style.cssText="position:fixed;left:-200px;top:0;opacity:0;pointer-events:none";const i=document.createElement("input");i.type="checkbox";i.setAttribute("switch","");i.tabIndex=-1;l.appendChild(i);document.body.appendChild(l);return l}catch(e){return null}})();
 function haptic(pattern){
@@ -2228,7 +2295,7 @@ function renderQ(restore){
   const ppn=nObj>1?"Replace <b>both</b> highlighted phrases with pronouns:":"Replace <b>only</b> the highlighted words with a pronoun:";
   const prompt=(isPast?(blind||info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(blind||info.key==="two"?ppn:(PPROMPT[info.key]||ppn)))+` <span class="tapnote">Tap any word for its meaning.</span>`;
   $("drill").innerHTML=`
-    <div class="meta">${blind?"<span style=\"flex:1\"></span>":`<span class="pill ${info.pillCls}">${esc(info.pill)}</span>`}${info.counter}</div>
+    <div class="meta">${blind?"<span style=\"flex:1\"></span>":`<span class="pill ${info.pillCls}">${esc(info.pill)}</span>`}${info.counter}${spkBtn(itemSayQ(item),"")}</div>
     <div class="qpush" aria-hidden="true"></div>
     ${q}
     <p class="prompt">${prompt}</p>
@@ -2393,7 +2460,7 @@ function showFeedback(val,ok){
   fb.className="sheet top "+(ok?"ok":"bad");
   fb.innerHTML=`
     <div class="body">
-      <div class="vrow"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>
+      <div class="vrow"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>${spkBtn(itemSay(item))}
       ${g?`<div class="gain"><b>${g.pts>0?"+":g.pts<0?"−":""}${Math.abs(g.pts)}</b><span>${esc(g.why)}</span></div>`:""}</div>
       <div>${!ok&&val!==null?`You wrote <i>${esc(val)}</i> · `:""}Answer: <b>${esc(item.display)}</b>${!ok&&item.extra&&item.extra.length?`<span style="color:var(--muted)"> · also accepted: ${item.extra.filter(e=>!e.note.startsWith("Accepted:")).slice(0,2).map(e=>`<i>${esc(e.raw)}</i>`).join(", ")}</span>`:""}</div>
       ${(()=>{const en=itemEN(item);return en?`<div class="en">${item.enAns?`${esc(en)} <span>→</span> <b>${esc(item.enAns)}</b>`:`<b>${esc(en)}</b>`}</div>`:""})()}
@@ -2410,6 +2477,7 @@ function showFeedback(val,ok){
     </div>`;
   // the panel drops in from the top; the question and tiles stay where they are and Next takes Check's place under the thumb
   sizeTopSheet(.4,12); fb.hidden=false; settleTopSheet();
+  if(S.auto==="on") speak(itemSay(item),fb.querySelector(".spk"));
   drawLinks();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(drawLinks);
   const nb=$("checkBtn"); nb.textContent=drillOn?"Next":lastQ?"Finish day":partEnds?"Next part":"Continue"; nb.disabled=false;
@@ -2490,7 +2558,7 @@ function showGloss(el){
   const src=el.dataset.w||el.textContent, r=lookup(src); if(!r) return;
   closeGloss();
   const g=document.createElement("div"); g.className="gloss"; g.setAttribute("role","status");
-  g.innerHTML=`<div class="gw">${esc(src.replace(/[¿?¡!.,]/g,"").trim())}</div>
+  g.innerHTML=`<div class="gw"><span>${esc(src.replace(/[¿?¡!.,]/g,"").trim())}</span>${spkBtn(src.replace(/[¿?¡!.,]/g,"").trim(),"sm")}</div>
     <div>${r.en?esc(r.en):"No entry here yet."}</div>${r.gm?`<div class="gm">${esc(r.gm)}</div>`:""}
     <a href="https://www.spanishdict.com/translate/${encodeURIComponent(r.q||r.w)}" target="_blank" rel="noopener">More on SpanishDict ↗</a>`;
   document.body.appendChild(g);
@@ -2594,7 +2662,7 @@ function renderStory(id){
   storyState={id,st,segs,gaps,vals:gaps.map((_,i)=>d[i]||""),att:d.a||{},revealed:d.r||{},cur:0};
   storyState.cur=Math.max(0,gaps.findIndex((_,k)=>!gapIsOk(k)));
   $("drill").innerHTML=`
-    <div class="meta"><span class="pill ${st.kind==="past"?"pret":"both"}">${st.kind==="past"?"Past tense":"Pronouns"}</span><span class="sub" style="margin:0">${esc(st.en)} · ${gaps.length} gaps</span></div>
+    <div class="meta"><span class="pill ${st.kind==="past"?"pret":"both"}">${st.kind==="past"?"Past tense":"Pronouns"}</span><span class="sub" style="margin:0">${esc(st.en)} · ${gaps.length} gaps</span><span style="margin-left:auto">${spkBtn(segs.map(sg=>typeof sg==="string"?sg:(gaps[sg.i].answers[0]||"")).join(" "))}</span></div>
     <p class="hint" style="margin:0">${st.kind==="past"?"Type each verb in the pretérito or imperfecto.":"Type the object pronoun(s). The note says what each gap replaces."} Tap a gap to jump to it, or any word for its meaning.</p>
     <p class="story" id="storyText">${segs.map(sg=>typeof sg==="string"?storyWords(sg):`<span class="gp" data-i="${sg.i}"></span><span class="ginf">(${esc(gapLabel(sg))})</span>`).join("")}</p>`;
   $("drill").insertAdjacentHTML("beforeend",transHTML(id));
@@ -3368,10 +3436,10 @@ const VBX_X={pres:150,pret:92,imp:78,fut:240,cond:240,perf:115,near:190};
 function vSceneHTML(q){
   const {v,tk,p,fem}=q, pick=vSet().mode==="pick", mix=V.tense==="mix";
   const blank=`<div class="vblank"><span class="vwho">${vIc(p,fem)}<span>${vPro(p,fem)}</span></span>${pick?'<span class="vgap"></span>':""}</div>`;
-  if(!mix) return `<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf">${esc(v.inf)}</div><div class="ven">${esc(vGloss(v))}</div>${blank}</div>`;
+  if(!mix) return `<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf">${esc(v.inf)}</div><div class="ven">${esc(vGloss(v))}${spkBtn(v.inf,"sm")}</div>${blank}</div>`;
   const x=Math.max(24,Math.min(76,(VBX_X[tk]||150)/3));
   return `<div class="va"><div class="vstage"><div class="vbub" style="left:${x}%" aria-hidden="true">${vIc(p,fem)}<i>+</i>${v.ic}</div>${tlSVG(tk)}</div>
-    <div class="vinf" style="margin-top:12px">${esc(v.inf)}</div><div class="ven">${esc(vGloss(v))}</div>${blank}</div>`;
+    <div class="vinf" style="margin-top:12px">${esc(v.inf)}</div><div class="ven">${esc(vGloss(v))}${spkBtn(v.inf,"sm")}</div>${blank}</div>`;
 }
 function renderVQ(){
   screen="vq"; chrome(); $("fb").hidden=true; V.answered=false; V.tries=0;
@@ -3430,7 +3498,7 @@ function vAnswer(val){
   const fb=$("fb"); fb.className="sheet top "+(ok?"ok":"bad");
   fb.innerHTML=`<div class="body">
     <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>
-      <span style="font-size:1.25rem"><span style="color:var(--muted);font-size:.9rem">${vPro(p,q.fem)} →</span> ${vhl(v,tk,p)}</span></div>
+      <span style="font-size:1.25rem"><span style="color:var(--muted);font-size:.9rem">${vPro(p,q.fem)} →</span> ${vhl(v,tk,p)}</span>${spkBtn(vPro(p,q.fem)+" "+right,"sm")}</div>
     ${val!==null&&!ok?`<div style="color:var(--muted);font-size:.88rem">you wrote <i>${esc(val)}</i></div>`:""}
     ${en?`<div style="font-size:.98rem">= ${esc(en)}</div>`:""}
     ${extra?`<p class="note" style="margin:4px 0 0">${extra}</p>`:""}
@@ -3442,6 +3510,7 @@ function vAnswer(val){
   requestAnimationFrame(()=>{const me=fb.querySelector(".vrow.me"), bd=fb.querySelector(".body"); if(me&&bd&&me.offsetTop+me.offsetHeight>bd.clientHeight) bd.scrollTop=me.offsetTop+me.offsetHeight-bd.clientHeight+8});
   const last=V.i+1>=V.q.length;
   $("actions").innerHTML=`<button type="button" class="grow" id="vNext">${last?"Finish":"Next"}</button>`;
+  if(S.auto==="on") speak(vPro(p,q.fem)+" "+right);
   $("vNext").onclick=()=>{if(last) renderVSum(); else{V.i++; renderVQ()}};
   $("vNext").focus({preventScroll:true});
 }
@@ -3508,7 +3577,7 @@ function renderVm(){
   const q=V.q[V.i], v=q.v;
   if(!q.opts){const d=vmDistract(v,3); q.opts=[v,...d].sort(()=>Math.random()-.5)}
   const es=q.dir==="es";
-  const scene=es?`<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf">${esc(v.inf)}</div><div class="ven">What does it mean?</div></div>`
+  const scene=es?`<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf">${esc(v.inf)}</div><div class="ven">What does it mean?${spkBtn(v.inf,"sm")}</div></div>`
     :`<div class="va"><div class="vbig2" aria-hidden="true">${v.ic}</div><div class="vinf" style="font-size:1.9rem;line-height:1.2">${esc(vGloss(v))}</div><div class="ven">Which verb is this?</div></div>`;
   $("drill").innerHTML=`<div class="meta"><span class="pill vp" style="background:var(--cc-soft);color:var(--cc)">MEANING</span><span class="label" style="margin-left:auto">${V.retry?"Second try · ":""}${V.i+1} / ${V.q.length}</span></div>
     <div class="qpush" aria-hidden="true"></div>${scene}
@@ -3526,12 +3595,13 @@ function vmAnswer(val){
   document.querySelectorAll(".vopt").forEach(b=>{b.disabled=true; if(b.dataset.o===v.inf) b.classList.add("ok"); else if(b.dataset.o===val) b.classList.add("bad"); else b.classList.add("dim")});
   chrome();
   const fb=$("fb"); fb.className="sheet top "+(ok?"ok":"bad");
-  fb.innerHTML=`<div class="body"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>
+  fb.innerHTML=`<div class="body"><div class="vrow"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>${spkBtn(v.inf)}</div>
     <div style="font-size:1.35rem;margin-top:2px"><b>${esc(v.inf)}</b> <span style="color:var(--muted)">=</span> ${esc(vGloss(v))}</div>
     <p class="note" style="margin:6px 0 0">Present: ${vPers(v).map(p=>`<span style="color:var(--muted)">${vPro(p,false)}</span> <b>${esc(vf(v,"pres",p))}</b>`).join(" · ")}</p></div>`;
   sizeTopSheet(.5,8); fb.hidden=false; settleTopSheet();
   const last=V.i+1>=V.q.length;
   $("actions").innerHTML=`<button type="button" class="grow" id="vNext">${last?"Finish":"Next"}</button>`;
+  if(S.auto==="on") speak(v.inf);
   $("vNext").onclick=()=>{if(last) renderVmSum(); else{V.i++; renderVm()}};
   $("vNext").focus({preventScroll:true});
 }
