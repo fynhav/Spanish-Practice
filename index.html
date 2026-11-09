@@ -141,6 +141,7 @@ button:focus-visible,input:focus-visible,.tile:focus-visible{outline:3px solid v
 .link .sentence{margin:0}
 .link .w .t{font-size:1.05rem}
 .link .gap{height:38px}
+.sheet.tight .body{padding-top:8px;font-size:.92rem}.sheet.tight .link{padding:6px 10px;margin-top:4px}.sheet.tight .link .gap{height:26px}.sheet.tight .link .w .t{font-size:.95rem}.sheet.tight .verdict{font-size:1.15rem}.sheet.tight .tag{font-size:.6rem}
 .links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .links path{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--len,0);stroke-dashoffset:var(--len,0);animation:draw .45s .15s ease-out forwards}
 .links .head{stroke-dasharray:none;stroke-dashoffset:0;opacity:0;animation:fade .15s .55s forwards}
@@ -515,12 +516,12 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
     <div class="panel-head"><h2 id="ovTitle">Settings</h2><button type="button" class="iconbtn" id="closeOv">Close</button></div>
     <div id="settingsPart" class="setting" style="gap:14px">
-      <div class="setting"><span class="label">Parts 1–2: answer with</span>
+      <div class="setting"><span class="label">Answer with</span>
         <div class="seg" id="segMode">
           <button type="button" data-v="tiles">Tiles</button>
           <button type="button" data-v="type">Typing</button>
         </div>
-        <span class="sub">Part 3 is always typed.</span></div>
+        <span class="sub">The past-tense “Choose the tense” part is always typed.</span></div>
       <div class="setting"><span class="label">Object pronouns: show objects as</span>
         <div class="seg" id="segView">
           <button type="button" data-v="words">Words</button>
@@ -537,11 +538,12 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <div class="seg" id="segRate" style="margin-top:6px"><button type="button" data-v="slow">Slow</button><button type="button" data-v="normal">Normal</button></div>
         <select class="vsel" id="voiceSel" aria-label="Voice" style="margin-top:6px"></select>
         <button type="button" class="ghost" id="voiceTest" style="margin-top:6px;min-height:40px">Test voice</button>
-        <span class="sub" id="voiceNote">For the most natural voice on iPhone: Settings → Accessibility → Spoken Content → Voices → Spanish, download an Enhanced or Premium voice (for example Mónica or Paulina), then pick it here.</span></div>
+        <button type="button" class="ghost" id="recDl" hidden style="margin-top:6px;min-height:40px">Download the natural voice for offline use</button><span class="sub" id="recDlNote" hidden></span>
+        <span class="sub" id="voiceNote">Spanish is read with the best voice this device allows. (iPhone keeps its Premium voices for itself, so apps like this one only get the basic ones.)</span></div>
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 15:18</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 16:28</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -984,7 +986,7 @@ const COURSES={
   pron:{name:"Object pronouns",short:"Pronouns",sub:"lo · la · le · les · se",cc:"do",parts:[
     {key:"do",n:10,name:"Direct objects",pill:"Part 1 · Direct",rule:`Replace <b class="do-t">what</b> is acted on with <b class="do-t">lo · la · los · las</b>. Match the noun’s gender and number.`,ex:"Compro las flores → Las compro"},
     {key:"io",n:10,name:"Indirect objects",pill:"Part 2 · Indirect",rule:`Replace <b class="io-t">to whom</b> with <b class="io-t">le</b> (one person) or <b class="io-t">les</b> (several). No gender. Keep the other noun.`,ex:"Escribo un mensaje a Carlos → Le escribo un mensaje"},
-    {key:"both",n:5,typing:true,name:"Both together",pill:"Part 3 · Typing",rule:`Use both: <b class="io-t">indirect</b> first, then <b class="do-t">direct</b>. <b class="io-t">le/les</b> turns into <b class="io-t">se</b> before lo/la/los/las. You type these.`,ex:"Juan da el libro a María → Juan se lo da"}]},
+    {key:"both",n:5,typing:true,name:"Both together",pill:"Part 3 · Both together",rule:`Use both: <b class="io-t">indirect</b> first, then <b class="do-t">direct</b>. <b class="io-t">le/les</b> turns into <b class="io-t">se</b> before lo/la/los/las.`,ex:"Juan da el libro a María → Juan se lo da"}]},
   past:{name:"Past tense",short:"Past tense",sub:"pretérito · imperfecto",cc:"pret",parts:[
     {key:"pret",n:10,name:"Pretérito",pill:"Part 1 · Pretérito",rule:`Finished actions at a specific time take the <b class="pret-t">pretérito</b>: <b class="pret-t">ayer, anoche, el sábado pasado, una vez</b>.`,ex:"Ayer (yo) ___ (comer) paella → comí"},
     {key:"imp",n:10,name:"Imperfecto",pill:"Part 2 · Imperfecto",rule:`Habits, repeated actions and background take the <b class="imp-t">imperfecto</b>: <b class="imp-t">siempre, todos los días, antes, normalmente</b>.`,ex:"Siempre (yo) ___ (comer) paella → comía"},
@@ -1815,7 +1817,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")$("ov").hidden=true}
 
 // ================= listen: Spanish text read aloud with the best natural voice the phone has =================
 const SPK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
-const spkBtn=(text,cls)=>TTS_OK&&text?`<button type="button" class="spk${cls?" "+cls:""}" data-say="${esc(text)}" aria-label="Listen">${SPK_SVG}</button>`:"";
+const spkBtn=(text,cls)=>(TTS_OK||REC_KEYS.size)&&text?`<button type="button" class="spk${cls?" "+cls:""}" data-say="${esc(text)}" aria-label="Listen">${SPK_SVG}</button>`:"";
 const TTS_OK=typeof window!=="undefined"&&"speechSynthesis" in window&&typeof SpeechSynthesisUtterance!=="undefined";
 if(!S.auto) S.auto="off"; if(!S.rate) S.rate="normal"; if(S.voice==null) S.voice="";
 const ttsVoices=()=>TTS_OK?speechSynthesis.getVoices().filter(v=>/^es([-_]|$)/i.test(v.lang)):[];
@@ -1829,36 +1831,82 @@ function ttsScore(v){
 }
 const ttsPick=()=>{const L=ttsVoices(); if(S.voice){const m=L.find(v=>v.voiceURI===S.voice); if(m) return m} return L.slice().sort((a,b)=>ttsScore(b)-ttsScore(a))[0]||null};
 let ttsBtn=null;
-function speak(text,btn){
-  if(!TTS_OK||!text) return;
+const ttsClean=t=>String(t).replace(/\([^)]*\)/g," ").replace(/[_{}\[\]]/g,"").replace(/\s+/g," ").trim();
+const ttsSplit=c=>(c.match(/[^.!?¿¡]+[.!?]*/g)||[c]).map(x=>x.trim()).filter(x=>/[a-záéíóúñü0-9]/i.test(x));
+function cyrb53(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)}
+const ttsKey=sn=>cyrb53(sn.toLowerCase()).toString(36);
+// natural recordings (built into the offline app): a clip per sentence, looked up by key
+const REC_KEYS=new Set(/*REC_KEYS*/[]);
+const recOn=()=>REC_KEYS.size>0&&(S.voice===""||S.voice==="rec");
+let recEl=null, recRun=0; const recBlobs=new Map();
+async function recBlob(key){
+  if(recBlobs.has(key)) return recBlobs.get(key);
+  const r=await fetch("audio/"+key+".mp3"); if(!r.ok) throw new Error("no clip");
+  const u=URL.createObjectURL(await r.blob()); recBlobs.set(key,u); if(recBlobs.size>60){const k0=recBlobs.keys().next().value; URL.revokeObjectURL(recBlobs.get(k0)); recBlobs.delete(k0)} return u;
+}
+function recPlay(keys,btn,fallback){
+  const run=++recRun; if(!recEl){recEl=new Audio(); recEl.preload="auto"}
+  const done=()=>{if(btn) btn.classList.remove("on")};
+  if(btn){btn.classList.add("on"); ttsBtn=btn}
+  const step=async i=>{
+    if(run!==recRun) return;
+    if(i>=keys.length){done();return}
+    try{
+      const u=await recBlob(keys[i]); if(run!==recRun) return;
+      recEl.src=u; recEl.playbackRate=S.rate==="slow"?.8:1; recEl.defaultPlaybackRate=recEl.playbackRate;
+      recEl.onended=()=>step(i+1); recEl.onerror=()=>{if(run===recRun){done(); if(i===0&&fallback) fallback()}};
+      if(keys[i+1]) recBlob(keys[i+1]).catch(()=>{});
+      await recEl.play();
+    }catch(e){ if(run===recRun){done(); if(i===0&&fallback) fallback()} }
+  };
+  step(0);
+}
+function speakDevice(parts,btn){
   try{
-    speechSynthesis.cancel(); if(ttsBtn) ttsBtn.classList.remove("on"); ttsBtn=null;
-    const clean=String(text).replace(/\([^)]*\)/g," ").replace(/[_{}\[\]]/g,"").replace(/\s+/g," ").trim(); if(!clean) return;
-    const parts=clean.match(/[^.!?¿¡]+[.!?]*/g)||[clean], v=ttsPick();
+    speechSynthesis.cancel(); const v=ttsPick();
     if(btn){btn.classList.add("on"); ttsBtn=btn}
     parts.forEach((t,i)=>{
-      const u=new SpeechSynthesisUtterance(t.trim()); if(!u.text) return;
+      const u=new SpeechSynthesisUtterance(t); if(!u.text) return;
       u.lang=v?v.lang:"es-ES"; if(v) u.voice=v; u.rate=S.rate==="slow"?.72:.92; u.pitch=1;
       if(i===parts.length-1) u.onend=u.onerror=()=>{if(btn) btn.classList.remove("on")};
       speechSynthesis.speak(u);
     });
   }catch(e){}
 }
+function speak(text,btn){
+  if(!text) return;
+  if(ttsBtn) ttsBtn.classList.remove("on"); ttsBtn=null; recRun++; if(recEl) try{recEl.pause()}catch(e){}
+  if(TTS_OK) try{speechSynthesis.cancel()}catch(e){}
+  const parts=ttsSplit(ttsClean(text)); if(!parts.length) return;
+  const keys=parts.map(ttsKey);
+  const dev=()=>{if(TTS_OK) speakDevice(parts,btn)};
+  if(recOn()&&keys.every(k=>REC_KEYS.has(k))) recPlay(keys,btn,dev); else dev();
+}
 document.addEventListener("click",e=>{const b=e.target.closest(".spk"); if(!b) return; e.preventDefault(); speak(b.dataset.say,b)},true);
 // iOS only lets speech start from a tap: wake the speech engine on the first one
-document.addEventListener("pointerdown",()=>{if(!TTS_OK||window.__ttsWoke) return; window.__ttsWoke=1; try{const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u)}catch(e){}},{once:true,capture:true});
+document.addEventListener("pointerdown",()=>{if(window.__ttsWoke) return; window.__ttsWoke=1;
+  if(TTS_OK) try{const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u)}catch(e){}
+  if(REC_KEYS.size) try{if(!recEl){recEl=new Audio(); recEl.preload="auto"} recEl.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="; recEl.play().catch(()=>{})}catch(e){}},{capture:true});
 function ttsFill(){
   const sel=$("voiceSel"); if(!sel) return;
-  const L=ttsVoices().sort((a,b)=>ttsScore(b)-ttsScore(a)), best=ttsPick();
-  sel.innerHTML=`<option value="">Automatic${best?` · ${esc(best.name)}`:""}</option>`+L.map(v=>`<option value="${esc(v.voiceURI)}"${S.voice===v.voiceURI?" selected":""}>${esc(v.name)} · ${esc(v.lang)}</option>`).join("");
-  if(!L.length) $("voiceNote").textContent="No Spanish voice found on this device yet. On iPhone: Settings → Accessibility → Spoken Content → Voices → Spanish, download one, then reopen the app.";
+  const L=ttsVoices().sort((a,b)=>ttsScore(b)-ttsScore(a)), best=ttsPick(), rec=REC_KEYS.size>0;
+  sel.innerHTML=`<option value=""${S.voice===""?" selected":""}>Automatic${rec?" · natural voice":best?` · ${esc(best.name)}`:""}</option>`+(rec?`<option value="rec"${S.voice==="rec"?" selected":""}>Natural voice (recorded, Dora)</option>`:"")+L.map(v=>`<option value="${esc(v.voiceURI)}"${S.voice===v.voiceURI?" selected":""}>${esc(v.name)} · ${esc(v.lang)} (this phone)</option>`).join("");
+  if(!L.length&&!rec) $("voiceNote").textContent="No Spanish voice found on this device yet. On iPhone: Settings → Accessibility → Read & Speak → Voices → Spanish, download one, then reopen the app.";
+  const dl=$("recDl"); if(dl) dl.hidden=!rec;
+  if(rec) $("voiceNote").textContent="Sentences from the exercises, stories and verbs are read with a natural recorded voice built into this app. Anything else is read with the best voice your phone allows. (iPhone keeps its Premium voices for itself, so web apps cannot use them.)";
 }
-if(TTS_OK){
-  speechSynthesis.addEventListener&&speechSynthesis.addEventListener("voiceschanged",ttsFill);
-  const segs=[["segAuto","auto"],["segRate","rate"]];
-  segs.forEach(([id,key])=>{const seg=$(id), sync=()=>seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S[key])); seg.addEventListener("click",e=>{const b=e.target.closest("button"); if(!b) return; S[key]=b.dataset.v; saveS(); sync()}); sync()});
+if(TTS_OK||REC_KEYS.size){
+  if(TTS_OK&&speechSynthesis.addEventListener) speechSynthesis.addEventListener("voiceschanged",ttsFill);
+  [["segAuto","auto"],["segRate","rate"]].forEach(([id,key])=>{const seg=$(id), sync=()=>seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S[key])); seg.addEventListener("click",e=>{const b=e.target.closest("button"); if(!b) return; S[key]=b.dataset.v; saveS(); sync()}); sync()});
   $("voiceSel").addEventListener("change",e=>{S.voice=e.target.value; saveS()});
   $("voiceTest").onclick=()=>speak("Hola, así suena esta voz. ¿Qué tal estás hoy?",$("voiceTest"));
+  $("recDl").onclick=async()=>{
+    const b=$("recDl"), n=$("recDlNote"), keys=[...REC_KEYS]; b.disabled=true; n.hidden=false; let ok=0, bad=0;
+    const worker=async()=>{while(keys.length){const k=keys.pop(); try{const r=await fetch("audio/"+k+".mp3"); if(r.ok){await r.arrayBuffer(); ok++} else bad++}catch(e){bad++} if((ok+bad)%25===0) n.textContent=`Saving… ${ok+bad} of ${REC_KEYS.size}`}};
+    await Promise.all([worker(),worker(),worker(),worker()]);
+    n.textContent=bad?`Saved ${ok} of ${REC_KEYS.size}. ${bad} could not be fetched (check your connection and try again).`:`All ${ok} recordings are saved on this phone. The natural voice now works offline.`; b.disabled=false;
+  };
   ttsFill();
 }else{ const ls=$("listenSet"); if(ls) ls.style.display="none" }
 // the Spanish sentence for an exercise (answer filled in)
@@ -2199,7 +2247,8 @@ function renderIntro(pi){
 // ================= question rendering =================
 let drillOn=false, hintUsed=false;
 const cur=()=>drillOn?{item:drill.item,part:-1}:queue[pos];
-const inputMode=()=>drillOn?S.dmode:(parts()[cur().part].typing?"type":S.mode);
+// pronoun Part 3 (both objects) uses tiles like the other parts; only the past-tense mixed part is typed
+const inputMode=()=>drillOn?S.dmode:(parts()[cur().part].typing&&cur().item.kind==="past"?"type":S.mode);
 const comboOf=st=>Math.min(3,1+0.5*Math.floor(st/5));
 const G={m:"masc.",f:"fem."}, N={s:"sing.",p:"plural"};
 function renderFull(words,mode){
@@ -2428,14 +2477,19 @@ function sizeTopSheet(k,pad){
   if(k!=null){topSheetK=k; topSheetPad=pad}
   const fb=$("fb"), m=$("drill"), qEl=m.querySelector(".qpush"), qTop=qEl&&qEl.nextElementSibling?qEl.nextElementSibling.offsetTop:m.clientHeight;
   fb.style.top=m.offsetTop+"px";
-  fb.style.maxHeight=Math.max(Math.round(m.clientHeight*topSheetK),qTop-topSheetPad)+"px";
+  // the answer panel is the star after answering: it may use the whole practice area, so nothing is ever cut off
+  fb.style.maxHeight=Math.max(m.clientHeight-4,Math.round(m.clientHeight*topSheetK),qTop-topSheetPad)+"px";
 }
 // keep the panel the right size whatever changes the layout under it (keyboard closing, rotation, fonts loading):
 // watch the area itself instead of trusting viewport events, which iOS fires late or not at all
 function resizeTopSheet(){
   const fb=$("fb"); if(!fb||fb.hidden) return;
   if(!fb.classList.contains("top")){ if($("drill").style.paddingBottom) $("drill").style.paddingBottom=(fb.offsetHeight+12)+"px"; return }
-  sizeTopSheet(); if(fb.querySelector("#linkBox")&&typeof drawLinks==="function") drawLinks();
+  sizeTopSheet();
+  // very short screens: if it still does not fit, tighten the spacing rather than cut anything off
+  const bd=fb.querySelector(".body"); fb.classList.remove("tight");
+  if(bd&&bd.scrollHeight>bd.clientHeight+1) fb.classList.add("tight");
+  if(fb.querySelector("#linkBox")&&typeof drawLinks==="function") drawLinks();
 }
 if(window.ResizeObserver){const ro=new ResizeObserver(resizeTopSheet); ro.observe($("drill")); ro.observe($("app"))}
 const settleTopSheet=()=>[80,250,500,900,1500].forEach(ms=>setTimeout(resizeTopSheet,ms));
@@ -2746,7 +2800,7 @@ function checkStoryResults(S){
   const list=STORIES.filter(x=>x.kind===st.kind), next=list[(list.indexOf(st)+1)%list.length];
   $("actions").innerHTML="";
   const fb=$("fb");
-  fb.className="sheet "+(score>=n*0.6?"ok":"bad"); fb.style.maxHeight="52%";
+  fb.className="sheet "+(score>=n*0.6?"ok":"bad"); fb.style.maxHeight="80%";
   fb.innerHTML=`<div class="body">
       <div class="vrow"><div class="verdict">${score===n?"¡Perfecto!":score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${score} / ${n}</b><span>right first time${T.best[st.id]>score?` · best ${T.best[st.id]}/${n}`:""}</span></div></div>
       ${wrong.length?`<div class="mistakes">${wrong.map(({g,val,fixed,shown})=>`<div><span class="dot ${g.type==="verb"?g.tense:"io"}"></span><span><b>${esc(g.answers[0])}</b>${shown?" (answer shown)":fixed?" (fixed on a second try)":val?` (you wrote <i>${esc(val)}</i>)`:" (skipped)"} · ${esc(gapExplain(g))}</span></div>`).join("")}</div>`:""}
@@ -2999,7 +3053,7 @@ function renderEasy(id){
   const cards=easyCards(st), total=cards.reduce((a,c)=>a+c.gaps.length,0);
   easy={id,st,cards,total,cur:0,done:0,score:0,res:{}};
   $("drill").innerHTML=`
-    <div class="meta"><span class="pill pret">Tap mode</span><span class="sub" style="margin:0">${esc(st.en)} · ${total} verbs</span></div>
+    <div class="meta"><span class="pill pret">Tap mode</span><span class="sub" style="margin:0">${esc(st.en)} · ${total} verbs</span><span style="margin-left:auto">${spkBtn(st.text.replace(TAP_RE,"$1"))}</span></div>
     <p class="hint" style="margin:0">Tap the form that fits: <b class="pret-t">pretérito</b> for finished events, <b class="imp-t">imperfecto</b> for background and habits.</p>
     <div class="feed" id="feed">${cards.map((c,ci)=>`<div class="ecard${ci===0?" cur":""}" data-c="${ci}"><div class="etext">${c.segs.map(sg=>typeof sg==="string"?storyWords(sg):
       `<span class="pick" data-g="${sg.i}">${shuf([[sg.right,sg.tense],[sg.other,sg.otherTense]]).map(([t,tn])=>`<button type="button" class="opt" data-v="${esc(t)}" data-t="${tn}">${esc(t)}</button>`).join("")}</span><span class="ginf">(${esc(sg.inf)})</span>`).join("")}</div><div class="enote"></div></div>`).join("")}</div>`;
@@ -3060,7 +3114,7 @@ function easyFinish(){
   T.best[key]=Math.max(T.best[key]||0,E.score); T.log[tk]=(T.log[tk]||0)+1; commit("stories");
   haptic(E.score===n?[30,40,30,40,80]:20);
   const list=TAP_STORIES, next=list[(list.indexOf(st)+1)%list.length];
-  const fb=$("fb"); fb.className="sheet "+(E.score>=n*0.6?"ok":"bad"); fb.style.maxHeight="45%";
+  const fb=$("fb"); fb.className="sheet "+(E.score>=n*0.6?"ok":"bad"); fb.style.maxHeight="80%";
   fb.innerHTML=`<div class="body"><div class="vrow"><div class="verdict">${E.score===n?"¡Perfecto!":E.score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${E.score} / ${n}</b><span>${T.best[key]>E.score?`best ${T.best[key]}/${n}`:"saved"}</span></div></div>
     <p class="note" style="color:var(--muted)">Scroll up to reread the story. The English translation is at the bottom.</p></div>
     <div class="foot" style="display:flex;gap:8px"><button type="button" id="eType" style="flex:1;background:var(--card);color:var(--ink);border-color:var(--line)">Try again</button><button type="button" id="eNext" style="flex:2">Next story</button></div>`;
@@ -3177,18 +3231,27 @@ function endDrill(){
 function drawLinks(){
   const box=$("linkBox"); if(!box||$("fb").hidden) return;
   const svg=box.querySelector("svg.links"), b=box.getBoundingClientRect();
-  let html="";
+  const L=[];
   box.querySelectorAll("[data-from]").forEach(f=>{
     const r=f.dataset.from, t=box.querySelector(`[data-to="${r}"]`); if(!t) return;
     const fr=f.getBoundingClientRect(), tr=t.getBoundingClientRect();
     const sx=fr.left+fr.width/2-b.left, sy=fr.bottom-b.top+3;
     const ex=tr.left+tr.width/2-b.left, ey=tr.top-b.top-4;
-    const dy=Math.max(ey-sy,12), col=`var(--${r})`;
-    html+=`<circle cx="${sx}" cy="${sy}" r="3" style="fill:${col}"/>`+
-      `<path class="line" d="M${sx} ${sy} C${sx} ${sy+dy*.65} ${ex} ${ey-dy*.65} ${ex} ${ey}" style="stroke:${col}"/>`+
-      `<path class="head" d="M${ex-5} ${ey-6} L${ex} ${ey} L${ex+5} ${ey-6}" style="stroke:${col}"/>`;
+    const dy=Math.max(ey-sy,12);
+    L.push({r,sx,sy,ex,ey,d:`M${sx} ${sy} C${sx} ${sy+dy*.65} ${ex} ${ey-dy*.65} ${ex} ${ey}`,h:`M${ex-5} ${ey-6} L${ex} ${ey} L${ex+5} ${ey-6}`});
   });
-  svg.innerHTML=html;
+  // measured again many times while the panel settles: move the existing arrows instead of rebuilding them, so the drawing animation plays once
+  const old=svg.querySelectorAll("path.line");
+  if(old.length===L.length&&L.length){
+    const dots=svg.querySelectorAll("circle"), heads=svg.querySelectorAll("path.head");
+    L.forEach((l,k)=>{dots[k].setAttribute("cx",l.sx); dots[k].setAttribute("cy",l.sy); old[k].setAttribute("d",l.d); heads[k].setAttribute("d",l.h);
+      try{old[k].style.setProperty("--len",old[k].getTotalLength())}catch(e){}});
+    return;
+  }
+  svg.innerHTML=L.map(l=>{const col=`var(--${l.r})`;
+    return `<circle cx="${l.sx}" cy="${l.sy}" r="3" style="fill:${col}"/>`+
+      `<path class="line" d="${l.d}" style="stroke:${col}"/>`+
+      `<path class="head" d="${l.h}" style="stroke:${col}"/>`}).join("");
   svg.querySelectorAll("path.line").forEach(p=>{try{p.style.setProperty("--len",p.getTotalLength())}catch(e){}});
 }
 window.addEventListener("resize",()=>{const s=$("linkBox")&&$("linkBox").querySelector("svg.links");if(s){drawLinks();s.querySelectorAll("path").forEach(p=>{p.style.animation="none";p.style.opacity=1;p.style.strokeDashoffset=0})}});
