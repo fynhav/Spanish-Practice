@@ -3683,6 +3683,18 @@ renderMenu();
 </script>
 
 <script>
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}))}
+/* update check: look for a new version when the app opens and whenever you come back to it, then refresh */
+if("serviceWorker" in navigator){
+  let reg=null, last=0, hadCtl=!!navigator.serviceWorker.controller, pending=false;
+  const typing=()=>{const a=document.activeElement;return !!a&&(a.isContentEditable||/^(INPUT|TEXTAREA)$/.test(a.tagName))};
+  const reloadNow=()=>{pending=false; try{sessionStorage.setItem("upd","1")}catch(e){} location.reload()};
+  const tryReload=()=>{if(typing()){pending=true} else reloadNow()};
+  const check=()=>{const n=Date.now(); if(!reg||n-last<20000) return; last=n; reg.update().catch(()=>{})};
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadCtl) tryReload(); hadCtl=true});
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{reg=r; r.update().catch(()=>{})}).catch(()=>{}));
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){if(pending&&!typing()) reloadNow(); else check()}});
+  window.addEventListener("pageshow",check); window.addEventListener("online",check);
+  document.addEventListener("focusout",()=>{if(pending) setTimeout(()=>{if(pending&&!typing()) reloadNow()},400)});
+}
 </script>
 </body></html>
