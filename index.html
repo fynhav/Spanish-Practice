@@ -568,7 +568,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:00</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:08</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2154,14 +2154,21 @@ function gapNav(dir){
 }
 const accentTap=b=>{if(b.dataset.nav) gapNav(+b.dataset.nav); else insertChar(b.dataset.ch)};
 $("accents").addEventListener("pointerdown",e=>{const b=e.target.closest("button"); if(!b) return; e.preventDefault(); accentTap(b)});
+// WebKit moves focus (and drops the keyboard) on mousedown/touchstart, not pointerdown, so cancel those too
+["mousedown","touchstart"].forEach(t=>$("accents").addEventListener(t,e=>{if(e.target.closest("button")) e.preventDefault()},{passive:false}));
 $("accents").addEventListener("click",e=>{if(e.detail===0){const b=e.target.closest("button"); if(b) accentTap(b)}});
 
 // keep the app sized to the visible area (shrinks above the keyboard)
+let baseH=Math.max(window.innerHeight,window.visualViewport?visualViewport.height:0);
+window.addEventListener("orientationchange",()=>{baseH=0});
 function fit(){
   const vv=window.visualViewport, r=document.documentElement.style;
   const h=vv?vv.height:window.innerHeight;
   r.setProperty("--vh",h+"px"); r.setProperty("--vt",(vv?vv.offsetTop:0)+"px");
-  const kb=window.innerHeight-h>120;
+  // iOS 26 shrinks innerHeight along with the visual viewport, so compare against the largest height seen while not typing
+  const ae=document.activeElement, editing=!!ae&&(ae.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName));
+  baseH=editing?Math.max(baseH,window.innerHeight,h):Math.max(window.innerHeight,h);
+  const kb=baseH-h>120;
   if(kb) r.setProperty("--kb-pad","0px"); else r.removeProperty("--kb-pad");
   document.documentElement.classList.toggle("kbd",kb);
   const fb=$("fb");
