@@ -568,7 +568,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:08</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:09</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4205,14 +4205,16 @@ renderMenu();
   $("spRows").innerHTML=rows.map(([n,v,t,c])=>`<div class="sp-row"><span>${n}</span><span>${v} / ${t}${n==="Stories"?"":" days"}</span><div class="sm"><i data-w="${t?v/t*100:0}" style="background:var(--${c})"></i></div></div>`).join("")+
     ((ST.drill.best||0)?`<div class="sp-row"><span>Endless drill best</span><span>${(ST.drill.best||0).toLocaleString()} pts</span></div>`:"");
   requestAnimationFrame(()=>requestAnimationFrame(()=>sp.querySelectorAll(".sm i").forEach(i=>i.style.width=Math.max(2,+i.dataset.w)+"%")));
-  // the bar fills over about 1.6 s; it waits a little for account sync, but never longer than 3 s
+  // the bar fills over about 0.9 s; it waits a little for account sync, but never longer than 3 s
   let pct=0, closed=false; const bar=$("spBar"), msg=$("spMsg"), t0=Date.now();
   const close=()=>{if(closed) return; closed=true; clearInterval(tick); bar.style.width="100%"; sp.classList.add("out"); setTimeout(()=>sp.remove(),480)};
   const tick=setInterval(()=>{
     const el=Date.now()-t0, synced=dbState!=="connecting";
-    pct=Math.min(synced?100:90, el/1600*100); bar.style.width=pct+"%";
-    if(el>500) msg.textContent=synced?(dbCol?"Progress synced":"Ready"):"Syncing your progress…";
-    if((pct>=100&&el>=1600)||el>3000) setTimeout(close,250);
+    pct=Math.min(synced?100:90, el/900*100); bar.style.width=pct+"%";
+    // "Ready" only once the bar is actually full, so the words and the bar agree
+    if(synced&&pct>=100) msg.textContent=dbCol?"Progress synced":"Ready";
+    else if(!synced&&el>500) msg.textContent="Syncing your progress…";
+    if((pct>=100&&el>=900)||el>3000) setTimeout(close,200);
   },50);
   sp.addEventListener("click",close);
 })();
