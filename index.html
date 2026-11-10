@@ -512,6 +512,32 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .wr-msg{margin-top:8px;padding:9px 12px;border-radius:12px;background:var(--ok-soft);color:var(--ink);font-size:.86rem;display:flex;gap:10px;align-items:center;justify-content:space-between}.wr-msg[hidden]{display:none}.wr-msg button{border:0;background:none;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;padding:4px 2px;cursor:pointer}
 .wr-row.st{outline:2px solid var(--both)}
 
+.xp-hero{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.xp-lv{width:46px;height:46px;border-radius:50%;background:var(--both);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-size:1.4rem;flex:none}
+.xp-hx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.xp-hx b{font-family:var(--f-display);font-weight:400;font-size:1.15rem;line-height:1.1}.xp-hx span{font-size:.78rem;color:var(--muted)}
+.xp-fire{display:flex;flex-direction:column;align-items:center;font-size:1.1rem;line-height:1}.xp-fire b{font-size:.9rem;margin-top:2px}
+.xp-bar{display:block;height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:4px}
+.xp-bar i{display:block;height:100%;width:var(--to);background:var(--both);border-radius:6px;animation:xpfill .9s .25s ease-out both}
+@keyframes xpfill{from{width:var(--from)}}
+@media(prefers-reduced-motion:reduce){.xp-bar i{animation:none}}
+.xp-note{border:0;background:var(--ok-soft);color:var(--ink);border-radius:12px;padding:9px 12px;font:inherit;font-size:.84rem;text-align:left;cursor:pointer;width:100%}
+.xp-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;width:100%;text-align:left;color:var(--ink);font:inherit}
+.xp-card .label{margin:0}.xp-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}.xp-c{font-size:.82rem;font-weight:700;color:var(--both)}
+.xp-q{display:grid;grid-template-columns:22px 1fr auto auto;gap:4px 10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:.9rem}
+.xp-q:first-of-type{border-top:0}
+.xp-ck{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);background:#fff;display:grid;place-items:center}
+.xp-q.ok .xp-ck,.xp-q.done .xp-ck{background:var(--ok);border-color:var(--ok)}.xp-q.ok .xp-ck::after,.xp-q.done .xp-ck::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.xp-q.ok .xp-ql,.xp-q.done .xp-ql{color:var(--muted)}
+.xp-qn{font-size:.78rem;color:var(--muted)}.xp-qx{font-size:.74rem;font-weight:700;background:var(--mix-soft);color:var(--mix);border-radius:10px;padding:2px 8px}
+.xp-tb{grid-column:2/5;height:5px;border-radius:4px;background:var(--line);overflow:hidden}.xp-tb i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.xp-fine{margin:8px 0 0;font-size:.78rem;color:var(--muted)}.xp-wk{cursor:pointer}
+.cf-row{display:grid;grid-template-columns:28px 1fr 38px;gap:10px;align-items:center;margin-top:6px}.cf-row b{font-size:.9rem}.cf-row .xp-bar{margin:0}.cf-p{font-size:.8rem;text-align:right;color:var(--muted)}
+.cf-d{margin-top:8px;font-size:.8rem;color:var(--muted)}.cf-d summary{cursor:pointer;font-weight:600;color:var(--ink)}.cf-d p{margin:6px 0 0}
+.lv{font:700 .66rem var(--f-body,inherit);padding:2px 7px;border-radius:8px;background:var(--paper);color:var(--muted);border:1px solid var(--line);margin-left:8px;vertical-align:middle;letter-spacing:.02em}
+.xp-strip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.xp-top{display:flex;justify-content:space-between;align-items:baseline}.xp-top b{font-family:var(--f-display);font-weight:400;font-size:1.5rem;color:var(--both)}.xp-top span{font-size:.8rem;color:var(--muted)}
+.xp-lines{display:flex;flex-direction:column;gap:2px;font-size:.8rem;color:var(--muted)}.xp-lines span{display:flex;justify-content:space-between;gap:8px}.xp-lines b{color:var(--ink)}
+
 .wr-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.wr-top .ven{margin:0;font-size:.82rem}.wr-top b{color:var(--ok)}
 
 .wr-cov{margin-top:0}.wr-pct{display:flex;align-items:center;gap:12px}.wr-pct b{font-family:var(--f-display);font-size:2.6rem;line-height:1;color:var(--cc)}.wr-pct span{font-size:.95rem;color:var(--ink);line-height:1.25}
@@ -580,7 +606,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:33</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:45</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2221,6 +2247,7 @@ function mergeCourse(dst,src){
 function docData(k){
   if(k==="drill") return {...ST.drill,updatedAt:Date.now()};
   if(k==="stories") return {...ST.stories,updatedAt:Date.now()};
+  if(k==="xp") return {seed:ST.xp.seed,seeded:!!ST.xp.seeded,log:ST.xp.log,q:ST.xp.q,updatedAt:Date.now()};
   const [t,c]=k.split("-");
   if(t==="prog") return {done:ST[c].done,log:ST[c].log,updatedAt:Date.now()};
   return ST.sess[c]||{cleared:true,updatedAt:0};
@@ -2241,11 +2268,12 @@ async function initDb(){
       if(d.id.startsWith("prog-")){const c=d.id.slice(5); if(ST[c]) mergeCourse(ST[c],v)}
       else if(d.id.startsWith("session-")){const c=d.id.slice(8); if(c in ST.sess&&(!ST.sess[c]||(v.updatedAt||0)>(ST.sess[c].updatedAt||0))) ST.sess[c]=v}
       else if(d.id==="stories"){const T=ST.stories; for(const [k2,x] of Object.entries(v.best||{})) T.best[k2]=Math.max(T.best[k2]||0,x||0); for(const [k2,x] of Object.entries(v.log||{})) T.log[k2]=Math.max(T.log[k2]||0,x||0)}
+      else if(d.id==="xp"){xpMerge(v)}
       else if(d.id==="drill"){const D=ST.drill; D.best=Math.max(D.best||0,v.best||0); D.bestStreak=Math.max(D.bestStreak||0,v.bestStreak||0); for(const [k2,x] of Object.entries(v.log||{})) D.log[k2]=Math.max(D.log[k2]||0,x||0)}
       else if(d.id.startsWith("day-")&&v.date){ST.pron.log[v.date]=Math.max(ST.pron.log[v.date]||0,v.best||0)}
     });
     dbCol=col; dbState="ok";
-    ["prog-pron","prog-past","session-pron","session-past","drill","stories"].forEach(markDirty); saveLocal();
+    ["prog-pron","prog-past","session-pron","session-past","drill","stories","xp"].forEach(markDirty); saveLocal();
     if(screen==="menu") renderMenu(); else if(screen==="course") renderCourse(course); else if(screen==="dsetup") renderDrillSetup(); else if(screen==="slist") renderStoryList();
     push();
   }catch(e){dbState="offline"; updateSync()}
@@ -2277,7 +2305,7 @@ function updateSync(){
 window.addEventListener("online",()=>{dbCol?push():initDb()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){saveLocal()} else if(ST.dirty.length){dbCol?push():initDb()}});
 setInterval(()=>{if(ST.dirty.length){dbCol?push():initDb()}},20000);
-initDb();
+initDb().then(()=>xpSeed(),()=>xpSeed());
 
 const activeSession=c=>{const s=ST.sess[c]; return s&&!s.cleared&&s.day>=1&&s.day<=DAYS&&s.pos<TOTAL(c)?s:null};
 function nextDay(c){
@@ -2290,10 +2318,11 @@ function completeDay(c,day,sc){
   ST[c].log[tk]=Math.max(ST[c].log[tk]||0,total);
   ST.sess[c]={cleared:true,updatedAt:Date.now()};
   commit("prog-"+c,"session-"+c);
+  const first=!prev; xpDay=xpAward([["Right first time",total*(first?5:2.5)],...(first?[["First time finishing Day "+day,25]]:[])]);
 }
 
 // ================= screens =================
-let screen="menu", course=null, day=1, queue=[], pos=0, scores={}, answered=false, tiles=[], built=[], tilesFor=-1, last=null, typed="", justDone=null, selDay=null, selFor=null;
+let xpDay=null, screen="menu", course=null, day=1, queue=[], pos=0, scores={}, answered=false, tiles=[], built=[], tilesFor=-1, last=null, typed="", justDone=null, selDay=null, selFor=null;
 const parts=()=>COURSES[course].parts;
 const LBL=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 function weekDays(){
@@ -2379,21 +2408,23 @@ function renderMenu(){
     const status=s?`<span class="now">In progress · Day ${s.day}, ${s.pos}/${TOTAL(c)}</span>`
       :tdone?`<span class="now">Done today ✓</span> · next: Day ${nd}`:`<span class="now">Day ${nd} ready</span>`;
     return `<button type="button" class="course" data-c="${c}" style="--cc:var(--${C.cc});--cc-soft:var(--${C.cc}-soft)">
-      <span><span class="cn">${C.name}</span><br><span class="cs">${C.sub}</span></span><span class="chev" aria-hidden="true">›</span>
+      <span><span class="cn">${C.name}${lvChip(COURSE_LV[c])}</span><br><span class="cs">${C.sub}</span></span><span class="chev" aria-hidden="true">›</span>
       <span class="cs">${status} · ${doneN}/${DAYS} days</span>
       <span class="segs">${[...Array(DAYS)].map((_,i)=>`<i class="${ST[c].done[i+1]?"on":""}"></i>`).join("")}</span></button>`;
   }).join("");
   $("drill").innerHTML=`
-    <h2 class="hello">${has(tk)?"Nice work today":"Today’s practice"}</h2>
-    ${timeCardHTML()}
-    <div><p class="label" style="margin-bottom:8px">This week <span style="text-transform:none;letter-spacing:0;font-weight:500">· <i class="dot do" style="width:8px;height:8px"></i> pronouns <i class="dot pret" style="width:8px;height:8px"></i> past <i class="dot" style="width:8px;height:8px;background:var(--io)"></i> drill/stories</span></p>${weekHTML(ring)}</div>
+    ${xpHeroHTML()}
+    ${xpQuestsHTML()}
+    ${cefrHTML()}
+    ${xpWeekHTML()}
+    <div><p class="label" style="margin-bottom:8px">Days practised <span style="text-transform:none;letter-spacing:0;font-weight:500">· <i class="dot do" style="width:8px;height:8px"></i> pronouns <i class="dot pret" style="width:8px;height:8px"></i> past <i class="dot" style="width:8px;height:8px;background:var(--io)"></i> drill/stories</span></p>${weekHTML(ring)}</div>
     ${cards}
     <button type="button" class="course drill" id="drillCard">
-      <span><span class="cn">Endless drill</span><br><span class="cs">Unlimited sentences · score points</span></span><span class="chev" aria-hidden="true">›</span>
+      <span><span class="cn">Endless drill${lvChip("A2")}</span><br><span class="cs">Unlimited sentences · score points</span></span><span class="chev" aria-hidden="true">›</span>
       <span class="cs"><span class="now">${(ST.drill.log[tk]||0).toLocaleString()} pts today</span> · best ${(ST.drill.best||0).toLocaleString()}</span>
     </button>
     <button type="button" class="course stories" id="storyCard">
-      <span><span class="cn">Stories</span><br><span class="cs">Short paragraphs: tap or type the missing words</span></span><span class="chev" aria-hidden="true">›</span>
+      <span><span class="cn">Stories${lvChip("A2")}</span><br><span class="cs">Short paragraphs: tap or type the missing words</span></span><span class="chev" aria-hidden="true">›</span>
       <span class="cs"><span class="now">${(()=>{const ids=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]); return `${Object.keys(ST.stories.best).filter(k=>ids.has(k)).length} of ${ids.size} done`})()}</span>${(ST.stories.log[tk]||0)?` · ${ST.stories.log[tk]} today`:""}</span>
     </button>
     ${wrMenuHTML()}
@@ -2408,6 +2439,7 @@ function renderMenu(){
   $("drillCard").onclick=renderDrillSetup;
   $("storyCard").onclick=()=>renderStoryList();
   $("wrCard").onclick=renderWrSet;
+  xpMenuBind();
   vMenuBind();
   updateSync();
 }
@@ -2423,8 +2455,8 @@ function renderCourse(c){
   const plan=C.parts.map(pt=>{const got=sel&&sel.parts?sel.parts[pt.key]:null;
     return `<div class="planrow"><span class="pill ${pt.key}">${pt.pill}</span><span class="meter m-${pt.key}"><i style="width:${got==null?0:got/pt.n*100}%"></i></span><span class="num">${got==null?pt.n+" sent.":got+" / "+pt.n}</span></div>`}).join("");
   const head=justDone&&justDone.c===c
-    ?`<div class="banner"><b>Day ${justDone.day} complete.</b> You scored ${justDone.score} / ${TOTAL(c)}.${justDone.day<DAYS?` Day ${nextDay(c)} is next.`:""}</div>`
-    :`<div><h2 class="hello">${C.name}</h2><p class="sub">${Object.keys(D.done).length} of ${DAYS} days complete${has(tk)?" · done today ✓":""}</p></div>`;
+    ?`<div class="banner"><b>Day ${justDone.day} complete.</b> You scored ${justDone.score} / ${TOTAL(c)}.${justDone.day<DAYS?` Day ${nextDay(c)} is next.`:""}</div>${xpStrip(justDone.xp)}`
+    :`<div><h2 class="hello">${C.name}${lvChip(COURSE_LV[c])}</h2><p class="sub">${Object.keys(D.done).length} of ${DAYS} days complete${has(tk)?" · done today ✓":""}</p></div>`;
   $("drill").innerHTML=`
     ${head}
     <div><p class="label" style="margin-bottom:8px">${DAYS}-day programme · tap a day</p><div class="days14">${grid}</div></div>
@@ -2761,7 +2793,7 @@ function showFeedback(val,ok){
   $("hintBtn").hidden=true; $("skip").hidden=true;
   nb.onclick=()=>{
     if(drillOn){nextDrill();return}
-    if(lastQ){justDone={c:course,day,score:Object.values(scores).reduce((a,b)=>a+b,0)}; selDay=null; renderCourse(course); return}
+    if(lastQ){justDone={c:course,day,score:Object.values(scores).reduce((a,b)=>a+b,0),xp:xpDay}; xpDay=null; selDay=null; renderCourse(course); return}
     pos++; tilesFor=-1;
     if(partEnds) renderIntro(cur().part); else renderQ(false);
   };
@@ -3021,16 +3053,17 @@ function checkStoryResults(S){
     else {el.className="gp done bad"; el.textContent=S.vals[k]||"—"; el.insertAdjacentHTML("afterend",`<span class="fix"> ${esc(g.answers[0])}</span>`); wrong.push({g,val:S.vals[k]})}
   });
   $("accents").hidden=true; if(document.activeElement) document.activeElement.blur();
-  const tk=todayKey(), T=ST.stories;
+  const tk=todayKey(), T=ST.stories, firstS=T.best[st.id]===undefined;
   T.best[st.id]=Math.max(T.best[st.id]||0,score); T.log[tk]=(T.log[tk]||0)+1;
   delete ST.storyDraft[st.id]; commit("stories");
+  const xr=xpAward([[firstS?"Story complete":"Story practised",firstS?15:7],["Gaps right first time",Math.round(score/n*(firstS?25:12))]]);
   haptic(score===n?[30,40,30,40,80]:score>=n/2?20:[70,50,70]);
   const list=STORIES.filter(x=>x.kind===st.kind), next=list[(list.indexOf(st)+1)%list.length];
   $("actions").innerHTML="";
   const fb=$("fb");
   fb.className="sheet "+(score>=n*0.6?"ok":"bad"); fb.style.maxHeight="80%";
   fb.innerHTML=`<div class="body">
-      <div class="vrow"><div class="verdict">${score===n?"¡Perfecto!":score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${score} / ${n}</b><span>right first time${T.best[st.id]>score?` · best ${T.best[st.id]}/${n}`:""}</span></div></div>
+      <div class="vrow"><div class="verdict">${score===n?"¡Perfecto!":score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${score} / ${n}</b><span>right first time${T.best[st.id]>score?` · best ${T.best[st.id]}/${n}`:""}</span></div></div>${xpStrip(xr)}
       ${wrong.length?`<div class="mistakes">${wrong.map(({g,val,fixed,shown})=>`<div><span class="dot ${g.type==="verb"?g.tense:"io"}"></span><span><b>${esc(g.answers[0])}</b>${shown?" (answer shown)":fixed?" (fixed on a second try)":val?` (you wrote <i>${esc(val)}</i>)`:" (skipped)"} · ${esc(gapExplain(g))}</span></div>`).join("")}</div>`:""}
       <p class="note" style="color:var(--muted)">Tap any gap in the story to see why. The English translation is below the story.</p>
     </div>
@@ -3339,11 +3372,13 @@ function easyTap(e){
 }
 function easyFinish(){
   const E=easy, st=E.st, n=E.total, tk=todayKey(), T=ST.stories, key="e:"+st.id;
+  const firstS=T.best[key]===undefined;
   T.best[key]=Math.max(T.best[key]||0,E.score); T.log[tk]=(T.log[tk]||0)+1; commit("stories");
+  const xr=xpAward([[firstS?"Story complete":"Story practised",firstS?15:7],["Words right first time",Math.round(E.score/n*(firstS?25:12))]]);
   haptic(E.score===n?[30,40,30,40,80]:20);
   const list=TAP_STORIES, next=list[(list.indexOf(st)+1)%list.length];
   const fb=$("fb"); fb.className="sheet "+(E.score>=n*0.6?"ok":"bad"); fb.style.maxHeight="80%";
-  fb.innerHTML=`<div class="body"><div class="vrow"><div class="verdict">${E.score===n?"¡Perfecto!":E.score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${E.score} / ${n}</b><span>${T.best[key]>E.score?`best ${T.best[key]}/${n}`:"saved"}</span></div></div>
+  fb.innerHTML=`<div class="body"><div class="vrow"><div class="verdict">${E.score===n?"¡Perfecto!":E.score>=n*0.6?"¡Bien hecho!":"Keep going"}</div><div class="gain"><b>${E.score} / ${n}</b><span>${T.best[key]>E.score?`best ${T.best[key]}/${n}`:"saved"}</span></div></div>${xpStrip(xr)}
     <p class="note" style="color:var(--muted)">Scroll up to reread the story. The English translation is at the bottom.</p></div>
     <div class="foot" style="display:flex;gap:8px"><button type="button" id="eType" style="flex:1;background:var(--card);color:var(--ink);border-color:var(--line)">Try again</button><button type="button" id="eNext" style="flex:2">Next story</button></div>`;
   fb.hidden=false; openTrans(); $("drill").style.paddingBottom=(fb.offsetHeight+12)+"px";
@@ -3440,6 +3475,7 @@ function popPoints(pts){
 function endDrill(){
   drillOn=false; screen="dsum"; $("fb").hidden=true; chrome();
   const acc=drill.answered?Math.round(drill.correct/drill.answered*100):0, nb=drill.points>drill.startBest&&drill.points>0;
+  if(!drill.xp&&drill.answered>=5) drill.xp=xpAward([["Drill points ÷ 10",drill.points/10]]);
   $("drill").innerHTML=`<div class="intro" style="text-align:center;align-items:center">
     <p class="label">${nb?"New best run":"Run complete"}</p>
     <div class="bigpts">${drill.points.toLocaleString()}</div><p class="sub" style="margin:0">points</p>
@@ -3447,7 +3483,7 @@ function endDrill(){
       <div class="stat"><b>${drill.answered}</b><span>sentences</span></div>
       <div class="stat"><b>${acc}%</b><span>correct</span></div>
       <div class="stat"><b>${drill.bestStreak}</b><span>best streak</span></div>
-    </div>
+    </div>${xpStrip(drill.xp)}
     <p class="syncline"></p></div>`;
   $("actions").innerHTML=`<button type="button" class="ghost" id="dMenu">Menu</button><button type="button" class="grow" id="dAgain">Drill again</button>`;
   $("dMenu").onclick=renderMenu; $("dAgain").onclick=startDrill;
@@ -3630,7 +3666,7 @@ function vMenuHTML(){
   const tk=todayKey(), done=ST.verbs.log[tk]||0, all=vStatAll();
   const tile=(t)=>{const s=t?vStat(t.k):vStatAll(), key=t?t.k:"mix";
     return `<button type="button" class="vtile" data-t="${key}" style="${vcc(key)}">
-      ${tlSVG(key,true)}<span class="tn">${t?t.n:"Mix · all tenses"}</span><span class="te">${t?t.en:"Random tense every question"}</span>
+      ${tlSVG(key,true)}<span class="tn">${t?t.n+lvChip(VT_LV[t.k]):"Mix · all tenses"}</span><span class="te">${t?t.en:"Random tense every question"}</span>
       <span class="vbar"><i style="width:${s.tot?Math.round(s.n/s.tot*100):0}%"></i></span><span class="tc">${s.n} / ${s.tot} learned</span></button>`};
   return `<div class="vsec"><p class="label" style="margin-top:4px">Verb trainer · ${VB.length} verbs <span style="text-transform:none;letter-spacing:0;font-weight:500">· ${done?`${done} answered today`:"great for beginners"}</span></p>
     <div class="vtiles">${VT.map(tile).join("")}${tile(null)}</div>
@@ -3700,11 +3736,11 @@ function vStartRound(){
     const ps=vPers(v).filter(p=>p!==lastP), p=ps.length?ps[Math.floor(Math.random()*ps.length)]:vPers(v)[0]; lastP=p;
     q.push({v,tk,p,fem:Math.random()<.5});
   }
-  V.q=q; V.i=0; V.score=0; V.wrong=[]; V.retry=false; V.answered=false; renderVQ();
+  V.q=q; V.i=0; V.score=0; V.wrong=[]; V.xp=null; V.retry=false; V.answered=false; renderVQ();
 }
 function vRetry(){
   const q=V.wrong.map(w=>({...w.q})).sort(()=>Math.random()-.5);
-  V.q=q; V.i=0; V.score=0; V.wrong=[]; V.retry=true; V.answered=false; renderVQ();
+  V.q=q; V.i=0; V.score=0; V.wrong=[]; V.xp=null; V.retry=true; V.answered=false; renderVQ();
 }
 function vOptions(q){
   const {v,tk,p}=q, right=vf(v,tk,p), seen=new Set([right]), out=[];
@@ -3814,7 +3850,8 @@ function vEnd(){ if(V.i===0&&!V.answered) renderVSetup(); else renderVSum() }
 function renderVSum(){
   screen="vsum"; $("fb").hidden=true; chrome();
   const n=V.i+(V.answered?1:0), s=V.score, stars=n?s/n:0;
-  $("drill").innerHTML=`<div class="vsum">
+  if(!V.xp&&!V.retry&&n>=3) V.xp=xpAward([["Correct answers",s*3],["Round complete",10]]);
+  $("drill").innerHTML=`<div class="vsum">${xpStrip(V.xp)}
     <div class="vcard" style="text-align:center"><div class="vstars">${stars>=.9?"⭐⭐⭐":stars>=.6?"⭐⭐":"⭐"}</div>
       <div class="vscore" style="color:var(--cc)">${s} / ${n}</div><p class="sub">${V.retry?(s===n?"All fixed. ¡Genial!":s?"Getting there. Some are still tricky.":"Still tricky. Look at them once more."):stars>=.9?"¡Excelente!":stars>=.6?"¡Muy bien! Keep going.":"Good practice. Those verbs will come back soon."}</p></div>
     ${V.wrong.length?`<div><p class="label" style="margin-bottom:8px">${V.retry?"Still to remember":"To remember"}</p><div class="vmist">${V.wrong.map(({q})=>`<div><span class="e">${q.v.ic}</span><span><b>${vPro(q.p,q.fem)} · ${vhl(q.v,q.tk,q.p)}</b><small>${esc(q.v.inf)} · ${VTK[q.tk].n}${vEn(q.v,q.tk,q.p,q.fem)?" · "+esc(vEn(q.v,q.tk,q.p,q.fem)):""}</small></span></div>`).join("")}</div></div>`:`<p class="sub" style="text-align:center">No mistakes this round.</p>`}
@@ -3850,8 +3887,8 @@ function vmBuild(){
   while(chosen.length<10&&rest.length){const v=vWeighted(rest,x=>{const m=vmM(x.inf); return m?[4,2.2,1,.35][m.b]*(Date.now()-m.t<60000?.2:1):3}); chosen.push(v); rest.splice(rest.indexOf(v),1)}
   return chosen.sort((a,b)=>a.i-b.i).map(v=>({v,dir:vmDir(v),opts:null}));
 }
-function vmStart(){V.tense="mix"; V.q=vmBuild(); V.i=0; V.score=0; V.wrong=[]; V.retry=false; V.answered=false; renderVm()}
-function vmRetry(){V.tense="mix"; V.q=V.wrong.map(w=>({v:w.v,dir:w.dir,opts:null})).sort(()=>Math.random()-.5); V.i=0; V.score=0; V.wrong=[]; V.retry=true; V.answered=false; renderVm()}
+function vmStart(){V.tense="mix"; V.q=vmBuild(); V.i=0; V.score=0; V.wrong=[]; V.xp=null; V.retry=false; V.answered=false; renderVm()}
+function vmRetry(){V.tense="mix"; V.q=V.wrong.map(w=>({v:w.v,dir:w.dir,opts:null})).sort(()=>Math.random()-.5); V.i=0; V.score=0; V.wrong=[]; V.xp=null; V.retry=true; V.answered=false; renderVm()}
 function renderVmSetup(){
   V.tense="mix"; screen="vmset"; $("fb").hidden=true; chrome(); setCourseColour(course);
   const S2=ST.verbs.mset, pct=r=>{const vs=VBX.slice(0,r); const n=vs.filter(v=>{const m=vmM(v.inf);return m&&m.b>=2}).length; return Math.round(n/vs.length*100)};
@@ -3905,7 +3942,8 @@ function vmEnd(){ if(V.i===0&&!V.answered) renderVmSetup(); else renderVmSum() }
 function renderVmSum(){
   screen="vmsum"; V.tense="mix"; $("fb").hidden=true; chrome(); setCourseColour(course);
   const n=V.i+(V.answered?1:0), s=V.score, stars=n?s/n:0, nw=V.wrong.length;
-  $("drill").innerHTML=`<div class="vsum"><div class="vcard" style="text-align:center"><div class="vstars">${stars>=.9?"⭐⭐⭐":stars>=.6?"⭐⭐":"⭐"}</div>
+  if(!V.xp&&!V.retry&&n>=3) V.xp=xpAward([["Correct answers",s*3],["Round complete",10]]);
+  $("drill").innerHTML=`<div class="vsum">${xpStrip(V.xp)}<div class="vcard" style="text-align:center"><div class="vstars">${stars>=.9?"⭐⭐⭐":stars>=.6?"⭐⭐":"⭐"}</div>
       <div class="vscore" style="color:var(--cc)">${s} / ${n}</div><p class="sub">${V.retry?(s===n?"All fixed. ¡Genial!":s?"Getting there. Some are still tricky.":"Still tricky. Look at them once more."):stars>=.9?"¡Excelente!":stars>=.6?"¡Muy bien! Keep going.":"Good practice. Those verbs will come back soon."}</p>
       <p class="sub" style="margin-top:4px">${vmKnown()} of ${VB.length} meanings known</p></div>
     ${nw?`<div><p class="label" style="margin-bottom:8px">${V.retry?"Still to remember":"To remember"}</p><div class="vmist">${V.wrong.map(({v})=>`<div><span class="e">${v.ic}</span><span><b>${esc(v.inf)}</b><small>${esc(vGloss(v))}</small></span></div>`).join("")}</div></div>`:""}</div>`;
@@ -3980,7 +4018,7 @@ function renderVLearn(){
 function vQuizVerb(v,tk){
   const ps=vPers(v), q=[]; let bag=[];
   for(let k=0;k<10;k++){ if(!bag.length) bag=ps.slice().sort(()=>Math.random()-.5); q.push({v,tk,p:bag.pop(),fem:Math.random()<.5}) }
-  V.tense=tk; V.q=q; V.i=0; V.score=0; V.wrong=[]; V.retry=false; V.answered=false; renderVQ();
+  V.tense=tk; V.q=q; V.i=0; V.score=0; V.wrong=[]; V.xp=null; V.retry=false; V.answered=false; renderVQ();
 }
 
 // ================= word review: spaced repetition (FSRS) =================
@@ -4038,7 +4076,7 @@ const WR={q:[],total:0,fin:0,rev:0,again:0,newN:0,list:{f:"all",s:"",lim:60}};
 const wrMax=30;
 function wrBuild(){
   const rev=wrDueKeys().slice(0,wrMax).map(k=>({k})), nw=wrNewList(wrNewAllow()).slice(0,Math.max(0,wrMax-rev.length)).map(k=>({k,nw:true}));
-  WR.q=[...rev,...nw]; WR.total=WR.q.length; WR.fin=0; WR.rev=0; WR.again=0; WR.newN=0; WR.t0=Date.now();
+  WR.xp=null; WR.q=[...rev,...nw]; WR.total=WR.q.length; WR.fin=0; WR.rev=0; WR.again=0; WR.newN=0; WR.t0=Date.now();
 }
 const wrPos=k=>WR_POS[WORDS[k-1][1]]||"";
 const wrRegTag=w=>w[5]?` <span class="wr-reg">${esc(w[5])}</span>`:"";
@@ -4110,8 +4148,9 @@ function wrEnd(){ if(!WR.rev) renderWrSet(); else renderWrSum() }
 function renderWrSum(){
   screen="wrsum"; V.tense="mix"; $("fb").hidden=true; chrome(); setCourseColour(course);
   const st=wrStats(), nxt=Object.values(ST.words.c).map(c=>c.due).filter(d=>d>=wrEndToday()).sort((a,b)=>a-b)[0];
+  if(WR.rev&&!WR.xp) WR.xp=xpAward([["Cards reviewed",(WR.rev-WR.again)*5+WR.again*2],["New words learned",WR.newN*3]]);
   const more=st.todo>0, good=WR.rev?Math.round((WR.rev-WR.again)/WR.rev*100):0;
-  $("drill").innerHTML=`<div class="vsum"><div class="vcard" style="text-align:center"><div class="vstars">${WR.rev?"🧠":"✓"}</div>
+  $("drill").innerHTML=`<div class="vsum">${xpStrip(WR.xp)}<div class="vcard" style="text-align:center"><div class="vstars">${WR.rev?"🧠":"✓"}</div>
     <div class="vscore" style="color:var(--cc)">${WR.rev}</div><p class="sub">${WR.rev===1?"card":"cards"} reviewed${WR.newN?` · ${WR.newN} new ${WR.newN===1?"word":"words"}`:""}</p>
     ${WR.rev?`<p class="sub" style="margin-top:4px">${good}% remembered first time</p>`:""}</div>
     <div class="vcard"><p class="ven" style="margin:0">${st.known} known well (${Math.round(wrCov().known)}% of everyday Spanish) · ${st.start} started · ${WORDS.length-st.start} still to meet</p>
@@ -4132,6 +4171,7 @@ function renderWrSet(){
     <div class="vcard wr-cov"><div class="wr-pct"><b>${cv.known<1&&cv.known>0?"<1":Math.round(cv.known)}%</b><span>of everyday Spanish<br>you know well</span></div>
       <span class="vbar wr-cb"><i style="width:${cv.known+cv.learn}%;opacity:.35"></i><i style="width:${cv.known}%"></i></span>
       <p class="ven" style="margin:8px 0 0">${st.known} ${st.known===1?"word":"words"} known well${cv.learn>=.5?` · ${st.start-st.known} more in progress (+${Math.round(cv.learn)}%)`:""}. All ${WORDS.length} words together make up about ${Math.round(cv.all)}% of everyday speech.</p>
+      <p class="ven" style="margin:6px 0 0;font-size:.78rem">Rough level guide: about 750 words ≈ A1, 1,500 ≈ A2, 3,000 ≈ B1.</p>
       <p class="ven" style="margin:6px 0 0;font-size:.78rem">Based on film and TV subtitle frequencies; published studies put the top 1,000 words at roughly 76–80% of written Spanish and about 88% of speech. “Known well” means you can hold a word in memory for 3+ weeks.</p></div>
     <div><p class="label" style="margin-bottom:8px">New words per day</p>${chip("wrNew",[[5,"5"],[10,"10"],[15,"15"],[20,"20"],[30,"30"]],s.newPer)}</div>
     <div><p class="label" style="margin-bottom:8px">Quiz style</p>${chip("wrMode",[["flip","Flip cards"],["mix","Mixed: flip + choose"]],s.mode)}</div>
@@ -4206,8 +4246,90 @@ function renderWrList(){
 function wrMenuHTML(){
   const st=wrStats(), tk=todayKey(), done=ST.words.log[tk]||0;
   return `<button type="button" class="course" id="wrCard" style="--cc:var(--both);--cc-soft:var(--both-soft)">
-    <span><span class="cn">Word review</span><br><span class="cs">Top ${WORDS.length} words · spaced repetition</span></span><span class="chev" aria-hidden="true">›</span>
+    <span><span class="cn">Word review${lvChip("A1–B1","rough guide: the top 1,000 words")}</span><br><span class="cs">Top ${WORDS.length} words · spaced repetition</span></span><span class="chev" aria-hidden="true">›</span>
     <span class="cs"><span class="now">${st.todo?`${st.due} due · ${st.nw} new`:"All done for today ✓"}</span> · ${Math.round(wrCov().known)}% of Spanish known${done?` · ${done} reviewed today`:""}</span></button>`;
+}
+
+// ================= XP, levels and CEFR progress =================
+ST.xp=ST.xp||{}; ST.xp.seed=ST.xp.seed||0; ST.xp.log=ST.xp.log||{}; ST.xp.q=ST.xp.q||{}; ST.xp.wk=ST.xp.wk||750;
+const XP_TITLES=[[1,"Principiante"],[5,"Aprendiz"],[10,"Estudiante"],[15,"Conversador"],[20,"Hablante"],[30,"Viajero"],[40,"Experto"],[50,"Maestro"]];
+// level L needs 100 + 20 (L-2) XP more than level L-1; xpAt(L) is the total XP at which level L starts
+const xpAt=L=>100*(L-1)+10*(L-1)*(L-2);
+const xpTotal=()=>ST.xp.seed+Object.values(ST.xp.log).reduce((a,b)=>a+b,0);
+function xpInfo(t){let L=1; while(xpAt(L+1)<=t) L++; const a=xpAt(L), b=xpAt(L+1); let ti=XP_TITLES[0][1]; XP_TITLES.forEach(([n,x])=>{if(L>=n) ti=x}); return {L,into:t-a,need:b-a,frac:(t-a)/(b-a),title:ti,total:t}}
+const dayHas=k=>ST.pron.log[k]!=null||ST.past.log[k]!=null||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0;
+const xpQuestDefs=()=>{const tk=todayKey(); return [
+  {id:"day",label:"Finish a pronoun or past-tense day",cur:(ST.pron.log[tk]!=null||ST.past.log[tk]!=null)?1:0,goal:1,xp:20},
+  {id:"words",label:"Review 10 words",cur:Math.min(10,ST.words.log[tk]||0),goal:10,xp:20},
+  {id:"time",label:"Practise for 20 minutes",cur:Math.min(GOAL_S,ST.time.log[tk]||0),goal:GOAL_S,xp:30}]};
+// bonus XP for goals completed since the last exercise
+function xpSweep(){const tk=todayKey(), q=ST.xp.q[tk]=ST.xp.q[tk]||{}, out=[], defs=xpQuestDefs();
+  defs.forEach(d=>{if(d.cur>=d.goal&&!q[d.id]){q[d.id]=1; out.push(["Goal: "+d.label.toLowerCase(),d.xp])}});
+  if(defs.every(d=>d.cur>=d.goal)&&!q.all){q.all=1; out.push(["Perfect day: all three goals",25])}
+  return out}
+// called once when an exercise ends; returns what to show on the finish screen
+function xpAward(parts){
+  const tk=todayKey(), before=xpTotal(), lines=parts.map(p=>[p[0],Math.round(p[1])]).filter(p=>p[1]>0);
+  if(lines.length&&ST.xp.first!==tk){ST.xp.first=tk; const n=Math.max(1,streak(dayHas)); lines.push([n>1?n+"-day streak":"First exercise today",Math.min(50,5*n)])}
+  xpSweep().forEach(l=>lines.push(l));
+  const gain=lines.reduce((a,l)=>a+l[1],0); if(!gain) return null;
+  ST.xp.log[tk]=(ST.xp.log[tk]||0)+gain; commit("xp");
+  const a=xpInfo(before), b=xpInfo(before+gain);
+  if(b.L>a.L) setTimeout(()=>showLevelUp(b),900);
+  return {gain,lines,lv0:a.L,lv1:b.L,f0:a.frac,f1:b.frac,info:b};
+}
+const xpStrip=r=>!r?"":`<div class="xp-strip"><div class="xp-top"><b>+${r.gain} XP</b><span>${r.lv1>r.lv0?`Level up! Level ${r.lv1}`:`Level ${r.lv1} · ${r.info.into} / ${r.info.need}`}</span></div><div class="xp-bar"><i style="--from:${r.lv1>r.lv0?0:r.f0*100}%;--to:${r.f1*100}%"></i></div><div class="xp-lines">${r.lines.map(l=>`<span>${esc(l[0])}<b>+${l[1]}</b></span>`).join("")}</div></div>`;
+const showLevelUp=i=>showCongrats({ico:"⭐",h:`Level ${i.L}!`,p1:i.title,p2:`${i.total.toLocaleString()} XP so far. Keep it going.`});
+function xpMerge(v){ST.xp.seed=Math.max(ST.xp.seed,v.seed||0); ST.xp.seeded=ST.xp.seeded||!!v.seeded;
+  for(const [k,x] of Object.entries(v.log||{})) ST.xp.log[k]=Math.max(ST.xp.log[k]||0,x||0);
+  for(const [k,x] of Object.entries(v.q||{})) ST.xp.q[k]=Object.assign({},x,ST.xp.q[k]||{})}
+// once per account: turn the progress made before XP existed into starting XP
+function xpSeed(){
+  if(!ST.xp.seeded){
+    let n=0; for(const c of ["pron","past"]) for(const d of Object.values(ST[c].done)) n+=(d.best||0)*5+25;
+    n+=Object.values(ST.words.log).reduce((a,b)=>a+(b||0),0)*5;
+    const ids=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]); n+=Object.keys(ST.stories.best).filter(k=>ids.has(k)).length*40;
+    n+=Math.round(Object.values(ST.drill.log).reduce((a,b)=>a+(b||0),0)/10);
+    n+=Object.values(ST.verbs.log||{}).reduce((a,b)=>a+(b||0),0)*3;
+    ST.xp.seed=Math.max(ST.xp.seed,Math.round(n)); ST.xp.seeded=true; ST.xp.note=ST.xp.seed; commit("xp");
+  }
+  if(screen==="menu") renderMenu();
+}
+// ---- CEFR: which level each part of the app sits at, and how much of each level you have done
+const CEFR=["A1","A2","B1"];
+const COURSE_LV={pron:"A2",past:"A2"};
+const VT_LV={pres:"A1",near:"A1",pret:"A2",imp:"A2",perf:"A2",fut:"B1",cond:"B1"};
+const lvChip=(l,t)=>`<span class="lv"${t?` title="${t}"`:""}>${l}</span>`;
+function cefrCalc(){
+  const lv={A1:[],A2:[],B1:[]};
+  Object.entries(COURSE_LV).forEach(([c,L])=>lv[L].push({n:COURSES[c].name,f:Object.keys(ST[c].done).length/DAYS,d:Object.keys(ST[c].done).length+" of "+DAYS+" days",w:30}));
+  const ids=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]), sd=Object.keys(ST.stories.best).filter(k=>ids.has(k)).length;
+  lv.A2.push({n:"Stories",f:sd/ids.size,d:sd+" of "+ids.size,w:30});
+  const top=VBX.slice(0,100);
+  CEFR.forEach(L=>{const ts=VT.filter(t=>VT_LV[t.k]===L); if(!ts.length) return; let m=0,tot=0;
+    ts.forEach(t=>top.forEach(v=>{if(!vOk(v,t.k)) return; tot++; const x=vM(t.k,v.inf); if(x&&x.b>=2) m++}));
+    lv[L].push({n:"Verb tenses: "+ts.map(t=>t.n).join(", "),f:tot?m/tot:0,d:m+" of "+tot+" top-100 verb forms",w:30})});
+  return CEFR.map(L=>{const c=lv[L], W=c.reduce((a,x)=>a+x.w,0); return {L,p:W?c.reduce((a,x)=>a+x.w*x.f,0)/W:0,items:c}});
+}
+function xpHeroHTML(){const i=xpInfo(xpTotal()), s=streak(dayHas), f=i.frac*100;
+  return `<div class="xp-hero"><div class="xp-lv" aria-hidden="true">${i.L}</div><div class="xp-hx"><b>${i.title}</b><span>Level ${i.L} · ${i.into} / ${i.need} XP</span><div class="xp-bar"><i style="--from:${f}%;--to:${f}%"></i></div></div><div class="xp-fire" aria-label="${s}-day streak"><span aria-hidden="true">🔥</span><b>${s}</b></div></div>${ST.xp.note?`<button type="button" class="xp-note" id="xpNote">We counted your progress so far: <b>+${ST.xp.note.toLocaleString()} XP</b>. Tap to dismiss.</button>`:""}`}
+function xpQuestsHTML(){const tk=todayKey(), defs=xpQuestDefs(), n=defs.filter(d=>d.cur>=d.goal).length;
+  return `<div class="xp-card"><div class="xp-h"><p class="label">Today’s goals</p><span class="xp-c">${n} / 3</span></div>${defs.map(d=>{const ok=d.cur>=d.goal, T=d.id==="time";
+    return `<div class="xp-q${ok?" ok":""}"${T?' id="tmCard"':""}><span class="xp-ck" aria-hidden="true"></span><span class="xp-ql">${d.label}</span><span class="xp-qn">${T?`<b id="tmTxt">${timeLbl(ST.time.log[tk]||0)}</b>`:`${d.cur} / ${d.goal}`}</span><span class="xp-qx">+${d.xp}</span>${T?`<span class="xp-tb"><i id="tmFill" style="width:${Math.min(100,d.cur/d.goal*100)}%"></i></span>`:""}</div>`}).join("")}<p class="xp-fine">All three goals: +25 bonus XP.</p></div>`}
+function xpWeekHTML(){const wk=weekDays().map(dkey), x=wk.reduce((a,k)=>a+(ST.xp.log[k]||0),0), g=ST.xp.wk, f=Math.min(100,x/g*100);
+  return `<button type="button" class="xp-card xp-wk" id="xpWk"><div class="xp-h"><p class="label">XP this week</p><span class="xp-c">${x.toLocaleString()} / ${g.toLocaleString()}</span></div><div class="xp-bar"><i style="--from:${f}%;--to:${f}%"></i></div><p class="xp-fine">Weekly target. Tap to change it.</p></button>`}
+function cefrHTML(){const R=cefrCalc(); let reached=0; for(const r of R){if(r.p>=.7) reached++; else break}
+  const head=reached===0?`Working toward ${CEFR[0]}`:reached>=CEFR.length?`${CEFR[CEFR.length-1]} reached`:`${CEFR[reached-1]} done · ${CEFR[reached]} ${Math.round(R[reached].p*100)}%`;
+  const kw=wrStats().known;
+  return `<div class="xp-card"><div class="xp-h"><p class="label">Where you are · CEFR</p><span class="xp-c">${head}</span></div>
+    ${R.map(r=>`<div class="cf-row"><b>${r.L}</b><span class="xp-bar"><i style="--from:${r.p*100}%;--to:${r.p*100}%"></i></span><span class="cf-p">${Math.round(r.p*100)}%</span></div>`).join("")}
+    <p class="xp-fine">Words known well: <b>${kw}</b>. Rough guide: A1 ≈ 750 · A2 ≈ 1,500 · B1 ≈ 3,000 words.</p>
+    <details class="cf-d"><summary>How this is worked out</summary>
+      ${R.map(r=>`<p><b>${r.L}</b> · ${r.items.map(x=>`${esc(x.n)} (${x.d})`).join(" · ")}</p>`).join("")}
+      <p>A level counts as reached at 70%. Each part of the app is tagged with the level it mostly practises. These tags are my estimate from typical A1–B1 syllabi, so treat this as a practice-based guide, not an exam result. B1 grammar courses and words are not in the app yet, so B1 only reflects the future and conditional verb tenses for now.</p></details></div>`}
+function xpMenuBind(){
+  if($("xpNote")) $("xpNote").onclick=()=>{delete ST.xp.note; saveLocal(); renderMenu()};
+  if($("xpWk")) $("xpWk").onclick=()=>{const o=[500,750,1000,1500]; ST.xp.wk=o[(o.indexOf(ST.xp.wk)+1)%o.length]||750; commit("xp"); renderMenu()};
 }
 
 // ================= practice timer: 20 active minutes a day =================
@@ -4221,13 +4343,13 @@ function timeCardHTML(){
   const t=timeToday(), done=t>=GOAL_S;
   return `<div class="tmcard${done?" done":""}" id="tmCard"><div class="tt"><span>${done?"Daily goal reached ✓":"Practice time today"}</span><b id="tmTxt">${timeLbl(t)}</b></div><div class="tmbar" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="${Math.min(20,Math.floor(t/60))}" aria-label="Minutes practised today"><i id="tmFill" style="width:${Math.min(100,t/GOAL_S*100)}%"></i></div></div>`;
 }
-function showCongrats(){
+function showCongrats(o){o=o||{};
   if(document.getElementById("cg")) return;
-  const d=document.createElement("div"); d.className="cg"; d.id="cg"; d.setAttribute("role","dialog"); d.setAttribute("aria-modal","true"); d.setAttribute("aria-label","Daily goal reached");
+  const d=document.createElement("div"); d.className="cg"; d.id="cg"; d.setAttribute("role","dialog"); d.setAttribute("aria-modal","true"); d.setAttribute("aria-label",o.h||"Daily goal reached");
   const LET="ENHORABUENAÑÁÉÍÓÚABCDEFGHIJLMNOPQRSTUVXYZ¡¿", COL=["#7A3E6B","#2F5D9E","#3E7D4F","#C0582F","#B8860B","#9A3B4E"];
   const cf=[...Array(64)].map((_,i)=>{const c=LET[Math.floor(Math.random()*LET.length)], sz=1.2+Math.random()*2.2;
     return `<span class="cf" aria-hidden="true" style="left:${Math.random()*96}%;font-size:${sz.toFixed(2)}rem;color:${COL[i%COL.length]};opacity:${(.55+Math.random()*.45).toFixed(2)};--sw:${Math.round(-30+Math.random()*60)}px;--rt:${Math.round(-540+Math.random()*1080)}deg;animation-duration:${(3.2+Math.random()*3.4).toFixed(2)}s;animation-delay:${(Math.random()*2.4).toFixed(2)}s">${c}</span>`}).join("");
-  d.innerHTML=`${cf}<div class="box"><div class="big" aria-hidden="true">🎉</div><h2>¡Enhorabuena!</h2><p><b>Congrats, you’ve done your 20 minutes of practice today.</b></p><p class="s">Keep going if you like. Every bit counts.</p><button type="button" id="cgOk">Continue</button></div>`;
+  d.innerHTML=`${cf}<div class="box"><div class="big" aria-hidden="true">${o.ico||"🎉"}</div><h2>${o.h||"¡Enhorabuena!"}</h2><p><b>${o.p1||"Congrats, you’ve done your 20 minutes of practice today."}</b></p><p class="s">${o.p2||"Keep going if you like. Every bit counts."}</p>${o.extra||""}<button type="button" id="cgOk">Continue</button></div>`;
   document.body.appendChild(d);
   try{haptic(30)}catch(e){}
   $("cgOk").onclick=()=>d.remove(); $("cgOk").focus&&$("cgOk").focus();
@@ -4238,7 +4360,7 @@ setInterval(()=>{
   const k=todayKey(); ST.time.log[k]=(ST.time.log[k]||0)+1; tmTicks++;
   const t=ST.time.log[k];
   if(screen==="menu"&&$("tmTxt")){const done=t>=GOAL_S; $("tmTxt").textContent=timeLbl(t); $("tmFill").style.width=Math.min(100,t/GOAL_S*100)+"%"; $("tmCard").classList.toggle("done",done)}
-  if(t>=GOAL_S&&!ST.time.shown[k]){ST.time.shown[k]=true; saveLocal(); showCongrats()}
+  if(t>=GOAL_S&&!ST.time.shown[k]){ST.time.shown[k]=true; saveLocal(); showCongrats({extra:xpStrip(xpAward([]))})}
   else if(tmTicks%10===0) saveLocal();
 },1000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden") saveLocal()});
