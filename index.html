@@ -507,6 +507,11 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .wr-tk i::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px);opacity:0}
 .wr-tk[aria-checked=true] i{background:var(--ok);border-color:var(--ok)}.wr-tk[aria-checked=true] i::after{opacity:1}
 .wr-row.on{background:var(--ok-soft)}.wr-row .tx{min-width:0}
+.wr-sticky{position:sticky;top:calc(-1*clamp(10px,2.5vh,20px));z-index:3;background:var(--paper);padding:clamp(10px,2.5vh,20px) 0 8px;margin-top:6px}.kbd .wr-sticky{top:-6px;padding-top:6px}.wr-sticky .wr-bulk{margin-top:4px}.wr-bulk{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.wr-bulk button{flex:1 1 auto;min-height:40px;border:1px solid var(--line);background:var(--card);border-radius:12px;font:inherit;font-weight:600;font-size:.88rem;padding:8px 12px;color:var(--ink);cursor:pointer}
+.wr-bulk button[aria-pressed=true]{background:var(--cc,var(--both));border-color:transparent;color:#fff}
+.wr-msg{margin-top:8px;padding:9px 12px;border-radius:12px;background:var(--ok-soft);color:var(--ink);font-size:.86rem;display:flex;gap:10px;align-items:center;justify-content:space-between}.wr-msg[hidden]{display:none}.wr-msg button{border:0;background:none;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;padding:4px 2px;cursor:pointer}
+.wr-row.st{outline:2px solid var(--both)}
+
 .wr-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.wr-top .ven{margin:0;font-size:.82rem}.wr-top b{color:var(--ok)}
 
 .wr-cov{margin-top:0}.wr-pct{display:flex;align-items:center;gap:12px}.wr-pct b{font-family:var(--f-display);font-size:2.6rem;line-height:1;color:var(--cc)}.wr-pct span{font-size:.95rem;color:var(--ink);line-height:1.25}
@@ -575,7 +580,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:30</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:33</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4140,7 +4145,7 @@ function renderWrSet(){
 }
 const WR_TICK_DAYS=180;
 // tick = "I know this well": push the next review about six months out. Untick undoes it.
-function wrSetKnown(i,on){
+function wrSetKnown(i,on,nosave){
   const c=ST.words.c[i], now=Date.now();
   if(on){
     ST.words.c[i]={d:c?Math.min(c.d,4):3,s:WR_TICK_DAYS,t:now,due:wrDayStart(WR_TICK_DAYS),st:2,ivl:WR_TICK_DAYS,r:c?c.r:0,l:c?c.l:0,man:1};
@@ -4149,31 +4154,50 @@ function wrSetKnown(i,on){
     else if(c.man) ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1,man:0};
     else ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1};   // learned the slow way: bring it back today
   }
-  saveLocal();
+  if(!nosave) saveLocal();
 }
 function renderWrList(){
   screen="wrlist"; $("fb").hidden=true; chrome();
   const L=WR.list, now=Date.now(), end=wrEndToday();
   const st=i=>{const c=ST.words.c[i]; return !c?"new":c.due<end?"due":wrKnown(c)?"known":"learning"};
   const stTxt=i=>{const s=st(i), c=ST.words.c[i]; return s==="new"?"new":s==="due"?"due":(c?wrLbl({...c,ivl:Math.max(1,Math.round((c.due-now)/WR_DAY)),st:c.st===2?2:1},now):"")};
+  let cur=[], rng=null, undo=null;   // cur: ids matching the filter; rng: first word of a range being picked
   $("drill").innerHTML=`<p class="ven" style="margin:0">Tick the words you already know well. They count as known and won’t come back for about 6 months. Untick to undo.</p>
     <input class="vsearch" id="wrSearch" type="search" placeholder="Search a word… (casa, house)" value="${esc(L.s)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="margin-top:10px">
     <div class="vchips" id="wrFil">${[["all","All"],["due","Due"],["learning","Learning"],["known","Known"],["new","Not known"]].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${L.f===v}">${l}</button>`).join("")}</div>
+    <div class="wr-sticky"><div class="wr-bulk"><button type="button" id="wrRng" aria-pressed="false">Tick a range</button><button type="button" id="wrAll"></button></div>
+    <div class="wr-msg" id="wrMsg" hidden></div></div>
     <div class="wr-top"><p class="ven" id="wrCnt"></p></div><div class="wr-list" id="wrRows"></div>`;
   const cnt=()=>{const k=wrStats().known; $("wrCnt").innerHTML=`<b>${k}</b> of ${WORDS.length} known well · ${Math.round(wrCov().known)}% of everyday Spanish`};
+  const msg=(t,u)=>{const m=$("wrMsg"); if(!t){m.hidden=true; return} m.hidden=false; m.innerHTML=`<span>${t}</span>${u?`<button type="button" id="wrUndo">Undo</button>`:""}`; if(u) $("wrUndo").onclick=()=>{u(); undo=null; msg(""); draw(true)}};
+  const allKnown=()=>cur.length>0&&cur.every(i=>wrKnown(ST.words.c[i]));
+  const bar=()=>{const b=$("wrAll"); b.textContent=!cur.length?"Nothing to tick":allKnown()?`Untick all ${cur.length}`:`Tick all ${cur.length} shown`; b.disabled=!cur.length;
+    const r=$("wrRng"); r.setAttribute("aria-pressed",rng!==null); r.textContent=rng===null?"Tick a range":rng?"Now tap the last word":"Tap the first word"};
+  // set many words at once; remember what they were so one tap can undo it
+  const bulk=(ids,on,label)=>{const prev={}; ids.forEach(i=>{prev[i]=ST.words.c[i]?{...ST.words.c[i]}:null; wrSetKnown(i,on,true)}); saveLocal();
+    msg(`${on?"Ticked":"Unticked"} ${ids.length} ${ids.length===1?"word":"words"}${label?" · "+label:""}`,()=>{for(const k in prev){if(prev[k]) ST.words.c[k]=prev[k]; else delete ST.words.c[k]} saveLocal()}); draw(true)};
   const rowHTML=i=>{const w=WORDS[i-1], s=st(i), k=wrKnown(ST.words.c[i]);
-    return `<div class="wr-row${k?" on":""}" data-i="${i}"><span class="rk">${i}</span><button type="button" class="wr-tk" role="checkbox" aria-checked="${k}" aria-label="I know “${esc(w[0])}” well"><i></i></button><span class="tx"><b>${esc(w[0])}</b><small>${esc(w[2])}</small></span><span class="stt ${s}">${stTxt(i)}</span></div>`};
-  const draw=()=>{const q=L.s.trim().toLowerCase(), rows=[];
-    for(let i=1;i<=WORDS.length;i++){const w=WORDS[i-1], s=st(i); if(L.f==="known"?s!=="known":L.f==="new"?wrKnown(ST.words.c[i]):(L.f!=="all"&&s!==L.f)) continue; if(q&&!(w[0].toLowerCase().includes(q)||w[2].toLowerCase().includes(q))) continue; rows.push(i)}
-    $("wrRows").innerHTML=rows.slice(0,L.lim).map(rowHTML).join("")||`<p class="sub">No words found.</p>`;
-    if(rows.length>L.lim){const b=document.createElement("button"); b.type="button"; b.className="ghost"; b.textContent=`Show more (${rows.length-L.lim})`; b.onclick=()=>{L.lim+=300; draw()}; $("wrRows").appendChild(b)}
-    cnt()};
-  // tapping a tick updates that row in place, so the list keeps its scroll position and filter
-  $("wrRows").addEventListener("click",e=>{const t=e.target.closest(".wr-tk"); if(!t) return;
-    const row=t.closest(".wr-row"), i=+row.dataset.i, on=t.getAttribute("aria-checked")!=="true";
+    return `<div class="wr-row${k?" on":""}${rng===i?" st":""}" data-i="${i}"><span class="rk">${i}</span><button type="button" class="wr-tk" role="checkbox" aria-checked="${k}" aria-label="I know “${esc(w[0])}” well"><i></i></button><span class="tx"><b>${esc(w[0])}</b><small>${esc(w[2])}</small></span><span class="stt ${s}">${stTxt(i)}</span></div>`};
+  const draw=keep=>{const q=L.s.trim().toLowerCase(), y=$("drill").scrollTop; cur=[];
+    for(let i=1;i<=WORDS.length;i++){const w=WORDS[i-1], s=st(i); if(L.f==="known"?s!=="known":L.f==="new"?wrKnown(ST.words.c[i]):(L.f!=="all"&&s!==L.f)) continue; if(q&&!(w[0].toLowerCase().includes(q)||w[2].toLowerCase().includes(q))) continue; cur.push(i)}
+    $("wrRows").innerHTML=cur.slice(0,L.lim).map(rowHTML).join("")||`<p class="sub">No words found.</p>`;
+    if(cur.length>L.lim){const b=document.createElement("button"); b.type="button"; b.className="ghost"; b.textContent=`Show more (${cur.length-L.lim})`; b.onclick=()=>{L.lim+=300; draw(true)}; $("wrRows").appendChild(b)}
+    cnt(); bar(); if(keep) $("drill").scrollTop=y};
+  // a tick updates its row in place, so the list keeps its scroll position and filter
+  $("wrRows").addEventListener("click",e=>{const row=e.target.closest(".wr-row"); if(!row) return; const i=+row.dataset.i;
+    if(rng!==null){   // range mode: first tap marks the start, second tap ticks (or unticks) everything between
+      if(!rng){rng=i; draw(true); bar(); return}
+      const a=cur.indexOf(rng), b=cur.indexOf(i); rng=null; $("wrRng").setAttribute("aria-pressed","false");
+      if(a<0||b<0){draw(true); return}
+      const ids=cur.slice(Math.min(a,b),Math.max(a,b)+1), on=!ids.every(k=>wrKnown(ST.words.c[k]));
+      bulk(ids,on,"range"); return}
+    const t=e.target.closest(".wr-tk"); if(!t) return;
+    const on=t.getAttribute("aria-checked")!=="true";
     wrSetKnown(i,on); const k=wrKnown(ST.words.c[i]);
     t.setAttribute("aria-checked",k); row.classList.toggle("on",k);
-    const sp=row.querySelector(".stt"); sp.className="stt "+st(i); sp.textContent=stTxt(i); cnt(); try{haptic(8)}catch(_){}});
+    const sp=row.querySelector(".stt"); sp.className="stt "+st(i); sp.textContent=stTxt(i); cnt(); bar(); try{haptic(8)}catch(_){}});
+  $("wrRng").onclick=()=>{rng=rng===null?0:null; msg(rng===0?"Tap the first word, then the last. Everything between them is ticked (or unticked if they were all ticked).":""); draw(true)};
+  $("wrAll").onclick=()=>{if(!cur.length) return; bulk(cur.slice(),!allKnown(),L.s||L.f!=="all"?"everything shown":"")};
   L.lim=Math.max(L.lim,120);
   draw(); $("wrSearch").addEventListener("input",e=>{L.s=e.target.value; L.lim=120; draw()});
   document.querySelectorAll("#wrFil button").forEach(b=>b.onclick=()=>{L.f=b.dataset.v; L.lim=120; renderWrList()});
