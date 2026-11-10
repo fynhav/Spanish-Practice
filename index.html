@@ -504,6 +504,8 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 
 .wr-cov{margin-top:0}.wr-pct{display:flex;align-items:center;gap:12px}.wr-pct b{font-family:var(--f-display);font-size:2.6rem;line-height:1;color:var(--cc)}.wr-pct span{font-size:.95rem;color:var(--ink);line-height:1.25}
 .wr-cb{display:block;height:10px;border-radius:6px;background:var(--line);overflow:hidden;position:relative;margin-top:10px}.wr-cb i{display:block;height:100%;background:var(--cc);position:absolute;left:0;top:0}
+.tnchip{font-size:.72rem;font-weight:700;color:var(--muted);border:1px solid var(--line);background:var(--card);border-radius:10px;padding:2px 8px;margin-left:6px;white-space:nowrap}
+.tnew{margin:0 0 6px;padding:9px 11px;border-radius:12px;background:var(--cc-soft);color:var(--ink);font-size:.9rem;line-height:1.35}
 </style>
 
 <div class="splash" id="splash" aria-live="polite">
@@ -566,7 +568,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-09 · 21:59</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:00</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -794,16 +796,190 @@ function makePron(kind,[forms,o],r){
   }
   return {kind:"pron",full,short,display,accept:acceptRaw.map(norm),acceptRaw,note,extra,...pronEN(kind,forms,o,rc,p,subj)};
 }
-function genPron(kind,count,seed){
-  const r=rng(seed), pairs=[];
-  (kind==="do"?DOV:IOV).forEach(([f,objs])=>objs.forEach(o=>pairs.push([f,o])));
-  const out=[];
-  const seen=new Set();
-  while(out.length<count) for(const pr of shuf(pairs.slice(),r)){
-    if(out.length>=count)break;
-    for(let k=0;k<6;k++){const it=makePron(kind,pr,r), key=JSON.stringify(it.full); if(!seen.has(key)){seen.add(key);out.push(it);break}}
+// ================= object pronouns in every common tense =================
+// Which tense appears when (days), how often (usage), and how each sentence is built.
+const DOV_INF=["comprar","leer","lavar","buscar","abrir","cerrar","preparar","necesitar","ver","llamar","escribir","tomar","visitar","invitar","vender","limpiar","olvidar","pedir","traer","terminar","escuchar","ayudar","conocer"];
+const IOV_INF=["dar","regalar","escribir","mandar","explicar","contar","decir","prestar","enseñar","comprar","servir","devolver","traer","preparar","ofrecer","pedir","leer","mostrar"];
+DOV.forEach((e,i)=>{e[0].inf=DOV_INF[i]}); IOV.forEach((e,i)=>{e[0].inf=IOV_INF[i]});
+const PT_PRON=["lo","la","los","las","le","les","se"];
+const PT_ORDER=["pres","inf","pret","cmd","imp","ger","perf"];
+const PT_INTRO={pres:1,inf:6,pret:10,cmd:14,imp:18,ger:20,perf:22};
+const PT_FOCUS=d=>d<=5?"pres":d<=9?"inf":d<=13?"pret":d<=17?"cmd":d<=19?"imp":d<=21?"ger":d<=26?"perf":null;
+const PT_W={pres:40,pret:18,cmd:15,inf:15,imp:6,perf:5,ger:3};   // how often each is used (speech and writing corpora)
+const PT_LABEL={inf:"Two verbs",pret:"Pretérito",cmd:"Command",imp:"Imperfecto",ger:"Right now",perf:"Present perfect"};
+const PT_NO={conocer:["cmd","ger","pret","perf"],ver:["cmd"],necesitar:["cmd","ger"],olvidar:["ger"]};
+const PT_CUES={pret:[["Ayer","Yesterday"],["Anoche","Last night"],["El sábado pasado","Last Saturday"],["La semana pasada","Last week"],["Hace dos días","Two days ago"]],
+  imp:[["Antes","Before,"],["Todos los días","Every day,"],["A menudo","Often,"],["Los domingos","On Sundays,"]],
+  perf:[["Hoy","Today"],["Esta semana","This week"],["Esta mañana","This morning"],["Hasta ahora","So far,"]]};
+const PT_INTRO_TXT={
+  inf:"New today: two verbs in a row. The pronoun goes before the first verb (lo voy a comprar) or attaches to the infinitive (voy a comprarlo). Both are right.",
+  pret:"New today: the pretérito. The pronoun still goes right before the verb: Ayer lo compré.",
+  cmd:"New today: commands. A positive command attaches the pronoun to the end and takes an accent (cómpralo). A negative command keeps it in front (no lo compres).",
+  imp:"New today: the imperfecto. The pronoun still goes right before the verb: Antes lo compraba.",
+  ger:"New today: estar + -ando/-iendo. The pronoun goes before estar (lo estoy comprando) or attaches to the -ndo form (estoy comprándolo).",
+  perf:"New today: the present perfect. The pronoun goes before haber, never in the middle: lo he comprado."};
+const AUXES=[{id:"ir",w:40,f:["voy a","vas a","va a","vamos a","van a"]},{id:"querer",w:25,f:["quiero","quieres","quiere","queremos","quieren"]},{id:"poder",w:20,f:["puedo","puedes","puede","podemos","pueden"]},{id:"tener",w:15,f:["tengo que","tienes que","tiene que","tenemos que","tienen que"]}];
+const HAB=["he","has","ha","hemos","han"], EST=["estoy","estás","está","estamos","están"];
+const PP_X={abrir:"abierto",escribir:"escrito",ver:"visto",decir:"dicho",devolver:"devuelto"};
+const GER_X={leer:"leyendo",traer:"trayendo",pedir:"pidiendo",servir:"sirviendo",decir:"diciendo"};
+const ptPP=inf=>{if(PP_X[inf]) return PP_X[inf]; const st=inf.slice(0,-2); return inf.endsWith("ar")?st+"ado":(/[aeo]$/.test(st)?st+"ído":st+"ido")};
+const ptGer=inf=>GER_X[inf]||(inf.endsWith("ar")?inf.slice(0,-2)+"ando":inf.slice(0,-2)+"iendo");
+const ptCmd=(inf,f)=>inf==="decir"?"di":f[2];
+const ptNegF=(inf,yo)=>{if(inf==="dar") return "des"; const st=yo.slice(0,-1); return inf.endsWith("ar")?st.replace(/c$/,"qu").replace(/g$/,"gu").replace(/z$/,"c")+"es":st+"as"};
+// an affirmative command with pronouns attached keeps its stress: compra + lo → cómpralo
+function ptAccCmd(w,ncl){
+  if(/[áéíóú]/.test(w)) return w;
+  const nuc=[], re=/[aeiouü]+/g; let m;
+  while((m=re.exec(w))){let a=m.index; for(let i=1;i<m[0].length;i++){ if("aeo".includes(m[0][i-1])&&"aeo".includes(m[0][i])){nuc.push([a,m.index+i]); a=m.index+i} } nuc.push([a,m.index+m[0].length])}
+  const idx=nuc.length>=2?nuc.length-2:(ncl>=2?0:-1); if(idx<0) return w;
+  const [a,b]=nuc[idx]; let k=b-1; for(let i=a;i<b;i++){ if("aeo".includes(w[i])){k=i;break} }
+  return w.slice(0,k)+"áéíóú"["aeiou".indexOf(w[k])]+w.slice(k+1);
+}
+const ptAccInf=w=>w.replace(/([aei])r$/,(m,v)=>"áéí"["aei".indexOf(v)]+"r");
+const ptAccGer=w=>w.replace(/([iy])endo$/,"$1éndo").replace(/ando$/,"ándo");
+const tokTxt=t=>t.parts?t.parts.map(x=>x[0]).join(""):t[0];
+const ptWeighted=(items,r)=>{const tot=items.reduce((a,x)=>a+x.w,0); let x=r()*tot; for(const it of items){ if(x<=it.w) return it; x-=it.w } return items[items.length-1]};
+function ptPlan(day,n,r){
+  const un=PT_ORDER.filter(t=>PT_INTRO[t]<=day), foc=PT_FOCUS(day);
+  if(un.length===1) return Array(n).fill("pres");
+  const out=[], nMix=Math.max(1,Math.round(n*.2)), nFoc=foc?Math.ceil(n*.5):0;
+  for(let i=0;i<nFoc;i++) out.push(foc);
+  for(let i=0;i<nMix;i++) out.push(pick(un,r));                       // 20%: any tense learned so far
+  while(out.length<n) out.push(ptWeighted(un.map(t=>({t,w:PT_W[t]})),r).t); // the rest follows real usage
+  return shuf(out,r);
+}
+// ---------- English for the other tenses ----------
+const EN_IRR={buy:["bought","bought"],read:["read","read"],see:["saw","seen"],write:["wrote","written"],take:["took","taken"],sell:["sold","sold"],forget:["forgot","forgotten"],bring:["brought","brought"],give:["gave","given"],send:["sent","sent"],tell:["told","told"],lend:["lent","lent"],show:["showed","shown"],say:["said","said"],have:["had","had"],watch:["watched","watched"]};
+function enForms(v){
+  const [w,...r]=v.split(" "), rest=r.length?" "+r.join(" "):"";
+  let past,pp; if(EN_IRR[w]) [past,pp]=EN_IRR[w]; else {const e=/e$/.test(w)?w+"d":/[^aeiou]y$/.test(w)?w.slice(0,-1)+"ied":w+"ed"; past=pp=e}
+  const ger=w==="forget"?"forgetting":/[^e]e$/.test(w)?w.slice(0,-1)+"ing":w+"ing";
+  return {past:past+rest,pp:pp+rest,ger:ger+rest};
+}
+const ENAUX={ir:p=>(p===0?"am":p===2?"is":"are")+" going to",querer:p=>p===2?"wants to":"want to",poder:()=>"can",tener:p=>p===2?"has to":"have to"};
+function enVP(tense,v,p,neg,aux){
+  const f=enForms(v);
+  return tense==="pret"?f.past:tense==="imp"?"used to "+v:tense==="perf"?(p===2?"has ":"have ")+f.pp:tense==="ger"?(p===0?"am ":p===2?"is ":"are ")+f.ger:tense==="inf"?ENAUX[aux](p)+" "+v:tense==="cmd"?(neg?"don’t "+v:v):v;
+}
+function pronEN2(kind,forms,o,rc,p,subj,tense,neg,aux,cueEN){
+  const cmd=tense==="cmd";
+  let S=cmd?"":p===0?"I":p===1?"you":p===3?"we":(SUBJ_EN[subj]||subj);
+  if(S&&cueEN&&S!=="I"&&!NAMES.has(S)) S=S.charAt(0).toLowerCase()+S.slice(1);
+  if(S&&!cueEN) S=capE(S);
+  const pre=(cueEN?cueEN+" ":""), fin=cmd?"!":".", wrap=(vp,rest)=>capE(pre+(S?S+" ":"")+vp+" "+rest)+fin;
+  if(kind==="do"){
+    let v=ENVERB[forms.en+"|"+o[0]]||forms.en;
+    if(tense==="ger"&&v==="see") v="look at";                                   // "we are seeing the photos" is not natural English
+    if(v==="know"&&tense==="inf") v=/^al? /.test(o[0])?"meet":"get to know";     // "going to know Carlos" → "going to meet Carlos"
+    const vp=enVP(tense,v,p,neg,aux);
+    return {en:wrap(vp,ENOBJ[o[0]]),enAns:wrap(vp,enPron(o))};
   }
-  return out;
+  const [sv,shift,pv,pw]=EN_IOV[forms.ei], obj=ENOBJ[o[0]], rec=ENOBJ[rc[0]];
+  if(shift===2){const vp=enVP(tense,"ask",p,neg,aux); return {en:wrap(vp,`${rec} for ${obj}`),enAns:wrap(vp,kind==="io"?`${enRec(rc)} for ${obj}`:`${enRec(rc)} for ${enPron(o)}`)}}
+  if(kind==="io"){
+    if(shift){const vp=enVP(tense,sv,p,neg,aux); return {en:wrap(vp,`${rec} ${obj}`),enAns:wrap(vp,`${enRec(rc)} ${obj}`)}}
+    const vp=enVP(tense,pv,p,neg,aux); return {en:wrap(vp,`${obj} ${pw} ${rec}`),enAns:wrap(vp,`${obj} ${pw} ${enRec(rc)}`)};
+  }
+  const vp=enVP(tense,shift?sv:pv,p,neg,aux);
+  return {en:wrap(vp,shift?`${rec} ${obj}`:`${obj} ${pw} ${rec}`),enAns:wrap(vp,`${enPron(o)} ${pw} ${enRec(rc)}`)};
+}
+// ---------- one sentence in a given tense ----------
+function makePronT(kind,[forms,o],tense,r,day){
+  const inf=forms.inf, cmd=tense==="cmd", neg=cmd&&day>=18&&r()<.4;
+  let p=cmd?1:Math.floor(r()*5), subj="";
+  const rc=kind==="do"?null:RC[pick(o[4].split(" "),r)], work=rc&&rc[0]==="a los clientes", clash=x=>x.toLowerCase().includes(subj.toLowerCase().replace(/^mis? /,""));
+  for(let k=0;k<12;k++){subj=cmd?"":p===2?pick(work?SUBJ_SW:SUBJ_S,r):p===4?pick(work?SUBJ_PW:SUBJ_P,r):""; if(!subj||!(clash(o[0])||(rc&&clash(rc[0])))) break}
+  const cueP=PT_CUES[tense]?pick(PT_CUES[tense],r):null, cue=cueP?cueP[0]:"", cueEN=cueP?cueP[1]:"";
+  const f=PFX(inf), aux=tense==="inf"?ptWeighted(AUXES,r):null;
+  let vWords;                                       // the verb group as it appears in the question
+  if(tense==="pret") vWords=[f.pret[p]]; else if(tense==="imp") vWords=[f.imp[p]];
+  else if(tense==="perf") vWords=[HAB[p],ptPP(inf)]; else if(tense==="ger") vWords=[EST[p],ptGer(inf)];
+  else if(tense==="inf") vWords=[...aux.f[p].split(" "),inf];
+  else vWords=neg?["no",ptNegF(inf,forms[0])]:[ptCmd(inf,forms)];
+  const tok=objTok(o,"do"), rcTok=rc?objTok(rc,"io"):null;
+  const objs=kind==="do"?[tok]:kind==="io"?[o[0],rcTok]:[tok,rcTok];
+  const lowSubj=subj&&cue&&!NAMES.has(subj.split(" ")[0])?subj.charAt(0).toLowerCase()+subj.slice(1):subj;
+  const full=[...(cue?cue.split(" "):[]),...(subj?[lowSubj]:[]),...vWords,...objs];
+  if(typeof full[0]==="string") full[0]=cap(full[0]);
+  const dopW=dop(o), leW=rc&&rc[2]==="p"?"les":"le";
+  const clOf=(k,doW)=>k==="do"?[[doW||dopW,"do"]]:k==="io"?[[leW,"io"]]:[["se","io"],[doW||dopW,"do"]];
+  const restOf=k=>k==="io"?[[o[0]]]:[];
+  const subjT=subj?[[subj]]:[];
+  // build the answer in one style: "pro" = pronouns before the verb, "enc" = attached to the end
+  const build=(style,k,doW)=>{
+    const cl=clOf(k,doW), n=cl.length, rest=restOf(k);
+    if(tense==="cmd"&&!neg){const w=ptAccCmd(vWords[0],n); return [{parts:[[w],...cl]},...rest]}
+    if(tense==="cmd") return [["no"],...cl,[vWords[1]],...rest];
+    if(style==="enc"&&tense==="inf"){const w=n>=2?ptAccInf(inf):inf; return [...subjT,...aux.f[p].split(" ").map(x=>[x]),{parts:[[w],...cl]},...rest]}
+    if(style==="enc"&&tense==="ger") return [...subjT,[EST[p]],{parts:[[ptAccGer(ptGer(inf))],...cl]},...rest];
+    return [...subjT,...cl,...vWords.map(x=>[x]),...rest];
+  };
+  const capTok=t=>t.parts?{parts:t.parts.map((x,i)=>i?x:[cap(x[0]),...x.slice(1)])}:[cap(t[0]),...t.slice(1)];
+  const txt=toks=>toks.map(tokTxt).join(" ");
+  const two=tense==="inf"||tense==="ger", style=two&&r()<.5?"enc":"pro";
+  let short=build(style,kind); short[0]=capTok(short[0]);
+  // a version of the same answer without the subject, and with the other pronoun position
+  const core=toks=>subj?toks.slice(1):toks;
+  const display=txt(short);
+  const acceptRaw=[], extra=[], push=x=>{const k=plain(x); if(k&&!acceptRaw.includes(k)) acceptRaw.push(k)};
+  const addAll=(t)=>{push(txt(t)); if(subj){push(txt(core(t)))} if(cue){push(cue+" "+txt(t)); if(subj) push(cue+" "+txt(core(t)))}};
+  addAll(short);
+  let other=null;
+  if(two){other=build(style==="enc"?"pro":"enc",kind); other[0]=capTok(other[0]); addAll(other); 
+    const sample=txt(core(other)).toLowerCase();
+    extra.push({raw:plain(txt(other)),note:`Also correct: ${tense==="inf"?"the pronouns can go before the first verb or attach to the infinitive":"the pronouns can go before estar or attach to the -ndo form"}.`}); }
+  const alt=(x,nt)=>{const k=plain(x); if(k&&!acceptRaw.includes(k)){acceptRaw.push(k); extra.push({raw:k,note:nt})}};
+  const rcTxt=rc?noun(rcTok):"";
+  if(kind==="do"&&tok.pre&&tok.g==="m"&&tok.n==="s"){
+    [short,other].filter(Boolean).forEach(t0=>{const t=build(t0===short?style:(style==="enc"?"pro":"enc"),"do","le"); t[0]=capTok(t[0]); alt(txt(t),"Accepted: using le for a man (leísmo) is common in Spain. Standard Spanish, and Latin America, use lo."); if(subj) alt(txt(core(t)),"Accepted: using le for a man (leísmo) is common in Spain. Standard Spanish, and Latin America, use lo.")});
+  }
+  if(kind==="io"){
+    const t=build(style,"both"); t[0]=capTok(t[0]);
+    alt(txt(t),`Also correct. You replaced both objects: ${leW} becomes se before ${dopW}. This part only asks for the indirect one, but your sentence is right.`); if(subj) alt(txt(core(t)),"Also correct. You replaced both objects.");
+    alt(txt(short)+" "+rcTxt,"Also correct. Everyday Spanish often keeps the person after le.");
+  }
+  if(kind==="both") alt(txt(short)+" "+rcTxt,`Also correct. Adding ${rcTxt} makes it clear who se refers to.`);
+  // tiles: every word either accepted order needs, plus a few that don't belong
+  const words=[]; [short,other].filter(Boolean).forEach(t=>t.forEach(x=>tokTxt(x).split(" ").forEach(w=>{const lw=NAMES.has(w)?w:w.toLowerCase(); if(!words.includes(lw)) words.push(lw)})));
+  const wrongEnc=w=>w.replace(/(lo|la|los|las)$/,m=>({lo:"la",la:"lo",los:"las",las:"los"}[m]));
+  const encW=[...short,...(other||[])].filter(x=>x.parts).map(x=>tokTxt(x).toLowerCase());
+  const bad=encW.length?wrongEnc(encW[0]):""; if(bad&&!words.includes(bad)) words.push(bad);
+  const used=new Set(words); shuf(PT_PRON.filter(x=>!used.has(x)),r).slice(0,bad?2:3).forEach(x=>words.push(x));
+  // explanation
+  const sty=(s)=>txt(core(s)).toLowerCase();
+  let tnote="";
+  const acc=/[áéíóú]/.test(sty(short))&&!/[áéíóú]/.test(vWords[0]);
+  if(cmd&&!neg) tnote=acc?`A positive command attaches the pronoun to the end, and the accent keeps the stress where it was: ${vWords[0]} → ${sty(short)}.`:`A positive command attaches the pronoun to the end: ${vWords[0]} → ${sty(short)}. (Short commands like da and di need no accent with one pronoun.)`;
+  else if(cmd) tnote=`A negative command keeps the pronoun in front of the verb: ${sty(short)}.`;
+  else if(tense==="inf") tnote=`With two verbs the pronoun goes before the first verb or attaches to the infinitive: ${sty(style==="pro"?short:other)} / ${sty(style==="pro"?other:short)}.`;
+  else if(tense==="ger") tnote=`With estar + -ndo the pronoun goes before estar or attaches to the -ndo form (with an accent): ${sty(style==="pro"?short:other)} / ${sty(style==="pro"?other:short)}.`;
+  else if(tense==="perf") tnote=`With the present perfect the pronoun goes before haber, never in the middle: ${sty(short)}.`;
+  else tnote=`The tense changes the verb, not the pronoun’s place: it goes right before the verb.`;
+  const tip=cmd&&!neg?(acc?"Attach the pronoun to the end of the command, with an accent.":"Attach the pronoun to the end of the command.")
+    :cmd?"A negative command keeps the pronoun in front of the verb."
+    :two?"The pronoun can go before the first verb or attach to the infinitive/-ndo form. Either is accepted."
+    :tense==="perf"?"Put the pronoun before haber (he, has, ha, hemos, han).":"";
+  const tl=neg?"Negative command":PT_LABEL[tense]||"";
+  return {kind:"pron",full,short,display,accept:acceptRaw.map(norm),acceptRaw,extra,tiles:shuf(words,r).map(x=>x),note:tnote,tn:tense,tl,tip,...pronEN2(kind,forms,o,rc,p,subj,tense,neg,aux&&aux.id,cueEN)};
+}
+function genPron(kind,count,seed){
+  const r=rng(seed), n=kind==="both"?5:10, pairs=[];
+  (kind==="do"?DOV:IOV).forEach(([f,objs])=>objs.forEach(o=>pairs.push([f,o])));
+  const out=[], seen=new Set(); let q=[];
+  for(let d=1;d<=Math.ceil(count/n);d++){
+    const firsts=new Set();
+    for(const t0 of ptPlan(d,n,r)){
+      for(let k=0;k<60;k++){
+        if(!q.length) q=shuf(pairs.slice(),r);
+        const pr=q.pop(), t=(PT_NO[pr[0].inf]||[]).includes(t0)?"pres":t0;
+        const it=t==="pres"?makePron(kind,pr,r):makePronT(kind,pr,t,r,d), key=JSON.stringify(it.full)+t;
+        if(seen.has(key)) continue;
+        seen.add(key); it.tn=it.tn||"pres"; if(t===PT_FOCUS(d)&&d===PT_INTRO[t]&&t!=="pres"&&!firsts.has(t)){it.intro=PT_INTRO_TXT[t]; firsts.add(t)}
+        out.push(it); break;
+      }
+    }
+  }
+  return out.slice(0,count);
 }
 
 // ================= past tense content =================
@@ -2335,6 +2511,7 @@ function hintText(item){
   let s=`Replace the ${ps.join(" and ")} object${ps.length>1?"s":""}.`;
   if(roles.length>1) s+=" Indirect goes first.";
   if(S.view==="pics") s+=` Pictures: ${item.full.filter(w=>typeof w!=="string").map(w=>`<b>${esc(w.t)}</b>`).join(", ")}.`;
+  if(item.tip) s+=" "+item.tip;
   return s;
 }
 const PRON=["lo","la","los","las","le","les","se"];
@@ -2370,10 +2547,11 @@ function renderQ(restore){
   const ppn=nObj>1?"Replace <b>both</b> highlighted phrases with pronouns:":"Replace <b>only</b> the highlighted words with a pronoun:";
   const prompt=(isPast?(blind||info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(blind||info.key==="two"?ppn:(PPROMPT[info.key]||ppn)))+` <span class="tapnote">Tap any word for its meaning.</span>`;
   $("drill").innerHTML=`
-    <div class="meta">${blind?"<span style=\"flex:1\"></span>":`<span class="pill ${info.pillCls}">${esc(info.pill)}</span>`}${info.counter}${spkBtn(itemSayQ(item),"")}</div>
+    <div class="meta">${blind?"<span style=\"flex:1\"></span>":`<span class="pill ${info.pillCls}">${esc(info.pill)}</span>`}${item.tl?`<span class="tnchip"${blind?' style="margin-left:0"':""}>${esc(item.tl)}</span>`:""}${info.counter}${spkBtn(itemSayQ(item),"")}</div>
     <div class="qpush" aria-hidden="true"></div>
     ${q}
     <p class="prompt">${prompt}</p>
+    ${item.intro&&!blind?`<p class="tnew">${esc(item.intro)}</p>`:""}
     ${m==="tiles"
       ?`${inSlot?"":`<div class="answer empty" id="answer" data-ph="Drag or tap words here" aria-label="Your answer"></div>`}<div class="bank" id="bank"></div>`
       :`<form id="f" autocomplete="off" onsubmit="return false"><div id="ans" ${FIELD_ATTRS} enterkeyhint="done" data-ph="${isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></div></form>`}
@@ -2572,8 +2750,6 @@ function showFeedback(val,ok){
 }
 
 // ================= tap a word for its meaning =================
-const DOV_INF=["comprar","leer","lavar","buscar","abrir","cerrar","preparar","necesitar","ver","llamar","escribir","tomar","visitar","invitar","vender","limpiar","olvidar","pedir","traer","terminar","escuchar","ayudar","conocer"];
-const IOV_INF=["dar","regalar","escribir","mandar","explicar","contar","decir","prestar","enseñar","comprar","servir","devolver","traer","preparar","ofrecer","pedir","leer","mostrar"];
 const VERB_EN={comprar:"to buy",leer:"to read",lavar:"to wash",buscar:"to look for",abrir:"to open",cerrar:"to close",preparar:"to prepare, make",necesitar:"to need",ver:"to see, watch",llamar:"to call",escribir:"to write",tomar:"to take; to have (food, drink)",visitar:"to visit",invitar:"to invite",vender:"to sell",limpiar:"to clean",olvidar:"to forget",pedir:"to ask for, order",traer:"to bring",terminar:"to finish",escuchar:"to listen to",ayudar:"to help",conocer:"to know (a person, place); to meet",dar:"to give",regalar:"to give (as a present)",mandar:"to send",explicar:"to explain",contar:"to tell (a story); to count",decir:"to say, tell",prestar:"to lend",enseñar:"to show; to teach",servir:"to serve",devolver:"to give back, return",ofrecer:"to offer",mostrar:"to show",enviar:"to send",hablar:"to speak, talk",comer:"to eat",cenar:"to have dinner",trabajar:"to work",estudiar:"to study",jugar:"to play (a game, sport)",llegar:"to arrive",beber:"to drink",salir:"to go out, leave",ir:"to go",hacer:"to do, make",tener:"to have",cocinar:"to cook",dormir:"to sleep",poner:"to put; to lay (the table)",venir:"to come",pagar:"to pay",empezar:"to start",correr:"to run",nadar:"to swim",bailar:"to dance",viajar:"to travel",volver:"to come back, return",estar:"to be (state, location)",conducir:"to drive",querer:"to want; to love",poder:"to be able to, can",ser:"to be (identity, description)",vivir:"to live",llover:"to rain",casar:"casarse: to get married",saber:"to know (facts, how to)",nacer:"to be born",tocar:"to play (an instrument); to touch",sonar:"to ring, sound",contestar:"to answer",tener_que:"to have to"};
 const WORD_EN={pan:"bread",flores:"flowers",flor:"flower",tomates:"tomatoes",leche:"milk","periódico":"newspaper",novela:"novel",mensajes:"messages",mensaje:"message",noticias:"news",noticia:"piece of news",platos:"plates, dishes",ropa:"clothes",coche:"car",ventanas:"windows",ventana:"window",llaves:"keys",llave:"key",pasaporte:"passport",cartera:"wallet",billetes:"tickets",puerta:"door",puertas:"doors",cajas:"boxes",regalo:"present, gift",botella:"bottle",libro:"book",libros:"books",tienda:"shop",cena:"dinner",desayuno:"breakfast",maletas:"suitcases",bocadillos:"sandwiches",ordenador:"computer",tijeras:"scissors",documentos:"documents","película":"film, movie",partido:"match, game",fotos:"photos",vecinos:"neighbours",vecina:"neighbour (f)",vecinas:"neighbours (f)",padres:"parents",doctora:"doctor (f)",chicas:"girls",carta:"letter",informe:"report",correos:"emails",correo:"email",postales:"postcards",postal:"postcard",tren:"train","autobús":"bus",sopa:"soup",pastillas:"pills",abuelos:"grandparents",museo:"museum",catedral:"cathedral",amigos:"friends",piso:"flat, apartment",bicicleta:"bicycle",sillas:"chairs",silla:"chair",cocina:"kitchen",baño:"bathroom",zapatos:"shoes",mesas:"tables",mesa:"table",paraguas:"umbrella","contraseña":"password","móvil":"mobile phone",cuenta:"bill",menú:"menu",postres:"desserts",postre:"dessert",bebidas:"drinks",vino:"wine",tarta:"cake",trabajo:"work, job",tarea:"task, homework",deberes:"homework",proyecto:"project",radio:"radio",podcast:"podcast",canciones:"songs",profesora:"teacher (f)",profesor:"teacher",hermano:"brother",hermana:"sister",abuela:"grandmother",abuelo:"grandfather","niñas":"girls","niños":"children",ciudad:"city",barrio:"neighbourhood",dinero:"money",juguetes:"toys","invitación":"invitation",paquete:"parcel","lección":"lesson",problema:"problem",reglas:"rules",ejercicios:"exercises",secreto:"secret",historia:"story; history",planes:"plans",chiste:"joke",verdad:"truth",respuesta:"answer",nombres:"names",apuntes:"notes",cuadros:"paintings",helado:"ice cream",camiseta:"T-shirt","café":"coffee",chaqueta:"jacket","té":"tea",sorpresa:"surprise",ayuda:"help",dulces:"sweets",favor:"favour",sal:"salt",datos:"details, data",cuento:"story",poemas:"poems",camino:"way, route",casa:"house, home",resultados:"results",clientes:"customers",perro:"dog",jefe:"boss",madre:"mother",compañeros:"colleagues, classmates",restaurante:"restaurant",italiano:"Italian",paella:"paella",pescado:"fish",terraza:"terrace",biblioteca:"library","inglés":"English","fútbol":"football",tenis:"tennis",clase:"class",diario:"diary",tele:"TV",playa:"beach",gimnasio:"gym",cine:"cinema",compra:"(food) shopping",piano:"piano","reunión":"meeting","panadería":"bakery",fruta:"fruit",mercado:"market",taxi:"taxi","música":"music",familia:"family",siesta:"nap",horas:"hours",pizza:"pizza","adiós":"goodbye",bici:"bike",paseo:"walk",vuelta:"stroll, a turn",centro:"town centre",tarjeta:"card",aparcamiento:"parking space",parque:"park","kilómetros":"kilometres",mar:"sea",piscina:"swimming pool",salsa:"salsa",noche:"night",oficina:"office",cuidado:"care",ayer:"yesterday",anoche:"last night","sábado":"Saturday",pasado:"last, past",semana:"week","días":"days","día":"day",verano:"summer",tarde:"afternoon; late",siempre:"always",normalmente:"normally",antes:"before; in the past",domingos:"on Sundays",cada:"each, every",mientras:"while",cuando:"when",temprano:"early",mucho:"a lot (of)",mucha:"a lot (of)",con:"with",por:"through, by, for",en:"in, on, at","teléfono":"phone",luz:"light; electricity",cartero:"postman",calle:"street",ducha:"shower",alta:"tall",simpática:"nice, friendly","años":"years",frío:"cold","pequeño":"little, small",piloto:"pilot",concierto:"concert",alguien:"someone",idiomas:"languages",fiesta:"party",error:"mistake",guitarra:"guitar",hotel:"hotel",cansado:"tired",muy:"very",todos:"all, every",todas:"all, every",y:"and",que:"that, which",el:"the (masc.)",un:"a (masc.)",una:"a (fem.)",unas:"some",unos:"some",a:"to; (before a person: marks who)",al:"to the",de:"of, from",del:"of the",desde:"from",para:"for",hasta:"until",después:"after",toda:"all, the whole",todo:"all, the whole",mi:"my",mis:"my",agua:"water",pasta:"pasta",portugal:"Portugal",lima:"Lima (Peru)",ana:"Ana (name)",pedro:"Pedro (name)",elena:"Elena (name)",carlos:"Carlos (name)","maría":"María (name)","lucía":"Lucía (name)",pero:"but",no:"no, not",tres:"three",dos:"two",diez:"ten",ocho:"eight",nueve:"nine",seis:"six",doce:"twelve",veinte:"twenty",ochenta:"eighty",tu:"your",fin:"end",sol:"sun",yo:"I","tú":"you","él":"he",ella:"she",nosotros:"we",ellos:"they",ellas:"they (f)",te:"you (object)"};
 const WORD_EN2={"hace":"does, makes (hacer); also “ago” (hace dos días = two days ago) and weather (hace frío = it’s cold)","esta":"this (fem.); is (estar, él/ella: está)","otro":"other, another","más":"more","año":"year","joven":"young; young person","padre":"father","mismo":"same","sus":"his, her, their (plural noun)","niño":"boy, child","colegio":"school","cinco":"five","médico":"doctor","lunes":"Monday","pasada":"last, past (fem.)","mes":"month","cama":"bed","buena":"good (fem.)","tiempo":"time; weather","horrible":"horrible","ese":"that (masc.)","campo":"countryside; field","pequeños":"little, small (plural); little ones","mañanas":"mornings","muchas":"many, a lot of (fem. plural)","cosa":"thing","mal":"badly; bad","cola":"queue; tail","pronto":"soon; early","aeropuerto":"airport","examen":"exam","banco":"bank; bench","aún":"still, yet","bien":"well, fine","ti":"you (after a preposition: para ti = for you)","montaña":"mountain","martes":"Tuesday","sevilla":"Seville (city in Spain)","rato":"a while","viejo":"old","semanas":"weeks","largo":"long","primer":"first (before a masc. noun)","casi":"almost","última":"last (fem.)","tus":"your (plural noun)","poco":"little, not much","maleta":"suitcase","último":"last (masc.)","viento":"wind","menudo":"small (a menudo = often)","fines":"ends (el fin de semana = weekend)","ahora":"now","cerca":"near, close","así":"like this, so","también":"also, too","raro":"strange","hijos":"sons, children","pesadilla":"nightmare","bonita":"pretty (fem.)","sueldo":"salary, wage","entre":"between, among","jueves":"Thursday","grande":"big, large","ladrar":"to bark","llamada":"phone call; called","importante":"important","hermanos":"brothers, siblings","alumnos":"students, pupils","enfermo":"ill, sick","meses":"months","cabeza":"head","sonrisa":"smile","misma":"same (fem.)","canción":"song","hijo":"son","oscuridad":"darkness","tardes":"afternoons, evenings","menos":"less; minus","grupo":"group, band","época":"era, period (en aquella época = at that time)","patio":"yard, playground","timbre":"doorbell","durante":"during, for","graciosa":"funny (fem.)","cómo":"how","videollamada":"video call","jugadores":"players","contra":"against","normal":"normal","contento":"happy, pleased","primo":"cousin (male)","personas":"people, persons","carretera":"road","dentista":"dentist","calles":"streets","tía":"aunt","vaso":"glass (for drinking)","atasco":"traffic jam","nueva":"new (fem.)","foto":"photo","retraso":"delay (con retraso = late)","estación":"station; season","dolor":"pain","mí":"me (after a preposition: para mí = for me)","obreros":"workmen, labourers","idea":"idea","lago":"lake","accidente":"accident","preciosa":"beautiful (fem.)","navidad":"Christmas","graciosas":"funny (fem. plural)","películas":"films, movies","tanto":"so much","vacía":"empty (fem.)","sábados":"Saturdays","jóvenes":"young (plural); young people","mapa":"map","lloviendo":"raining (estar lloviendo = to be raining)","estudiante":"student","olor":"smell","abierta":"open (fem.)","aquella":"that (over there, fem.)","camareros":"waiters","perfecto":"perfect","precioso":"beautiful, lovely","mujer":"woman; wife","aquí":"here","enfermera":"nurse (female)","medicinas":"medicines","increíble":"incredible","solo":"alone; only","punto":"point; dot","pez":"fish (live)","mirando":"looking (estar mirando = to be looking)","principio":"beginning (al principio = at first)","es":"is (ser)","presté":"I lent (prestar, pretérito)","devolví":"I gave back, returned (devolver, pretérito)","necesitaba":"I/he/she needed (necesitar, imperfecto)","vivo":"I live (vivir); alive","bebé":"baby","algo":"something","chicos":"boys, guys, kids","cuarto":"room; quarter; fourth","ex":"ex-partner, ex-","nuevas":"new (fem. plural)","abrazo":"hug","país":"country","cielo":"sky","oscurecerse":"to get dark","velocidad":"speed","aumento":"increase, raise","horno":"oven","pregunta":"question; he/she asks (preguntar)","rara":"strange (fem.)","recomendaste":"you recommended (recomendar, pretérito)","pastel":"cake, pastry","muchos":"many, a lot of (masc. plural)","entero":"whole, entire","ramo":"bunch, bouquet","curso":"course; school year","contigo":"with you","escena":"scene","sorprendió":"surprised (sorprender, pretérito)","maratón":"marathon","medio":"half; middle","barata":"cheap (fem.)","rica":"tasty; rich (fem.)","miércoles":"Wednesday","voz":"voice","tema":"topic, subject","avión":"plane","multa":"fine (penalty)","coraje":"courage; anger","sueños":"dreams","perdida":"lost (fem.)","preocupada":"worried (fem.)","rebajas":"sales (in shops)","buenísima":"really good, delicious (fem.)","matemáticas":"maths","entera":"whole, entire (fem.)","sobrino":"nephew","suegros":"parents-in-law","peluquería":"hairdresser’s","tostada":"toast, a slice of toast","gran":"great, big (before a noun)","capítulo":"chapter, episode","vernos":"to see each other","llena":"full (fem.)","humo":"smoke","detalle":"detail; thoughtful gesture","buen":"good (before a masc. noun)","mala":"bad (fem.)","quemó":"burned (quemar, pretérito)","pared":"wall","cincuenta":"fifty","casados":"married (plural)","apartamento":"flat, apartment","atardecer":"dusk, sunset","segundos":"seconds","discusión":"argument","estrellas":"stars","madrugada":"early hours (of the morning)","nota":"note; grade, mark","difícil":"difficult","abrigo":"coat","vergüenza":"shame, embarrassment","tan":"so (tan + adjective)","niebla":"fog","razón":"reason (tener razón = to be right)","pesada":"heavy; annoying (fem.)","junta":"together (fem.); meeting","delgado":"thin, slim","terror":"terror, horror","galletas":"biscuits, cookies","felices":"happy (plural)","amigas":"friends (female)","cuentos":"stories, tales","juguete":"toy","cariñoso":"affectionate","despertador":"alarm clock","programa":"programme, show","fiestas":"parties; festivals","guapa":"pretty, good-looking (fem.)","columpio":"swing","paciencia":"patience","aquellos":"those (over there, masc. plural)","fila":"row, line","verduras":"vegetables","edad":"age","tímido":"shy","hambre":"hunger (tener hambre = to be hungry)","juntos":"together (masc. plural)","nevaba":"it was snowing (nevar, imperfecto)","nevar":"to snow","vuelo":"flight","pantalla":"screen","moda":"fashion","corregía":"was correcting, marking (corregir, imperfecto)","página":"page","costa":"coast","azúcar":"sugar","panadera":"baker (female)","muchísima":"a great deal of (fem.)","sed":"thirst (tener sed = to be thirsty)","recién":"just, recently","hecho":"done, made (hacer); fact","arriba":"up, upstairs","andén":"platform","rock":"rock (music)","cariño":"affection; darling","enteré":"I found out (enterarse, pretérito)","luna":"moon","contentos":"happy, pleased (plural)","vacías":"empty (fem. plural)","visitarnos":"to visit us","sucio":"dirty","libre":"free","habitación":"room","recepcionista":"receptionist","bocadillo":"sandwich (in a baguette)","nuestros":"our (masc. plural)","ambulancia":"ambulance","ajedrez":"chess","sitio":"place, spot","europa":"Europe","suelo":"floor, ground","camisa":"shirt","verde":"green","despacio":"slowly","roto":"broken","corto":"short","gallinas":"hens, chickens","universidad":"university","reuniones":"meetings","volumen":"volume","deprisa":"quickly, in a hurry","terrazas":"terraces, outdoor seating areas","encendida":"on, switched on (fem.)","sano":"healthy","juventud":"youth","infancia":"childhood","escuela":"school","pizzería":"pizzeria","público":"audience, public","internet":"internet","anteayer":"the day before yesterday","alrededor":"around","asusté":"I got scared (asustarse, pretérito)","congelada":"frozen (fem.)","chistes":"jokes","cenas":"dinners","cliente":"customer","quemado":"burnt, burned","valor":"courage; value","callamos":"we went quiet (callarse, pretérito)","actor":"actor","marido":"husband","pasaportes":"passports","costumbre":"habit, custom (de costumbre = usual)","alarma":"alarm","gritos":"shouts, screams","perú":"Peru","perros":"dogs","motivo":"reason","plato":"dish, plate","gracioso":"funny","cenado":"had dinner (cenar, past participle)","mallorca":"Majorca (Spanish island)","sentados":"seated, sitting (masc. plural)","inviernos":"winters","fábrica":"factory","oso":"bear","monte":"mountain, hills","jubiló":"retired (jubilarse, pretérito)","prado":"meadow; the Prado museum","goya":"Goya (Spanish painter)","cansados":"tired (plural)","fuerte":"strong; loud","completamente":"completely","quince":"fifteen","hablando":"talking (estar hablando = to be talking)","mío":"mine","cómodo":"comfortable","oporto":"Porto (city in Portugal)","viendo":"watching, seeing (estar viendo)","español":"Spanish; Spaniard","colombia":"Colombia","perfecta":"perfect (fem.)","noventa":"ninety","torneo":"tournament","minuto":"minute","nerviosos":"nervous (plural)","segunda":"second (fem.)","parte":"part; half (of a match)","españoles":"Spanish people, Spaniards","sirviendo":"serving (estaba sirviendo = was serving)","desayunos":"breakfasts","jazz":"jazz","poca":"little, not much (fem.)","tocando":"playing (an instrument) (estaba tocando)","bailando":"dancing (estaba bailando)","cantante":"singer","miraflores":"Miraflores (district of Lima)","cusco":"Cusco (city in Peru)","machu":"Machu (Picchu: Inca site in Peru)","picchu":"Picchu (Machu Picchu: Inca site in Peru)","junio":"June","antigua":"old, ancient (fem.)","comiendo":"eating (estar comiendo = to be eating)","divertido":"fun, amusing","envolví":"I wrapped (envolver, pretérito)","rojo":"red","va":"goes (ir); va a + infinitive = is going to","ha":"has (haber, auxiliary: ha visto = has seen)","visto":"seen (ver, past participle)","espero":"I hope; I wait (esperar)","gusten":"(that they) please, are liked (gustar, subjunctive: espero que le gusten = I hope she likes them)","recomendó":"recommended (recomendar, pretérito)","encantaron":"delighted, were loved (encantar, pretérito: le encantaron = she loved them)","imprimir":"to print","roja":"red (fem.)","uso":"I use (usar); use","devolvió":"gave back, returned (devolver, pretérito)","amiga":"friend (female)","explicó":"explained (explicar, pretérito)","entregué":"I handed in, delivered (entregar, pretérito)","corrigió":"corrected, marked (corregir, pretérito)","escondió":"hid (esconder, pretérito)","envolvió":"wrapped (envolver, pretérito)","guardar":"to keep, put away; to save","septiembre":"September","cuidan":"they look after, take care of (cuidar)","prestaron":"they lent (prestar, pretérito)","guardé":"I kept, put away (guardar, pretérito)","regaba":"I/he/she used to water (regar, imperfecto)","feliz":"happy","asiento":"seat","atrás":"back, behind","encantó":"delighted, was loved (encantar, pretérito: le encantó = he/she loved it)","carmen":"Carmen (a name)","sara":"Sara (a name)","laura":"Laura (a name)","rosa":"Rosa (a name); pink; rose","nuria":"Nuria (a name)","miguel":"Miguel (a name)","tomás":"Tomás (a name)","julia":"Julia (a name)","lola":"Lola (a name)","raúl":"Raúl (a name)","elisa":"Elisa (a name)","hugo":"Hugo (a name)","marcos":"Marcos (a name)","alicia":"Alicia (a name)","londres":"London","mateo":"Mateo (a name)","sofía":"Sofía (a name)","roma":"Rome","mónica":"Mónica (a name)","clara":"Clara (a name); clear","daniel":"Daniel (a name)","barcelona":"Barcelona","juan":"Juan (a name)","javier":"Javier (a name)","alba":"Alba (a name)","andrés":"Andrés (a name)","silvia":"Silvia (a name)","méxico":"Mexico","sandra":"Sandra (a name)","jaime":"Jaime (a name)","rebeca":"Rebeca (a name)","gabriel":"Gabriel (a name)","cádiz":"Cádiz (city in Spain)","cuba":"Cuba","carla":"Carla (a name)","paula":"Paula (a name)","álex":"Álex (a name)","parís":"Paris","paco":"Paco (a name)","jorge":"Jorge (a name)","rafa":"Rafa (a name)","víctor":"Víctor (a name)","teresa":"Teresa (a name)","rita":"Rita (a name)","andrea":"Andrea (a name)","italia":"Italy"};
@@ -2581,9 +2757,15 @@ const PHRASE_EN={"a menudo":"often","de vez en cuando":"now and then","todos los
 const PRON_EN={lo:"it, him · direct object, masc. sing.",la:"it, her · direct object, fem. sing.",los:"them · direct object, masc. plural",las:"them · direct object, fem. plural",le:"to/for him, her · indirect object, singular",les:"to/for them · indirect object, plural",se:"le/les turns into se before lo, la, los, las · also the reflexive pronoun (se levantó = he got up)"};
 const GER={leyendo:"leer",preparando:"preparar",escribiendo:"escribir",buscando:"buscar"};
 const FORMS={};
+[...DOV_INF,...IOV_INF].forEach(i=>{GER[ptGer(i)]=i});
 const addForm=(f,info)=>{const k=f.toLowerCase();(FORMS[k]=FORMS[k]||[]).push(info)};
 DOV.forEach(([fs],i)=>fs.forEach((f,p)=>addForm(f,{inf:DOV_INF[i],t:"present",p})));
 IOV.forEach(([fs],i)=>fs.forEach((f,p)=>addForm(f,{inf:IOV_INF[i],t:"present",p})));
+[...new Set([...DOV_INF,...IOV_INF])].forEach(inf=>{const fp=PFX(inf), yo=(DOV.find(x=>x[0].inf===inf)||IOV.find(x=>x[0].inf===inf))[0];
+  fp.pret.forEach((x,p)=>addForm(x,{inf,t:"pretérito",p})); fp.imp.forEach((x,p)=>addForm(x,{inf,t:"imperfecto",p}));
+  addForm(ptPP(inf),{inf,t:"past participle"}); addForm(ptCmd(inf,yo),{inf,t:"command (tú)"}); addForm(ptNegF(inf,yo[0]),{inf,t:"negative command (tú)"})});
+HAB.forEach((x,p)=>addForm(x,{inf:"haber",t:"present",p})); EST.forEach((x,p)=>addForm(x,{inf:"estar",t:"present",p}));
+AUXES.forEach(a=>a.f.forEach((x,p)=>x.split(" ").slice(0,1).forEach(w=>addForm(w,{inf:{ir:"ir",querer:"querer",poder:"poder",tener:"tener_que"}[a.id],t:"present",p}))));
 PV.forEach(([inf])=>{const f=pastForms(inf); f.pret.forEach((x,p)=>addForm(x,{inf,t:"pretérito",p})); f.imp.forEach((x,p)=>addForm(x,{inf,t:"imperfecto",p}))});
 [...HAND,...HAND2].forEach(([,inf,ans,alt,tense])=>{const a=tense==="pret"?"pretérito":"imperfecto",b=tense==="pret"?"imperfecto":"pretérito"; addForm(ans,{inf,t:a}); addForm(alt,{inf,t:b})});
 [["voy","ir","present",0],["vamos","ir","present",3],["quiero","querer","present",0],["quiere","querer","present",2],["tengo","tener_que","present",0],["tienes","tener_que","present",1],["necesito","necesitar","present",0],["puedes","poder","present",1],["estoy","estar","present",0],["estás","estar","present",1],["estamos","estar","present",3],
@@ -2623,6 +2805,7 @@ function lookup(raw){
   const m=n.match(/^(.+?)((?:se|le|les)?(?:lo|la|los|las)|te|me)$/);
   if(m){
     const base=m[1], inf=Object.keys(VERB_EN).find(v=>v===base)||Object.keys(GER).find(g=>g===base)&&GER[base];
+    const fb=!inf&&FORMS[base]; if(fb) return {w,en:`${infName(fb[0].inf)} + ${m[2].replace(/^se(?=.)/,"se + ")}`,gm:`${VERB_EN[fb[0].inf]||""} · command with the pronoun attached${/[áéíóú]/.test(w)?", so it takes an accent":""}`,q:infName(fb[0].inf)};
     if(inf) return {w,en:`${inf} + ${m[2].replace(/^se(?=.)/,"se + ")}`,gm:`${VERB_EN[inf]} · pronoun attached to the ${VERB_EN[base]?"infinitive":"gerund"}${/[áéíóú]/.test(w)?", so it takes an accent":""}`,q:inf};
   }
   if(WORD_EN[w]) return {w,en:WORD_EN[w],q:w};
@@ -3264,7 +3447,12 @@ function drawLinks(){
     const sx=fr.left+fr.width/2-b.left, sy=fr.bottom-b.top+3;
     const ex=tr.left+tr.width/2-b.left, ey=tr.top-b.top-4;
     const dy=Math.max(ey-sy,12);
-    L.push({r,sx,sy,ex,ey,d:`M${sx} ${sy} C${sx} ${sy+dy*.65} ${ex} ${ey-dy*.65} ${ex} ${ey}`,h:`M${ex-5} ${ey-6} L${ex} ${ey} L${ex+5} ${ey-6}`});
+    // the arrowhead points along the curve's real direction at the tip, so the line runs through the middle of the head instead of crossing one side of it
+    const c1y=sy+dy*.65, c2y=ey-dy*.65, bz=t=>{const u=1-t; return [u*u*u*sx+3*u*u*t*sx+3*u*t*t*ex+t*t*t*ex, u*u*u*sy+3*u*u*t*c1y+3*u*t*t*c2y+t*t*t*ey]};
+    let tx=ex, ty=ey, ux=0, uy=1;
+    for(let t=.97;t>=.5;t-=.01){const q=bz(t), dd=Math.hypot(tx-q[0],ty-q[1]); if(dd>=11){ux=(tx-q[0])/dd; uy=(ty-q[1])/dd; break}}
+    const nx=-uy, ny=ux, hx=tx-ux*7, hy=ty-uy*7;
+    L.push({r,sx,sy,ex,ey,d:`M${sx} ${sy} C${sx} ${c1y} ${ex} ${c2y} ${ex} ${ey}`,h:`M${hx+nx*5} ${hy+ny*5} L${tx} ${ty} L${hx-nx*5} ${hy-ny*5}`});
   });
   // measured again many times while the panel settles: move the existing arrows instead of rebuilding them, so the drawing animation plays once
   const old=svg.querySelectorAll("path.line");
