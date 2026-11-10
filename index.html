@@ -642,7 +642,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 17:03</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 23:56</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4263,6 +4263,7 @@ function renderWrSet(){
     <div class="vcard wr-cov"><div class="wr-pct"><b>${cv.known<1&&cv.known>0?"<1":Math.round(cv.known)}%</b><span>of everyday Spanish<br>you know well</span></div>
       <span class="vbar wr-cb"><i style="width:${cv.known+cv.learn}%;opacity:.35"></i><i style="width:${cv.known}%"></i></span>
       <p class="ven" style="margin:8px 0 0">${st.known} ${st.known===1?"word":"words"} known well${cv.learn>=.5?` · ${st.start-st.known} more in progress (+${Math.round(cv.learn)}%)`:""}. All ${WORDS.length} words together make up about ${Math.round(cv.all)}% of everyday speech.</p>
+      <p class="ven" style="margin:6px 0 0;font-size:.78rem">Why so high with few words? A few hundred very common words (de, que, no, es…) make up most of everyday speech.</p>
       <p class="ven" style="margin:6px 0 0;font-size:.78rem">Rough level guide: about 750 words ≈ A1, 1,500 ≈ A2, 3,000 ≈ B1.</p>
       <p class="ven" style="margin:6px 0 0;font-size:.78rem">Based on film and TV subtitle frequencies; published studies put the top 1,000 words at roughly 76–80% of written Spanish and about 88% of speech. “Known well” means you can hold a word in memory for 3+ weeks.</p></div>
     <div><p class="label" style="margin-bottom:8px">New words per day</p>${chip("wrNew",[[5,"5"],[10,"10"],[15,"15"],[20,"20"],[30,"30"]],s.newPer)}</div>
