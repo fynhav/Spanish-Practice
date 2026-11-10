@@ -544,6 +544,41 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .wr-cb{display:block;height:10px;border-radius:6px;background:var(--line);overflow:hidden;position:relative;margin-top:10px}.wr-cb i{display:block;height:100%;background:var(--cc);position:absolute;left:0;top:0}
 .tnchip{font-size:.72rem;font-weight:700;color:var(--muted);border:1px solid var(--line);background:var(--card);border-radius:10px;padding:2px 8px;margin-left:6px;white-space:nowrap}
 .tnew{margin:0 0 6px;padding:9px 11px;border-radius:12px;background:var(--cc-soft);color:var(--ink);font-size:.9rem;line-height:1.35}
+
+/* bottom toolbar + level map */
+.tabbar{flex:none;display:flex;background:var(--card);border-top:1px solid var(--line);
+  margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+  margin-bottom:calc(-1 * var(--kb-pad,env(safe-area-inset-bottom,0px)));
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(var(--kb-pad,env(safe-area-inset-bottom,0px)) + 4px) max(8px,env(safe-area-inset-left,0px))}
+.kbd .tabbar{display:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;color:var(--muted);font:500 .68rem var(--f-body);padding:2px 0;min-height:52px}
+.tab .tp{width:56px;height:30px;border-radius:15px;display:grid;place-items:center}
+.tab svg{width:24px;height:24px}
+.tab[aria-current="page"]{color:var(--both);font-weight:700}
+.tab[aria-current="page"] .tp{background:var(--both-soft)}
+.lm{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.lm.cur{border:2px solid var(--both)}
+.lm-h{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--paper);border-bottom:1px solid var(--line)}
+.lm.cur .lm-h{background:var(--both-soft)} .lm.done .lm-h{background:var(--ok-soft)}
+.lm-l{font-family:var(--f-display);font-size:1.5rem;color:var(--muted)} .lm.cur .lm-l{color:var(--both)} .lm.done .lm-l{color:var(--ok)}
+.lm-h>div{flex:1;font-size:.88rem;font-weight:600} .lm-h .ck{color:var(--ok);font-size:1.3rem}
+.lm-bar{display:block;height:6px;border-radius:4px;background:rgba(107,78,140,.18);margin-top:5px;overflow:hidden}.lm-bar i{display:block;height:100%;background:var(--both);border-radius:4px}
+.lm-b{padding:4px 14px 6px}
+.lm-r{border-radius:0;display:flex;align-items:center;gap:10px;padding:9px 0;border:0;border-bottom:1px solid #EFE9D8;background:none;width:100%;text-align:left;color:var(--ink);font:inherit}
+.lm-r:last-child{border-bottom:0}
+.lm-r .d{width:8px;height:8px;border-radius:50%;flex:none;background:var(--cc)}
+.lm-r .t{flex:1;min-width:0}.lm-r .t b{display:block;font-size:.95rem;font-weight:600}.lm-r .t small{font-size:.76rem;color:var(--muted)}
+.lm-r .g{font-size:.82rem;font-weight:700;color:var(--cc)}
+.lm-r.soon{color:var(--muted)}.lm-r.soon .d{background:#B7A2C9}.lm-r.soon .g{font-weight:500;color:var(--muted);font-size:.75rem}
+.wd-card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--both);border-radius:16px;padding:12px 14px;width:100%;text-align:left;color:var(--ink);font:inherit}
+.wd-top{display:flex;justify-content:space-between;align-items:baseline}.wd-top b{font-family:var(--f-display);font-weight:400;font-size:1.15rem}
+.wd-bar{position:relative;height:10px;border-radius:6px;background:var(--line);margin-top:10px;overflow:hidden}.wd-bar i{display:block;height:100%;background:var(--both);border-radius:6px}
+.wd-sc{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:6px}
+.all-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.all-t{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--cc);border-radius:14px;padding:12px;text-align:left;color:var(--ink);font:inherit}
+.all-t b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.05rem}.all-t span{font-size:.78rem;color:var(--muted)}
+.all-s{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px}
+.all-s .lm-r:not(.soon) .g{color:var(--muted);font-size:1.2rem;font-weight:400}
 </style>
 
 <div class="splash" id="splash" aria-live="polite">
@@ -572,6 +607,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
     <button type="button" data-ch="á">á</button><button type="button" data-ch="é">é</button><button type="button" data-ch="í">í</button><button type="button" data-ch="ó">ó</button><button type="button" data-ch="ú">ú</button><button type="button" data-ch="ñ">ñ</button><button type="button" class="ex" data-ch="ü">ü</button><button type="button" class="ex" data-ch="¿">¿</button><button type="button" class="ex" data-ch="¡">¡</button><button type="button" class="nav" data-nav="-1" aria-label="Previous gap" hidden>‹</button><button type="button" class="nav" data-nav="1" aria-label="Next gap" hidden>›</button>
   </div>
   <div class="actions" id="actions"></div>
+  <nav class="tabbar" id="tabbar" hidden aria-label="Main sections"></nav>
   <div class="sheet" id="fb" hidden></div>
 </div>
 
@@ -606,7 +642,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:45</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 17:03</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2274,7 +2310,7 @@ async function initDb(){
     });
     dbCol=col; dbState="ok";
     ["prog-pron","prog-past","session-pron","session-past","drill","stories","xp"].forEach(markDirty); saveLocal();
-    if(screen==="menu") renderMenu(); else if(screen==="course") renderCourse(course); else if(screen==="dsetup") renderDrillSetup(); else if(screen==="slist") renderStoryList();
+    if(screen==="menu") renderMenu(); else if(screen==="ctab") renderCoursesTab(); else if(screen==="all") renderAll(); else if(screen==="prog") renderProg(); else if(screen==="course") renderCourse(course); else if(screen==="dsetup") renderDrillSetup(); else if(screen==="slist") renderStoryList();
     push();
   }catch(e){dbState="offline"; updateSync()}
 }
@@ -2347,9 +2383,10 @@ function chrome(){
   document.querySelectorAll("#accents .ex").forEach(b=>b.hidden=screen==="story");
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
-  $("backBtn").hidden=!(screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm"&&screen!=="wr")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq"||screen==="vm"||screen==="wr");
-  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":"‹ Menu";
-  $("title").textContent=isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
+  const tb=tabOf(); $("tabbar").hidden=!tb; if(tb) tabDraw(tb);
+  $("backBtn").hidden=!!tb||!(screen==="vhome"||screen==="prog"||screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm"&&screen!=="wr")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq"||screen==="vm"||screen==="wr");
+  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":screen==="course"?"‹ Courses":screen==="wrlist"?"‹ Words":(screen==="vhome"||screen==="prog"||isDrill()||(isV()&&!/^wr/.test(screen)))?"‹ All":"‹ Home";
+  $("title").textContent=screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
   $("progress").hidden=!(inS||screen==="vq"||screen==="vm"||screen==="wr"); $("openRules").hidden=$("openSettings").hidden=screen==="vq"||screen==="vm"||screen==="wr";
   $("score").textContent=screen==="wr"?`${WR.fin} / ${WR.total}`:screen==="vq"||screen==="vm"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
   if(screen==="wr") $("progress").innerHTML=`<span class="p-v" style="flex:1"><i style="width:${WR.total?Math.min(100,WR.fin/WR.total*100):0}%"></i></span>`;
@@ -2361,7 +2398,7 @@ function chrome(){
   }
   setCourseColour(course);
 }
-$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else renderMenu()};
+$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else if(screen==="course") renderCoursesTab(); else if(screen==="vhome"||screen==="prog"||isDrill()||(isV()&&!/^wr/.test(screen))) renderAll(); else renderMenu()};
 $("quit").onclick=()=>{if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
 function vTitle(){return screen==="wrset"||screen==="wr"?"Word review":screen==="wrsum"?"Session done":screen==="wrlist"?WORDS.length+" words":screen==="vmset"||screen==="vm"?"Verb meanings":screen==="vmsum"?"Round done":screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
 // swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
@@ -2397,13 +2434,12 @@ function weekHTML(ringFor){
   return `<div class="week">${weekDays().map((d,i)=>{const k=dkey(d),isT=k===tk,fut=k>tk,x=ringFor(k);
     return `<div class="day${isT?" is-today":""}"><span class="dl">${LBL[i]}</span><span class="ring${x.cls}${isT?" today":""}${fut?" future":""}" aria-label="${LBL[i]}: ${esc(x.label)}">${x.html}</span></div>`}).join("")}</div>`;
 }
-function renderMenu(){
-  screen="menu"; course=null; drillOn=false; $("fb").hidden=true; chrome();
-  const tk=todayKey(), wk=weekDays().map(dkey);
-  const has=k=>ST.pron.log[k]!=null||ST.past.log[k]!=null||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0;
-  const ring=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0;
-    return {cls:a||b||c?" any":"",label:[a&&"object pronouns",b&&"past tense",c&&"drill, stories or verbs"].filter(Boolean).join(", ")||"nothing yet",html:`<span class="dd"><i class="${a?"a":""}"></i><i class="${b?"b":""}"></i><i class="${c?"c":""}"></i></span>`}};
-  const cards=Object.keys(COURSES).map(c=>{
+const homeHas=k=>ST.pron.log[k]!=null||ST.past.log[k]!=null||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0;
+const homeRing=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0;
+  return {cls:a||b||c?" any":"",label:[a&&"object pronouns",b&&"past tense",c&&"drill, stories or verbs"].filter(Boolean).join(", ")||"nothing yet",html:`<span class="dd"><i class="${a?"a":""}"></i><i class="${b?"b":""}"></i><i class="${c?"c":""}"></i></span>`}};
+function courseCardsHTML(){
+  const tk=todayKey();
+  return Object.keys(COURSES).map(c=>{
     const C=COURSES[c], s=activeSession(c), nd=nextDay(c), doneN=Object.keys(ST[c].done).length, tdone=ST[c].log[tk]!=null;
     const status=s?`<span class="now">In progress · Day ${s.day}, ${s.pos}/${TOTAL(c)}</span>`
       :tdone?`<span class="now">Done today ✓</span> · next: Day ${nd}`:`<span class="now">Day ${nd} ready</span>`;
@@ -2412,36 +2448,92 @@ function renderMenu(){
       <span class="cs">${status} · ${doneN}/${DAYS} days</span>
       <span class="segs">${[...Array(DAYS)].map((_,i)=>`<i class="${ST[c].done[i+1]?"on":""}"></i>`).join("")}</span></button>`;
   }).join("");
+}
+const B1_SOON=["Subjunctive and commands","Future and conditional","Narrating the past","Connecting ideas"];
+const soonRows=()=>B1_SOON.map(n=>`<div class="lm-r soon"><span class="d"></span><span class="t"><b>${n}</b></span><span class="g">coming soon</span></div>`).join("");
+// the level map: every part of the app, grouped by CEFR level
+function lmHTML(){
+  const R=cefrCalc(); let cur=R.findIndex(r=>r.p<.7); if(cur<0) cur=R.length-1;
+  return R.map((r,i)=>{const st=r.p>=.7?"done":i===cur?"cur":"next", pc=Math.round(r.p*100);
+    const rows=r.items.map(x=>`<button type="button" class="lm-r" data-go="${x.go}" style="--cc:var(--${x.cc})"><span class="d"></span><span class="t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small></span><span class="g">${x.go.startsWith("c:")?`Day ${nextDay(x.go.slice(2))} ›`:x.go==="stories"?"Next ›":"Practise ›"}</span></button>`).join("");
+    return `<div class="lm ${st}"><div class="lm-h"><span class="lm-l">${r.L}</span><div>${st==="done"?"Complete":st==="cur"?`In progress · ${pc}%`:`Next · ${pc}%`}${st==="cur"?`<span class="lm-bar"><i style="width:${pc}%"></i></span>`:""}</div>${st==="done"?'<span class="ck" aria-hidden="true">✓</span>':""}</div><div class="lm-b">${rows}${r.L==="B1"?soonRows():""}</div></div>`}).join("");
+}
+function lmBind(){
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const g=b.dataset.go; justDone=null;
+    if(g.startsWith("c:")) renderCourse(g.slice(2)); else if(g==="stories") renderStoryList(); else renderVHome()});
+}
+function wordsDashHTML(){
+  const st=wrStats(), k=st.known, f=Math.min(100,k/3000*100);
+  return `<button type="button" class="wd-card" id="wrCard"><div class="wd-top"><b>Words${lvChip("rough guide","about 750 words ≈ A1, 1,500 ≈ A2, 3,000 ≈ B1")}</b><span style="font-size:.82rem;color:var(--muted)">${k} known well</span></div>
+    <div class="wd-bar"><i style="width:${f}%"></i></div><div class="wd-sc"><span>0</span><span>A1 750</span><span>A2 1,500</span><span>B1 3,000</span></div>
+    <div style="font-size:.85rem;margin-top:8px"><b>${st.due} due</b> · ${st.nw} new today</div></button>`;
+}
+function renderMenu(){
+  screen="menu"; course=null; drillOn=false; $("fb").hidden=true; chrome();
   $("drill").innerHTML=`
     ${xpHeroHTML()}
     ${xpQuestsHTML()}
-    ${cefrHTML()}
-    ${xpWeekHTML()}
-    <div><p class="label" style="margin-bottom:8px">Days practised <span style="text-transform:none;letter-spacing:0;font-weight:500">· <i class="dot do" style="width:8px;height:8px"></i> pronouns <i class="dot pret" style="width:8px;height:8px"></i> past <i class="dot" style="width:8px;height:8px;background:var(--io)"></i> drill/stories</span></p>${weekHTML(ring)}</div>
-    ${cards}
-    <button type="button" class="course drill" id="drillCard">
-      <span><span class="cn">Endless drill${lvChip("A2")}</span><br><span class="cs">Unlimited sentences · score points</span></span><span class="chev" aria-hidden="true">›</span>
-      <span class="cs"><span class="now">${(ST.drill.log[tk]||0).toLocaleString()} pts today</span> · best ${(ST.drill.best||0).toLocaleString()}</span>
-    </button>
-    <button type="button" class="course stories" id="storyCard">
-      <span><span class="cn">Stories${lvChip("A2")}</span><br><span class="cs">Short paragraphs: tap or type the missing words</span></span><span class="chev" aria-hidden="true">›</span>
-      <span class="cs"><span class="now">${(()=>{const ids=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]); return `${Object.keys(ST.stories.best).filter(k=>ids.has(k)).length} of ${ids.size} done`})()}</span>${(ST.stories.log[tk]||0)?` · ${ST.stories.log[tk]} today`:""}</span>
-    </button>
-    ${wrMenuHTML()}
-    ${vMenuHTML()}
-    <div class="stats two">
-      <div class="stat"><b>${streak(has)}</b><span>day streak</span></div>
-      <div class="stat"><b>${wk.filter(has).length}<small style="font-size:.9rem;color:var(--muted)"> / 7</small></b><span>days this week</span></div>
-    </div>
+    <div style="display:flex;align-items:center;gap:10px"><p class="label" style="margin:0;white-space:nowrap">Your level map</p><span style="flex:1;height:1px;background:var(--line)"></span></div>
+    ${lmHTML()}
+    ${wordsDashHTML()}
     <p class="syncline"></p>`;
   $("actions").innerHTML="";
-  document.querySelectorAll(".course[data-c]").forEach(b=>b.onclick=()=>{justDone=null;renderCourse(b.dataset.c)});
-  $("drillCard").onclick=renderDrillSetup;
-  $("storyCard").onclick=()=>renderStoryList();
-  $("wrCard").onclick=renderWrSet;
+  lmBind(); $("wrCard").onclick=renderWrSet;
   xpMenuBind();
-  vMenuBind();
   updateSync();
+}
+function renderCoursesTab(){
+  screen="ctab"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  $("drill").innerHTML=`<p class="label" style="margin:0">A2 courses</p>${courseCardsHTML()}
+    <p class="label" style="margin:6px 0 0">B1 courses</p><div class="all-s">${soonRows()}</div><p class="syncline"></p>`;
+  $("actions").innerHTML="";
+  document.querySelectorAll(".course[data-c]").forEach(b=>b.onclick=()=>{justDone=null;renderCourse(b.dataset.c)});
+  updateSync();
+}
+function renderVHome(){
+  screen="vhome"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  $("drill").innerHTML=vMenuHTML()+`<p class="syncline"></p>`; $("actions").innerHTML="";
+  vMenuBind(); updateSync();
+}
+function renderAll(){
+  screen="all"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  const st=wrStats(), tk=todayKey(), ids=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]), sd=Object.keys(ST.stories.best).filter(k=>ids.has(k)).length;
+  const tile=(id,cc,t,sub)=>`<button type="button" class="all-t" id="${id}" style="--cc:var(--${cc})"><b>${t}</b><span>${sub}</span></button>`;
+  const row=(id,cc,t,sub,g)=>`<button type="button" class="lm-r" id="${id}" style="--cc:var(--${cc})"><span class="d"></span><span class="t"><b>${t}</b><small>${sub}</small></span><span class="g">${g||"›"}</span></button>`;
+  const sec=(l,h)=>`<div><p class="label" style="margin:0 0 6px 2px">${l}</p><div class="all-s">${h}</div></div>`;
+  $("drill").innerHTML=`
+    <div><p class="label" style="margin:0 0 6px 2px">Practise</p><div class="all-grid">
+      ${tile("aWr","both","Word review",st.todo?`${st.due} due · ${st.nw} new`:"All done today ✓")}${tile("aVb","pres","Verb trainer","A1–B1 tenses")}${tile("aSt","io","Stories",`A2 · ${sd} of ${ids.size}`)}${tile("aDr","io","Endless drill",`best ${(ST.drill.best||0).toLocaleString()} pts`)}</div></div>
+    ${sec("Courses · A2",Object.keys(COURSES).map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${Object.keys(ST[c].done).length} / ${DAYS} days · Day ${nextDay(c)} ready`)).join(""))}
+    ${sec("Courses · B1",soonRows())}
+    ${sec("Words",row("aWl","both",`All ${WORDS.length.toLocaleString()} words`,"tick the ones you know")+row("aWk","both","Known list",`${st.known} known well`))}
+    ${sec("You",row("aLv","both","Level and XP",`Level ${xpInfo(xpTotal()).L} · ${xpInfo(xpTotal()).title}`)+row("aDy","io","Days practised",`${streak(homeHas)}-day streak`)+row("aSe","mix","Settings","sound, speed, sync")+row("aHe","mix","Help","how it works"))}
+    <p class="syncline"></p>`;
+  $("actions").innerHTML="";
+  $("aWr").onclick=renderWrSet; $("aVb").onclick=renderVHome; $("aSt").onclick=()=>renderStoryList(); $("aDr").onclick=renderDrillSetup;
+  Object.keys(COURSES).forEach(c=>$("ac-"+c).onclick=()=>{justDone=null;renderCourse(c)});
+  $("aWl").onclick=()=>{renderWrList()}; $("aWk").onclick=()=>{try{WR.list.f="known"}catch(e){} renderWrList()};
+  $("aLv").onclick=$("aDy").onclick=renderProg; $("aSe").onclick=()=>$("openSettings").click(); $("aHe").onclick=()=>$("openRules").click();
+  updateSync();
+}
+function renderProg(){
+  screen="prog"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  const wk=weekDays().map(dkey);
+  $("drill").innerHTML=`${xpHeroHTML()}${cefrHTML()}${xpWeekHTML()}
+    <div><p class="label" style="margin-bottom:8px">Days practised <span style="text-transform:none;letter-spacing:0;font-weight:500">· <i class="dot do" style="width:8px;height:8px"></i> pronouns <i class="dot pret" style="width:8px;height:8px"></i> past <i class="dot" style="width:8px;height:8px;background:var(--io)"></i> drill/stories</span></p>${weekHTML(homeRing)}</div>
+    <div class="stats two"><div class="stat"><b>${streak(homeHas)}</b><span>day streak</span></div><div class="stat"><b>${wk.filter(homeHas).length}<small style="font-size:.9rem;color:var(--muted)"> / 7</small></b><span>days this week</span></div></div>
+    <p class="syncline"></p>`;
+  $("actions").innerHTML=""; xpMenuBind(); updateSync();
+}
+// ---- bottom toolbar
+const TABS=[["home","Home",'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>'],["courses","Courses",'<path d="M4 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H4zM20 5h-4a3 3 0 0 0-3 3"/>'],["words","Words",'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'],["stories","Stories",'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/>'],["all","All",'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>']];
+const tabOf=()=>({menu:"home",ctab:"courses",wrset:"words",slist:"stories",all:"all"})[screen]||null;
+function tabDraw(cur){
+  const tb=$("tabbar"); if(!tb.dataset.on){tb.dataset.on=1;
+    tb.innerHTML=TABS.map(([k,l,i])=>`<button type="button" class="tab" data-tab="${k}"><span class="tp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${i}</svg></span><span>${l}</span></button>`).join("");
+    tb.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{justDone=null; haptic(8); const k=b.dataset.tab; ({home:renderMenu,courses:renderCoursesTab,words:renderWrSet,stories:()=>renderStoryList(),all:renderAll})[k]()})}
+  tb.querySelectorAll(".tab").forEach(b=>b.toggleAttribute("aria-current",b.dataset.tab===cur)); 
+  tb.querySelectorAll(".tab").forEach(b=>{if(b.dataset.tab===cur) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current")});
 }
 function renderCourse(c){
   screen="course"; course=c; $("fb").hidden=true; chrome();
@@ -4293,7 +4385,7 @@ function xpSeed(){
     n+=Object.values(ST.verbs.log||{}).reduce((a,b)=>a+(b||0),0)*3;
     ST.xp.seed=Math.max(ST.xp.seed,Math.round(n)); ST.xp.seeded=true; ST.xp.note=ST.xp.seed; commit("xp");
   }
-  if(screen==="menu") renderMenu();
+  if(screen==="menu") renderMenu(); else if(screen==="prog") renderProg();
 }
 // ---- CEFR: which level each part of the app sits at, and how much of each level you have done
 const CEFR=["A1","A2","B1"];
@@ -4302,13 +4394,13 @@ const VT_LV={pres:"A1",near:"A1",pret:"A2",imp:"A2",perf:"A2",fut:"B1",cond:"B1"
 const lvChip=(l,t)=>`<span class="lv"${t?` title="${t}"`:""}>${l}</span>`;
 function cefrCalc(){
   const lv={A1:[],A2:[],B1:[]};
-  Object.entries(COURSE_LV).forEach(([c,L])=>lv[L].push({n:COURSES[c].name,f:Object.keys(ST[c].done).length/DAYS,d:Object.keys(ST[c].done).length+" of "+DAYS+" days",w:30}));
+  Object.entries(COURSE_LV).forEach(([c,L])=>lv[L].push({n:COURSES[c].name,f:Object.keys(ST[c].done).length/DAYS,d:Object.keys(ST[c].done).length+" of "+DAYS+" days",w:30,go:"c:"+c,cc:COURSES[c].cc}));
   const ids=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]), sd=Object.keys(ST.stories.best).filter(k=>ids.has(k)).length;
-  lv.A2.push({n:"Stories",f:sd/ids.size,d:sd+" of "+ids.size,w:30});
+  lv.A2.push({n:"Stories",f:sd/ids.size,d:sd+" of "+ids.size+" done",w:30,go:"stories",cc:"io"});
   const top=VBX.slice(0,100);
   CEFR.forEach(L=>{const ts=VT.filter(t=>VT_LV[t.k]===L); if(!ts.length) return; let m=0,tot=0;
     ts.forEach(t=>top.forEach(v=>{if(!vOk(v,t.k)) return; tot++; const x=vM(t.k,v.inf); if(x&&x.b>=2) m++}));
-    lv[L].push({n:"Verb tenses: "+ts.map(t=>t.n).join(", "),f:tot?m/tot:0,d:m+" of "+tot+" top-100 verb forms",w:30})});
+    lv[L].push({n:"Verbs · "+ts.map(t=>t.n.toLowerCase()).join(", "),f:tot?m/tot:0,d:m+" of "+tot+" top-100 verb forms",w:30,go:"verbs",cc:"pres"})});
   return CEFR.map(L=>{const c=lv[L], W=c.reduce((a,x)=>a+x.w,0); return {L,p:W?c.reduce((a,x)=>a+x.w*x.f,0)/W:0,items:c}});
 }
 function xpHeroHTML(){const i=xpInfo(xpTotal()), s=streak(dayHas), f=i.frac*100;
@@ -4328,8 +4420,8 @@ function cefrHTML(){const R=cefrCalc(); let reached=0; for(const r of R){if(r.p>
       ${R.map(r=>`<p><b>${r.L}</b> · ${r.items.map(x=>`${esc(x.n)} (${x.d})`).join(" · ")}</p>`).join("")}
       <p>A level counts as reached at 70%. Each part of the app is tagged with the level it mostly practises. These tags are my estimate from typical A1–B1 syllabi, so treat this as a practice-based guide, not an exam result. B1 grammar courses and words are not in the app yet, so B1 only reflects the future and conditional verb tenses for now.</p></details></div>`}
 function xpMenuBind(){
-  if($("xpNote")) $("xpNote").onclick=()=>{delete ST.xp.note; saveLocal(); renderMenu()};
-  if($("xpWk")) $("xpWk").onclick=()=>{const o=[500,750,1000,1500]; ST.xp.wk=o[(o.indexOf(ST.xp.wk)+1)%o.length]||750; commit("xp"); renderMenu()};
+  if($("xpNote")) $("xpNote").onclick=()=>{delete ST.xp.note; saveLocal(); screen==="prog"?renderProg():renderMenu()};
+  if($("xpWk")) $("xpWk").onclick=()=>{const o=[500,750,1000,1500]; ST.xp.wk=o[(o.indexOf(ST.xp.wk)+1)%o.length]||750; commit("xp"); screen==="prog"?renderProg():renderMenu()};
 }
 
 // ================= practice timer: 20 active minutes a day =================
