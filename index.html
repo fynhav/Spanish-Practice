@@ -498,9 +498,16 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .wr-band .vbar{display:block;height:8px;border-radius:5px;background:var(--line);overflow:hidden;position:relative}.wr-band .vbar i{display:block;height:100%;background:var(--cc);position:absolute;left:0;top:0;margin:0!important}
 .wr-band .tc{text-align:right}
 .wr-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.wr-row{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.wr-row{display:grid;grid-template-columns:28px 40px 1fr auto;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
 .wr-row .rk{font-size:.74rem;color:var(--muted);text-align:right}.wr-row .tx b{display:block;font-size:1rem}.wr-row .tx small{color:var(--muted);font-size:.84rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wr-row .stt{font-size:.74rem;font-weight:700;border-radius:10px;padding:2px 8px;background:var(--mix-soft);color:var(--mix)}.wr-row .stt.due{background:var(--bad-soft);color:var(--bad)}.wr-row .stt.known{background:var(--ok-soft);color:var(--ok)}.wr-row .stt.new{background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+
+.wr-tk{width:40px;height:40px;margin:-6px 0;border:0;background:none;padding:0;display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wr-tk i{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:#fff;display:grid;place-items:center;transition:background .12s,border-color .12s}
+.wr-tk i::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px);opacity:0}
+.wr-tk[aria-checked=true] i{background:var(--ok);border-color:var(--ok)}.wr-tk[aria-checked=true] i::after{opacity:1}
+.wr-row.on{background:var(--ok-soft)}.wr-row .tx{min-width:0}
+.wr-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.wr-top .ven{margin:0;font-size:.82rem}.wr-top b{color:var(--ok)}
 
 .wr-cov{margin-top:0}.wr-pct{display:flex;align-items:center;gap:12px}.wr-pct b{font-family:var(--f-display);font-size:2.6rem;line-height:1;color:var(--cc)}.wr-pct span{font-size:.95rem;color:var(--ink);line-height:1.25}
 .wr-cb{display:block;height:10px;border-radius:6px;background:var(--line);overflow:hidden;position:relative;margin-top:10px}.wr-cb i{display:block;height:100%;background:var(--cc);position:absolute;left:0;top:0}
@@ -568,7 +575,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:09</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 16:30</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4126,24 +4133,50 @@ function renderWrSet(){
     <div><p class="label" style="margin-bottom:8px">Memory target <span style="text-transform:none;letter-spacing:0;font-weight:500">· higher = more reviews</span></p>${chip("wrRet",[[.85,"85%"],[.9,"90%"],[.95,"95%"]],s.ret)}</div>
     <div><p class="label" style="margin-bottom:8px">Progress <span style="text-transform:none;letter-spacing:0;font-weight:500">· known words by frequency</span></p><div class="wr-bands">${bands.join("")}</div></div>`;
   $("drill").style.cssText=""; $("drill").scrollTop=0;
-  $("actions").innerHTML=`<button type="button" class="ghost" id="wrBr">Browse</button><button type="button" class="grow" id="wrGo">${st.todo?`Study · ${Math.min(st.todo,wrMax)} cards`:"Nothing due"}</button>`;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="wrBr">Tick known words</button><button type="button" class="grow" id="wrGo">${st.todo?`Study · ${Math.min(st.todo,wrMax)} cards`:"Nothing due"}</button>`;
   $("wrBr").onclick=()=>renderWrList(); $("wrGo").onclick=()=>{ if(!st.todo){const t=todayKey(); ST.words.xtra[t]=(ST.words.xtra[t]||0)+5; saveLocal()} wrBuild(); WR.q.length?wrNext():renderWrSet() };
   const bind=(id,key,num)=>document.querySelectorAll("#"+id+" button").forEach(b=>b.onclick=()=>{s[key]=num?+b.dataset.v:b.dataset.v; saveLocal(); renderWrSet()});
   bind("wrNew","newPer",1); bind("wrMode","mode"); bind("wrRet","ret",1);
+}
+const WR_TICK_DAYS=180;
+// tick = "I know this well": push the next review about six months out. Untick undoes it.
+function wrSetKnown(i,on){
+  const c=ST.words.c[i], now=Date.now();
+  if(on){
+    ST.words.c[i]={d:c?Math.min(c.d,4):3,s:WR_TICK_DAYS,t:now,due:wrDayStart(WR_TICK_DAYS),st:2,ivl:WR_TICK_DAYS,r:c?c.r:0,l:c?c.l:0,man:1};
+  }else if(c){
+    if(c.man&&!c.r) delete ST.words.c[i];                       // ticked by hand and never reviewed: back to new
+    else if(c.man) ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1,man:0};
+    else ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1};   // learned the slow way: bring it back today
+  }
+  saveLocal();
 }
 function renderWrList(){
   screen="wrlist"; $("fb").hidden=true; chrome();
   const L=WR.list, now=Date.now(), end=wrEndToday();
   const st=i=>{const c=ST.words.c[i]; return !c?"new":c.due<end?"due":wrKnown(c)?"known":"learning"};
-  $("drill").innerHTML=`<input class="vsearch" id="wrSearch" type="search" placeholder="Search a word… (casa, house)" value="${esc(L.s)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-    <div class="vchips" id="wrFil">${[["all","All"],["due","Due"],["learning","Learning"],["known","Known"],["new","New"]].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${L.f===v}">${l}</button>`).join("")}</div><div class="wr-list" id="wrRows"></div>`;
+  const stTxt=i=>{const s=st(i), c=ST.words.c[i]; return s==="new"?"new":s==="due"?"due":(c?wrLbl({...c,ivl:Math.max(1,Math.round((c.due-now)/WR_DAY)),st:c.st===2?2:1},now):"")};
+  $("drill").innerHTML=`<p class="ven" style="margin:0">Tick the words you already know well. They count as known and won’t come back for about 6 months. Untick to undo.</p>
+    <input class="vsearch" id="wrSearch" type="search" placeholder="Search a word… (casa, house)" value="${esc(L.s)}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="margin-top:10px">
+    <div class="vchips" id="wrFil">${[["all","All"],["due","Due"],["learning","Learning"],["known","Known"],["new","Not known"]].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${L.f===v}">${l}</button>`).join("")}</div>
+    <div class="wr-top"><p class="ven" id="wrCnt"></p></div><div class="wr-list" id="wrRows"></div>`;
+  const cnt=()=>{const k=wrStats().known; $("wrCnt").innerHTML=`<b>${k}</b> of ${WORDS.length} known well · ${Math.round(wrCov().known)}% of everyday Spanish`};
+  const rowHTML=i=>{const w=WORDS[i-1], s=st(i), k=wrKnown(ST.words.c[i]);
+    return `<div class="wr-row${k?" on":""}" data-i="${i}"><span class="rk">${i}</span><button type="button" class="wr-tk" role="checkbox" aria-checked="${k}" aria-label="I know “${esc(w[0])}” well"><i></i></button><span class="tx"><b>${esc(w[0])}</b><small>${esc(w[2])}</small></span><span class="stt ${s}">${stTxt(i)}</span></div>`};
   const draw=()=>{const q=L.s.trim().toLowerCase(), rows=[];
-    for(let i=1;i<=WORDS.length;i++){const w=WORDS[i-1], s=st(i); if(L.f!=="all"&&s!==L.f) continue; if(q&&!(w[0].toLowerCase().includes(q)||w[2].toLowerCase().includes(q))) continue; rows.push(i)}
-    $("wrRows").innerHTML=rows.slice(0,L.lim).map(i=>{const w=WORDS[i-1], s=st(i), c=ST.words.c[i];
-      return `<div class="wr-row"><span class="rk">${i}</span><span class="tx"><b>${esc(w[0])}</b><small>${esc(w[2])}</small></span><span class="stt ${s}">${s==="new"?"new":s==="due"?"due":(c?wrLbl({...c,ivl:Math.max(1,Math.round((c.due-now)/WR_DAY)),st:c.st===2?2:1},now):"")}</span></div>`}).join("")||`<p class="sub">No words found.</p>`;
-    if(rows.length>L.lim){const b=document.createElement("button"); b.type="button"; b.className="ghost"; b.textContent=`Show more (${rows.length-L.lim})`; b.onclick=()=>{L.lim+=80; draw()}; $("wrRows").appendChild(b)}};
-  draw(); $("wrSearch").addEventListener("input",e=>{L.s=e.target.value; L.lim=60; draw()});
-  document.querySelectorAll("#wrFil button").forEach(b=>b.onclick=()=>{L.f=b.dataset.v; L.lim=60; renderWrList()});
+    for(let i=1;i<=WORDS.length;i++){const w=WORDS[i-1], s=st(i); if(L.f==="known"?s!=="known":L.f==="new"?wrKnown(ST.words.c[i]):(L.f!=="all"&&s!==L.f)) continue; if(q&&!(w[0].toLowerCase().includes(q)||w[2].toLowerCase().includes(q))) continue; rows.push(i)}
+    $("wrRows").innerHTML=rows.slice(0,L.lim).map(rowHTML).join("")||`<p class="sub">No words found.</p>`;
+    if(rows.length>L.lim){const b=document.createElement("button"); b.type="button"; b.className="ghost"; b.textContent=`Show more (${rows.length-L.lim})`; b.onclick=()=>{L.lim+=300; draw()}; $("wrRows").appendChild(b)}
+    cnt()};
+  // tapping a tick updates that row in place, so the list keeps its scroll position and filter
+  $("wrRows").addEventListener("click",e=>{const t=e.target.closest(".wr-tk"); if(!t) return;
+    const row=t.closest(".wr-row"), i=+row.dataset.i, on=t.getAttribute("aria-checked")!=="true";
+    wrSetKnown(i,on); const k=wrKnown(ST.words.c[i]);
+    t.setAttribute("aria-checked",k); row.classList.toggle("on",k);
+    const sp=row.querySelector(".stt"); sp.className="stt "+st(i); sp.textContent=stTxt(i); cnt(); try{haptic(8)}catch(_){}});
+  L.lim=Math.max(L.lim,120);
+  draw(); $("wrSearch").addEventListener("input",e=>{L.s=e.target.value; L.lim=120; draw()});
+  document.querySelectorAll("#wrFil button").forEach(b=>b.onclick=()=>{L.f=b.dataset.v; L.lim=120; renderWrList()});
   $("actions").innerHTML=""; $("drill").scrollTop=0;
 }
 function wrMenuHTML(){
