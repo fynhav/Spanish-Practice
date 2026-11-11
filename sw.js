@@ -1,4 +1,4 @@
-const CACHE="practica-v61", AUDIO="practica-audio";
+const CACHE="practica-v62", AUDIO="practica-audio";
 const CORE=["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE&&k!==AUDIO).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
