@@ -643,7 +643,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-11 · 00:53</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-11 · 01:00</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2506,7 +2506,7 @@ function chrome(){
   $("accents").hidden=true;
   const tb=tabOf(); $("tabbar").hidden=!tb; if(tb) tabDraw(tb);
   $("backBtn").hidden=!!tb||!(screen==="vhome"||screen==="prog"||screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm"&&screen!=="wr")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq"||screen==="vm"||screen==="wr");
-  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":screen==="course"?"‹ Courses":screen==="wrlist"?"‹ Words":(screen==="vhome"||screen==="prog"||isDrill()||(isV()&&!/^wr/.test(screen)))?"‹ All":"‹ Home";
+  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":screen==="wrlist"?"‹ Words":"‹ "+rootName;
   $("title").textContent=screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
   $("progress").hidden=!(inS||screen==="vq"||screen==="vm"||screen==="wr"); $("openRules").hidden=$("openSettings").hidden=screen==="vq"||screen==="vm"||screen==="wr";
   $("score").textContent=screen==="wr"?`${WR.fin} / ${WR.total}`:screen==="vq"||screen==="vm"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
@@ -2519,7 +2519,7 @@ function chrome(){
   }
   setCourseColour(course);
 }
-$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else if(screen==="course") renderCoursesTab(); else if(screen==="vhome"||screen==="prog"||isDrill()||(isV()&&!/^wr/.test(screen))) renderAll(); else renderMenu()};
+$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
 $("quit").onclick=()=>{if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
 function vTitle(){return screen==="wrset"||screen==="wr"?"Word review":screen==="wrsum"?"Session done":screen==="wrlist"?WORDS.length+" words":screen==="vmset"||screen==="vm"?"Verb meanings":screen==="vmsum"?"Round done":screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
 // swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
@@ -2590,7 +2590,7 @@ function wordsDashHTML(){
     <div style="font-size:.85rem;margin-top:8px"><b>${st.due} due</b> · ${st.nw} new today</div></button>`;
 }
 function renderMenu(){
-  screen="menu"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  screen="menu"; setRoot(renderMenu,"Home"); course=null; drillOn=false; $("fb").hidden=true; chrome();
   $("drill").innerHTML=`
     ${xpHeroHTML()}
     ${xpQuestsHTML()}
@@ -2604,7 +2604,7 @@ function renderMenu(){
   updateSync();
 }
 function renderCoursesTab(){
-  screen="ctab"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  screen="ctab"; setRoot(renderCoursesTab,"Courses"); course=null; drillOn=false; $("fb").hidden=true; chrome();
   $("drill").innerHTML=`<p class="label" style="margin:0">A2 courses</p>${courseCardsHTML()}
     <p class="label" style="margin:6px 0 0">B1 courses</p><div class="all-s">${soonRows()}</div><p class="syncline"></p>`;
   $("actions").innerHTML="";
@@ -2617,7 +2617,7 @@ function renderVHome(){
   vMenuBind(); updateSync();
 }
 function renderAll(){
-  screen="all"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  screen="all"; setRoot(renderAll,"All"); course=null; drillOn=false; $("fb").hidden=true; chrome();
   const st=wrStats(), tk=todayKey(), ids=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]), sd=Object.keys(ST.stories.best).filter(k=>ids.has(k)).length;
   const tile=(id,cc,t,sub)=>`<button type="button" class="all-t" id="${id}" style="--cc:var(--${cc})"><b>${t}</b><span>${sub}</span></button>`;
   const row=(id,cc,t,sub,g)=>`<button type="button" class="lm-r" id="${id}" style="--cc:var(--${cc})"><span class="d"></span><span class="t"><b>${t}</b><small>${sub}</small></span><span class="g">${g||"›"}</span></button>`;
@@ -2648,6 +2648,8 @@ function renderProg(){
 }
 // ---- bottom toolbar
 const TABS=[["home","Home",'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>'],["courses","Courses",'<path d="M4 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H4zM20 5h-4a3 3 0 0 0-3 3"/>'],["words","Words",'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'],["stories","Stories",'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/>'],["all","All",'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>']];
+let rootRet=()=>renderMenu(), rootName="Home";
+const setRoot=(f,n)=>{rootRet=f; rootName=n};
 const tabOf=()=>({menu:"home",ctab:"courses",wrset:"words",slist:"stories",all:"all"})[screen]||null;
 function tabDraw(cur){
   const tb=$("tabbar"); if(!tb.dataset.on){tb.dataset.on=1;
@@ -3158,7 +3160,7 @@ function transHTML(id){const t=EN_STORY[id];return t?`<details class="trans"><su
 function openTrans(){const d=document.querySelector("#drill .trans");if(d)d.open=true}
 function renderStoryList(kind){
   if(kind) storyKind=kind;
-  screen="slist"; course=null; drillOn=false; $("fb").hidden=true; chrome();
+  screen="slist"; setRoot(()=>renderStoryList(),"Stories"); course=null; drillOn=false; $("fb").hidden=true; chrome();
   const list=storyKind==="easy"?TAP_STORIES:STORIES.filter(x=>x.kind===storyKind);
   const intro={easy:"Tap mode: short everyday stories. Read one sentence at a time and tap pretérito or imperfecto.",past:"Type mode: type every verb into the story.",pron:"Type the object pronouns into the story."}[storyKind];
   $("drill").innerHTML=`
@@ -4071,8 +4073,8 @@ function renderVSum(){
   </div>`;
   const nw=V.wrong.length;
   $("actions").innerHTML=nw?`<button type="button" class="ghost" id="vAgain">New round</button><button type="button" class="grow" id="vFix">Fix ${nw===1?"it":nw+" mistakes"}</button>`
-    :`<button type="button" class="ghost" id="vMenuB">Menu</button><button type="button" class="grow" id="vAgain">Another round</button>`;
-  if($("vMenuB")) $("vMenuB").onclick=()=>renderMenu(); $("vAgain").onclick=()=>vStartRound(); if(nw) $("vFix").onclick=()=>vRetry();
+    :`<button type="button" class="ghost" id="vMenuB">${rootName}</button><button type="button" class="grow" id="vAgain">Another round</button>`;
+  if($("vMenuB")) $("vMenuB").onclick=()=>rootRet(); $("vAgain").onclick=()=>vStartRound(); if(nw) $("vFix").onclick=()=>vRetry();
   $("drill").scrollTop=0;
 }
 
@@ -4161,8 +4163,8 @@ function renderVmSum(){
       <p class="sub" style="margin-top:4px">${vmKnown()} of ${VB.length} meanings known</p></div>
     ${nw?`<div><p class="label" style="margin-bottom:8px">${V.retry?"Still to remember":"To remember"}</p><div class="vmist">${V.wrong.map(({v})=>`<div><span class="e">${v.ic}</span><span><b>${esc(v.inf)}</b><small>${esc(vGloss(v))}</small></span></div>`).join("")}</div></div>`:""}</div>`;
   $("actions").innerHTML=nw?`<button type="button" class="ghost" id="vAgain">New round</button><button type="button" class="grow" id="vFix">Fix ${nw===1?"it":nw+" mistakes"}</button>`
-    :`<button type="button" class="ghost" id="vMenuB">Menu</button><button type="button" class="grow" id="vAgain">Another round</button>`;
-  if($("vMenuB")) $("vMenuB").onclick=()=>renderMenu(); $("vAgain").onclick=()=>vmStart(); if(nw) $("vFix").onclick=()=>vmRetry();
+    :`<button type="button" class="ghost" id="vMenuB">${rootName}</button><button type="button" class="grow" id="vAgain">Another round</button>`;
+  if($("vMenuB")) $("vMenuB").onclick=()=>rootRet(); $("vAgain").onclick=()=>vmStart(); if(nw) $("vFix").onclick=()=>vmRetry();
   $("drill").scrollTop=0;
 }
 // ---------- browse ----------
@@ -4368,15 +4370,15 @@ function renderWrSum(){
     ${WR.rev?`<p class="sub" style="margin-top:4px">${good}% remembered first time</p>`:""}</div>
     <div class="vcard"><p class="ven" style="margin:0">${st.known} known well (${Math.round(wrCov().known)}% of everyday Spanish) · ${st.start} started · ${WORDS.length-st.start} still to meet</p>
     <p class="ven" style="margin:6px 0 0">${more?`${st.due?st.due+" due":""}${st.due&&st.nw?" · ":""}${st.nw?st.nw+" new today":""} still to do.`:`All done for today. ${nxt?"Next reviews: "+(nxt<wrDayStart(2)?"tomorrow":"in "+Math.round((nxt-Date.now())/WR_DAY)+" days")+".":""}`}</p></div></div>`;
-  $("actions").innerHTML=more?`<button type="button" class="ghost" id="wrMenu">Menu</button><button type="button" class="grow" id="wrMore">Keep going</button>`
-    :`<button type="button" class="ghost" id="wrMenu">Menu</button><button type="button" class="grow" id="wrMore">Learn 5 more new</button>`;
-  $("wrMenu").onclick=()=>renderMenu();
+  $("actions").innerHTML=more?`<button type="button" class="ghost" id="wrMenu">${rootName}</button><button type="button" class="grow" id="wrMore">Keep going</button>`
+    :`<button type="button" class="ghost" id="wrMenu">${rootName}</button><button type="button" class="grow" id="wrMore">Learn 5 more new</button>`;
+  $("wrMenu").onclick=()=>rootRet();
   $("wrMore").onclick=()=>{if(!more){const t=todayKey(); ST.words.xtra[t]=(ST.words.xtra[t]||0)+5; saveLocal()} wrBuild(); WR.q.length?wrNext():renderWrSet()};
   $("drill").scrollTop=0;
 }
 function wrBand(a){const b=WORDS.length;let n=0,k=0,s=0;for(let i=a;i<a+100&&i<=b;i++){n++;const c=ST.words.c[i]; if(c){s++; if(wrKnown(c)) k++}}return{n,s,k}}
 function renderWrSet(){
-  screen="wrset"; V.tense="mix"; $("fb").hidden=true; chrome(); setCourseColour(course);
+  screen="wrset"; setRoot(renderWrSet,"Words"); V.tense="mix"; $("fb").hidden=true; chrome(); setCourseColour(course);
   const st=wrStats(), cv=wrCov(), s=ST.words.set, T=WORDS.length, chip=(id,opts,cur)=>`<div class="vchips" id="${id}">${opts.map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${String(cur)===String(v)}">${l}</button>`).join("")}</div>`;
   const bands=[];for(let a=1;a<=T;a+=100){const b=wrBand(a); bands.push(`<div class="wr-band"><span>${a}–${Math.min(T,a+99)}</span><span class="vbar"><i style="width:${b.s/b.n*100}%;opacity:.45"></i><i style="width:${b.k/b.n*100}%;margin-top:-100%"></i></span><span class="tc">${b.k} / ${b.n}</span></div>`)}
   $("drill").innerHTML=`<div class="vcard"><div class="vbig"><span class="e">🧠</span><div><h2>Word review</h2><p>The ${T} most common Spanish words. Each one comes back just before you would forget it.</p></div></div>
