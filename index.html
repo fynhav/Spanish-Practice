@@ -651,7 +651,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-11 · 01:11</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-11 · 01:35</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2605,12 +2605,12 @@ const soonRows=()=>B1_SOON.filter(n=>!Object.values(COURSES).some(C=>C.name===n)
 function lmHTML(){
   const R=cefrCalc(); let cur=R.findIndex(r=>r.p<.7); if(cur<0) cur=R.length-1;
   return R.map((r,i)=>{const st=r.p>=.7?"done":i===cur?"cur":"next", pc=Math.round(r.p*100);
-    const rows=r.items.map(x=>`<button type="button" class="lm-r" data-go="${x.go}" style="--cc:var(--${x.cc})"><span class="d"></span><span class="t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small></span><span class="g">${x.go.startsWith("c:")?`Day ${nextDay(x.go.slice(2))} ›`:x.go==="stories"?"Next ›":"Practise ›"}</span></button>`).join("");
-    return `<div class="lm ${st}"><div class="lm-h"><span class="lm-l">${r.L}</span><div>${st==="done"?"Complete":st==="cur"?`In progress · ${pc}%`:`Next · ${pc}%`}${st==="cur"?`<span class="lm-bar"><i style="width:${pc}%"></i></span>`:""}</div>${st==="done"?'<span class="ck" aria-hidden="true">✓</span>':""}</div><div class="lm-b">${rows}${r.L==="B1"?soonRows():""}</div></div>`}).join("");
+    const rows=r.items.map(x=>`<button type="button" class="lm-r" data-go="${x.go}" style="--cc:var(--${x.cc})"><span class="d"></span><span class="t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small></span><span class="g">${x.go.startsWith("c:")?`Day ${nextDay(x.go.slice(2))} ›`:x.go==="stories"?"Next ›":x.go==="words"?"Review ›":"Practise ›"}</span></button>`).join("");
+    return `<div class="lm ${st}"><div class="lm-h"><span class="lm-l">${r.L}</span><div>${st==="done"?"Complete":st==="cur"?`In progress · ${pc}%`:`Next · ${pc}%`}<span class="lm-bar"><i style="width:${pc}%"></i></span></div>${st==="done"?'<span class="ck" aria-hidden="true">✓</span>':""}</div><div class="lm-b">${rows}${r.L==="B1"?soonRows():""}</div></div>`}).join("");
 }
 function lmBind(){
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const g=b.dataset.go; justDone=null;
-    if(g.startsWith("c:")) renderCourse(g.slice(2)); else if(g==="stories") renderStoryList(); else renderVHome()});
+    if(g.startsWith("c:")) renderCourse(g.slice(2)); else if(g==="stories") renderStoryList(); else if(g==="words") renderWrSet(); else renderVHome()});
 }
 function wordsDashHTML(){
   const st=wrStats(), k=st.known, f=Math.min(100,k/3000*100);
@@ -4560,6 +4560,8 @@ function cefrCalc(){
   CEFR.forEach(L=>{const ts=VT.filter(t=>VT_LV[t.k]===L); if(!ts.length) return; let m=0,tot=0;
     ts.forEach(t=>top.forEach(v=>{if(!vOk(v,t.k)) return; tot++; const x=vM(t.k,v.inf); if(x&&x.b>=2) m++}));
     lv[L].push({n:"Verbs · "+ts.map(t=>t.n.toLowerCase()).join(", "),f:tot?m/tot:0,d:m+" of "+tot+" top-100 verb forms",w:30,go:"verbs",cc:"pres"})});
+  const kn=wrStats().known, CAP={A1:750,A2:1500,B1:3000};
+  CEFR.forEach(L=>lv[L].push({n:"Words known well",f:Math.min(1,kn/CAP[L]),d:kn.toLocaleString()+" of "+CAP[L].toLocaleString(),w:30,go:"words",cc:"both"}));
   return CEFR.map(L=>{const c=lv[L], W=c.reduce((a,x)=>a+x.w,0); return {L,p:W?c.reduce((a,x)=>a+x.w*x.f,0)/W:0,items:c}});
 }
 function xpHeroHTML(){const i=xpInfo(xpTotal()), s=streak(dayHas), f=i.frac*100;
@@ -4574,7 +4576,7 @@ function cefrHTML(){const R=cefrCalc(); let reached=0; for(const r of R){if(r.p>
   const kw=wrStats().known;
   return `<div class="xp-card"><div class="xp-h"><p class="label">Where you are · CEFR</p><span class="xp-c">${head}</span></div>
     ${R.map(r=>`<div class="cf-row"><b>${r.L}</b><span class="xp-bar"><i style="--from:${r.p*100}%;--to:${r.p*100}%"></i></span><span class="cf-p">${Math.round(r.p*100)}%</span></div>`).join("")}
-    <p class="xp-fine">Words known well: <b>${kw}</b>. Rough guide: A1 ≈ 750 · A2 ≈ 1,500 · B1 ≈ 3,000 words.</p>
+    <p class="xp-fine">Each level has its own score, and known words count toward it: A1 ≈ 750 · A2 ≈ 1,500 · B1 ≈ 3,000 words (you know <b>${kw.toLocaleString()}</b>).</p>
     <details class="cf-d"><summary>How this is worked out</summary>
       ${R.map(r=>`<p><b>${r.L}</b> · ${r.items.map(x=>`${esc(x.n)} (${x.d})`).join(" · ")}</p>`).join("")}
       <p>A level counts as reached at 70%. Each part of the app is tagged with the level it mostly practises. These tags are my estimate from typical A1–B1 syllabi, so treat this as a practice-based guide, not an exam result. B1 is still being built: so far it reflects the Subjunctive course and the future and conditional verb tenses.</p></details></div>`}
