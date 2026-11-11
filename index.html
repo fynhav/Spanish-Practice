@@ -641,8 +641,9 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub" id="voiceNote">Spanish is read with the best voice this device allows. (iPhone keeps its Premium voices for itself, so apps like this one only get the basic ones.)</span></div>
       <div class="setting"><span class="label">Spanish keyboard</span>
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
+      <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-10 · 23:56</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-11 · 00:53</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2080,7 +2081,7 @@ function openOv(which){
   $("ovTitle").textContent=which==="rules"?"Rules":"Settings";
   $("rulesPart").hidden=which!=="rules"; $("settingsPart").hidden=which==="rules";
   $("rulesPron").hidden=course==="past"; $("rulesPast").hidden=course==="pron";
-  $("ov").hidden=false; $("ov").querySelector(".panel").scrollTop=0; $("closeOv").focus();
+  $("ov").hidden=false; if(which!=="rules"&&typeof railUI==="function") railUI(); $("ov").querySelector(".panel").scrollTop=0; $("closeOv").focus();
 }
 $("openRules").onclick=()=>openOv("rules");
 $("openSettings").onclick=()=>openOv("settings");
@@ -2269,7 +2270,7 @@ ST.drill=ST.drill||{best:0,bestStreak:0,log:{}};
 ST.stories=ST.stories||{best:{},log:{}}; ST.storyDraft=ST.storyDraft||{};
 const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const todayKey=()=>dkey(new Date());
-function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(ST))}catch(e){}}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(ST))}catch(e){} try{railSoon()}catch(e){}}
 function markDirty(k){if(!ST.dirty.includes(k))ST.dirty.push(k)}
 function commit(...keys){keys.forEach(markDirty); saveLocal(); updateSync(); push()}
 try{ // bring over the calendar from the first version of this page
@@ -2284,9 +2285,39 @@ function docData(k){
   if(k==="drill") return {...ST.drill,updatedAt:Date.now()};
   if(k==="stories") return {...ST.stories,updatedAt:Date.now()};
   if(k==="xp") return {seed:ST.xp.seed,seeded:!!ST.xp.seeded,log:ST.xp.log,q:ST.xp.q,updatedAt:Date.now()};
+  if(k==="words") return {c:ST.words.c,gone:ST.words.gone,log:ST.words.log,nlog:ST.words.nlog,xtra:ST.words.xtra,updatedAt:Date.now()};
+  if(k==="verbs") return {m:ST.verbs.m,log:ST.verbs.log,updatedAt:Date.now()};
+  if(k==="time") return {log:ST.time.log,shown:ST.time.shown,updatedAt:Date.now()};
   const [t,c]=k.split("-");
   if(t==="prog") return {done:ST[c].done,log:ST[c].log,updatedAt:Date.now()};
   return ST.sess[c]||{cleared:true,updatedAt:0};
+}
+// merge a document from any backend into the local state (only ever moves progress forward)
+const cardStamp=c=>Math.max(c.t||0,c.u||0);
+function mergeDoc(id,v){
+  if(!v||typeof v!=="object") return;
+  const mx=(T,S)=>{for(const [k2,x] of Object.entries(S||{})) T[k2]=Math.max(T[k2]||0,x||0)};
+  if(id.startsWith("prog-")){const c=id.slice(5); if(ST[c]) mergeCourse(ST[c],v)}
+  else if(id.startsWith("session-")){const c=id.slice(8); if(c in ST.sess&&(!ST.sess[c]||(v.updatedAt||0)>(ST.sess[c].updatedAt||0))) ST.sess[c]=v}
+  else if(id==="stories"){mx(ST.stories.best,v.best); mx(ST.stories.log,v.log)}
+  else if(id==="xp"){xpMerge(v)}
+  else if(id==="drill"){const D=ST.drill; D.best=Math.max(D.best||0,v.best||0); D.bestStreak=Math.max(D.bestStreak||0,v.bestStreak||0); mx(D.log,v.log)}
+  else if(id==="words"&&ST.words){const W=ST.words; for(const [k2,x] of Object.entries(v.c||{})){const l=W.c[k2]; if(!l||cardStamp(x)>cardStamp(l)) W.c[k2]=x} mx(W.log,v.log); mx(W.nlog,v.nlog); mx(W.xtra,v.xtra); mx(W.gone,v.gone); for(const [k2,g] of Object.entries(W.gone)){const l=W.c[k2]; if(l&&cardStamp(l)<=g) delete W.c[k2]}}
+  else if(id==="verbs"&&ST.verbs){const V2=ST.verbs; for(const [tk,mm] of Object.entries(v.m||{})){const T=V2.m[tk]=V2.m[tk]||{}; for(const [inf,x] of Object.entries(mm||{})){const l=T[inf]; if(!l||(x.t||0)>(l.t||0)) T[inf]=x}} mx(V2.log,v.log)}
+  else if(id==="time"&&ST.time){mx(ST.time.log,v.log); for(const k2 of Object.keys(v.shown||{})) ST.time.shown[k2]=true}
+  else if(id.startsWith("day-")&&v.date){ST.pron.log[v.date]=Math.max(ST.pron.log[v.date]||0,v.best||0)}
+}
+// restoring replaces local progress with the server copy instead of merging
+function replaceDoc(id,v){
+  if(!v||typeof v!=="object") return;
+  if(id.startsWith("prog-")){const c=id.slice(5); if(ST[c]){ST[c].done=v.done||{}; ST[c].log=v.log||{}}}
+  else if(id.startsWith("session-")){const c=id.slice(8); if(c in ST.sess) ST.sess[c]=v}
+  else if(id==="stories"){ST.stories.best=v.best||{}; ST.stories.log=v.log||{}}
+  else if(id==="xp"){ST.xp.seed=v.seed||0; ST.xp.seeded=!!v.seeded; ST.xp.log=v.log||{}; ST.xp.q=v.q||{}}
+  else if(id==="drill"){ST.drill.best=v.best||0; ST.drill.bestStreak=v.bestStreak||0; ST.drill.log=v.log||{}}
+  else if(id==="words"){ST.words.c=v.c||{}; ST.words.gone=v.gone||{}; ST.words.log=v.log||{}; ST.words.nlog=v.nlog||{}; ST.words.xtra=v.xtra||{}}
+  else if(id==="verbs"){ST.verbs.m=v.m||{}; ST.verbs.log=v.log||{}}
+  else if(id==="time"){ST.time.log=v.log||{}; ST.time.shown=v.shown||{}}
 }
 let dbCol=null, syncing=false, dbState="connecting";
 const timeout=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(new Error("timeout")),ms))]);
@@ -2299,15 +2330,7 @@ async function initDb(){
     const id=await user.id(); if(!id){dbState="none";updateSync();return}
     const col=db.collection("data/users/"+id);
     const snap=await timeout(col.get(),12000);
-    snap.docs.forEach(d=>{
-      const v=d.data(); if(!v) return;
-      if(d.id.startsWith("prog-")){const c=d.id.slice(5); if(ST[c]) mergeCourse(ST[c],v)}
-      else if(d.id.startsWith("session-")){const c=d.id.slice(8); if(c in ST.sess&&(!ST.sess[c]||(v.updatedAt||0)>(ST.sess[c].updatedAt||0))) ST.sess[c]=v}
-      else if(d.id==="stories"){const T=ST.stories; for(const [k2,x] of Object.entries(v.best||{})) T.best[k2]=Math.max(T.best[k2]||0,x||0); for(const [k2,x] of Object.entries(v.log||{})) T.log[k2]=Math.max(T.log[k2]||0,x||0)}
-      else if(d.id==="xp"){xpMerge(v)}
-      else if(d.id==="drill"){const D=ST.drill; D.best=Math.max(D.best||0,v.best||0); D.bestStreak=Math.max(D.bestStreak||0,v.bestStreak||0); for(const [k2,x] of Object.entries(v.log||{})) D.log[k2]=Math.max(D.log[k2]||0,x||0)}
-      else if(d.id.startsWith("day-")&&v.date){ST.pron.log[v.date]=Math.max(ST.pron.log[v.date]||0,v.best||0)}
-    });
+    snap.docs.forEach(d=>{const v=d.data(); if(v) mergeDoc(d.id,v)});
     dbCol=col; dbState="ok";
     ["prog-pron","prog-past","session-pron","session-past","drill","stories","xp"].forEach(markDirty); saveLocal();
     if(screen==="menu") renderMenu(); else if(screen==="ctab") renderCoursesTab(); else if(screen==="all") renderAll(); else if(screen==="prog") renderProg(); else if(screen==="course") renderCourse(course); else if(screen==="dsetup") renderDrillSetup(); else if(screen==="slist") renderStoryList();
@@ -2331,12 +2354,110 @@ async function push(){
 }
 function updateSync(){
   let txt,col="var(--ok)";
+  if(RL.code){
+    if(rState==='badcode'){txt='Saved on this device · cloud code not accepted';col='var(--bad)'}
+    else if(rState==='ok'&&!railPending()) txt='Backed up to the cloud';
+    else if(rState==='syncing'||rState==='connecting'){txt='Saved on this device · saving to the cloud…';col='var(--io)'}
+    else {txt='Saved on this device · cloud backup waiting';col='var(--io)'}
+    document.querySelectorAll('.syncline').forEach(el=>{el.textContent=txt;el.style.setProperty('--sd',col)}); if($('railBox')&&!$('ov').hidden) railUI(); return;
+  }
   if(dbCol&&!ST.dirty.length){txt="Saved to your account"}
   else if(dbCol&&syncing){txt="Saved on this device · syncing…";col="var(--io)"}
   else if(dbCol||dbState==="offline"){txt="Saved on this device · syncs when you’re back online";col="var(--io)"}
   else if(dbState==="connecting"){txt="Saved on this device · connecting to your account…";col="var(--io)"}
   else txt="Saved on this device";
   document.querySelectorAll(".syncline").forEach(el=>{el.textContent=txt;el.style.setProperty("--sd",col)});
+}
+// ================= cloud copy on Railway (optional; one pairing code per person) =================
+const RAIL_URL="https://practica-sync-production.up.railway.app", RK="pd-rail";
+const RDOCS=["prog-pron","prog-past","session-pron","session-past","drill","stories","xp","words","verbs","time"];
+let RL={code:"",revs:{},hash:{},pulled:0}; try{Object.assign(RL,JSON.parse(localStorage.getItem(RK)||"{}"))}catch(e){}
+const rSave=()=>{try{localStorage.setItem(RK,JSON.stringify(RL))}catch(e){}};
+let rState=RL.code?"connecting":"off", rBusy=false, rTimer=0, rAgain=false;
+const rHash=t=>cyrb53(t.replace(/"updatedAt":\d+,?/g,"")).toString(36);
+function railSoon(){if(!RL.code) return; clearTimeout(rTimer); rTimer=setTimeout(()=>rsync(),2500)}
+async function rfetch(path,opt){
+  const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),15000);
+  try{const r=await fetch(RAIL_URL+path,{...opt,signal:ctl.signal,headers:{"authorization":"Bearer "+RL.code,"content-type":"application/json"}}); return r}
+  finally{clearTimeout(t)}
+}
+function railRefresh(){
+  if(screen==="menu") renderMenu(); else if(screen==="ctab") renderCoursesTab(); else if(screen==="all") renderAll(); else if(screen==="prog") renderProg(); else if(screen==="wrset") renderWrSet(); else if(screen==="slist") renderStoryList();
+}
+async function rsync(full){
+  if(!RL.code) return; if(rBusy){rAgain=true; return}
+  rBusy=true; rState="syncing"; updateSync();
+  try{
+    if(full||!RL.pulled){
+      const r=await rfetch("/sync"); if(r.status===401){rState="badcode"; throw new Error("code")} if(!r.ok) throw new Error("http "+r.status);
+      const j=await r.json(); for(const [id,o] of Object.entries(j.docs||{})){mergeDoc(id,o.data); RL.revs[id]=o.rev}
+      RL.pulled=1; RL.hash={}; saveLocalNoRail(); railRefresh();
+    }
+    for(const k of RDOCS){
+      for(let tries=0;tries<3;tries++){
+        const data=JSON.parse(JSON.stringify(docData(k))), h=rHash(JSON.stringify(data));
+        if(RL.hash[k]===h) break;
+        const r=await rfetch("/sync/"+encodeURIComponent(k),{method:"PUT",body:JSON.stringify({rev:RL.revs[k]||0,data})});
+        if(r.status===409){const c=await r.json(); RL.revs[k]=c.rev; if(c.data){mergeDoc(k,c.data); saveLocalNoRail()} continue}
+        if(!r.ok) throw new Error("http "+r.status);
+        const j=await r.json(); RL.revs[k]=j.rev; RL.hash[k]=h; break;
+      }
+    }
+    rState="ok"; RL.last=Date.now();
+  }catch(e){if(rState!=="badcode") rState="offline"}
+  rBusy=false; rSave(); updateSync();
+  if(rAgain){rAgain=false; railSoon()}
+}
+function saveLocalNoRail(){try{localStorage.setItem(LS,JSON.stringify(ST))}catch(e){}}
+function railPending(){return RDOCS.some(k=>RL.hash[k]!==rHash(JSON.stringify(docData(k))))}
+async function railConnect(code){
+  code=String(code||"").trim().toLowerCase(); if(!/^[a-z0-9-]{2,24}\.[0-9a-f]{24}$/.test(code)) return "That code doesn’t look right. It should look like name.abc123…";
+  const old=RL; RL={code,revs:{},hash:{},pulled:0}; rState="connecting"; rBusy=false;
+  const r=await rfetch("/sync").catch(()=>null);
+  if(!r){RL=old; rState=RL.code?"offline":"off"; return "Couldn’t reach the server. Check your connection and try again."}
+  if(r.status===401){RL=old; rState=RL.code?"ok":"off"; return "That code was not accepted."}
+  rSave(); await rsync(true); return rState==="ok"?"":"Connected, but the first sync didn’t finish. It will retry.";
+}
+function railDisconnect(){RL={code:"",revs:{},hash:{},pulled:0}; rState="off"; rSave(); updateSync()}
+async function railBackup(){
+  const r=await rfetch("/backup"); if(!r.ok) throw new Error("backup"); const t=await r.text();
+  const blob=new Blob([t],{type:"application/json"}), a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="practica-backup-"+todayKey()+".json"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove()},4000);
+}
+async function railRestore(body){
+  const r=await rfetch("/restore",{method:"POST",body:JSON.stringify(body)}); if(!r.ok) throw new Error("restore");
+  const j=await rfetch("/sync").then(x=>x.json()); for(const [id,o] of Object.entries(j.docs||{})){replaceDoc(id,o.data); RL.revs[id]=o.rev}
+  RL.hash={}; for(const k of RDOCS) RL.hash[k]=rHash(JSON.stringify(docData(k)));
+  saveLocalNoRail(); rSave(); railRefresh();
+}
+window.addEventListener("online",()=>{if(RL.code) rsync()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(RL.code&&railPending()) rsync()} else if(RL.code) rsync()});
+setInterval(()=>{if(RL.code) rsync()},60000);
+if(RL.code) setTimeout(()=>rsync(true),400);
+function railUI(){
+  const box=$("railBox"); if(!box) return;
+  const on=!!RL.code, who=on?RL.code.split(".")[0]:"";
+  const st=on?({ok:"Backed up to the cloud"+(RL.last?" · "+new Date(RL.last).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):""),syncing:"Saving…",connecting:"Connecting…",offline:"Couldn’t reach the cloud. Your progress is safe on this device and will sync later.",badcode:"The saved code is no longer accepted."})[rState]||"":"";
+  box.innerHTML=on?`<span class="sub"><b>Connected as ${esc(who)}.</b> ${st}</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="ghost" id="rNow" style="min-height:40px">Sync now</button><button type="button" class="ghost" id="rBk" style="min-height:40px">Download backup</button><button type="button" class="ghost" id="rRs" style="min-height:40px">Restore…</button><button type="button" class="ghost" id="rOff" style="min-height:40px">Disconnect</button></div>
+      <div id="rRsBox" hidden style="display:flex;flex-direction:column;gap:8px"></div>`
+    :`<span class="sub">Keep a copy of your progress in the cloud so it survives losing or resetting your phone. Paste the code you were given.</span>
+      <div style="display:flex;gap:8px"><input id="rCode" class="vsel" type="text" inputmode="text" autocapitalize="none" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="name.code" style="flex:1"><button type="button" class="ghost" id="rGo" style="min-height:44px;flex:none">Connect</button></div>`;
+  const msg=t=>{let m=$("rMsg"); if(!m){m=document.createElement("span"); m.id="rMsg"; m.className="sub"; box.appendChild(m)} m.textContent=t};
+  if(on){
+    $("rNow").onclick=async()=>{msg("Syncing…"); await rsync(true); msg(rState==="ok"?"Done.":"Couldn’t sync right now."); railUI()};
+    $("rBk").onclick=async()=>{try{await railBackup(); msg("Backup saved to your Downloads.")}catch(e){msg("Couldn’t download the backup.")}};
+    $("rOff").onclick=()=>{if(confirm("Stop syncing this phone? Your progress stays on the phone and in the cloud.")){railDisconnect(); railUI()}};
+    $("rRs").onclick=async()=>{
+      const b=$("rRsBox"); b.hidden=false; b.innerHTML='<span class="sub">Loading earlier copies…</span>';
+      try{const j=await rfetch("/snapshots").then(x=>x.json()); const L=(j.snapshots||[]);
+        b.innerHTML=`<span class="sub">Replace the progress on this phone with an earlier cloud copy. Your current progress is kept as a copy too.</span>${L.length?`<select class="vsel" id="rSel">${L.map(x=>`<option value="${x.id}">${x.day}${x.kind==="pre-restore"?" (before a restore)":""} · ${new Date(x.taken_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</option>`).join("")}</select><button type="button" class="ghost" id="rSelGo" style="min-height:40px">Restore this copy</button>`:'<span class="sub">No earlier copies yet. They are saved automatically once a day.</span>'}<label class="sub" style="display:block">Or restore from a backup file: <input type="file" id="rFile" accept=".json,application/json"></label>`;
+        if($("rSelGo")) $("rSelGo").onclick=async()=>{if(!confirm("Replace the progress on this phone with that copy?")) return; try{await railRestore({snapshot:Number($("rSel").value)}); msg("Restored.")}catch(e){msg("Couldn’t restore.")}};
+        $("rFile").onchange=async e=>{const f=e.target.files[0]; if(!f) return; try{const o=JSON.parse(await f.text()); if(!o.docs) throw 0; if(!confirm("Replace the progress on this phone and in the cloud with this backup?")) return; await railRestore({docs:o.docs}); msg("Restored.")}catch(x){msg("That file isn’t a valid backup.")}};
+      }catch(e){b.innerHTML='<span class="sub">Couldn’t load the copies.</span>'}
+    };
+  }else{
+    $("rGo").onclick=async()=>{const m=await railConnect($("rCode").value); if(m) msg(m); else railUI()};
+  }
 }
 window.addEventListener("online",()=>{dbCol?push():initDb()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){saveLocal()} else if(ST.dirty.length){dbCol?push():initDb()}});
@@ -4118,7 +4239,7 @@ const WORDS=[["el","det","the (masculine)","El niño come una manzana.","The boy
 const WR_WT=[263,263,74,74,74,74,74,350,349,329,300,122,122,231,47,47,47,47,184,172,165,34,34,34,34,125,113,108,101,95,45,45,87,87,43,43,73,69,67,64,63,62,59,59,57,57,50,23,23,46,41,40,39,39,37,36,31,29,27,27,26,25,25,23,23,22,21,21,21,20,20,19,19,19,19,18,18,17,17,16,16,16,15,15,15,15,14,14,14,14,14,14,14,14,13,13,13,13,13,13,13,13,13,12,12,12,12,12,12,12,12,12,11,11,11,11,11,11,11,10,10,10,10,10,10,10,10,10,10,10,10,10,9,9,9,9,9,9,9,8,8,8,8,8,8,8,8,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];   // share of everyday speech each word makes up, in 1/10,000 (film and TV subtitle frequencies)
 const WR_W=[0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621];
 const WR_DAY=864e5, WR_FAC=19/81, WR_DEC=-0.5, WR_POS={n:"noun",v:"verb",adj:"adjective",adv:"adverb",prep:"preposition",conj:"conjunction",pron:"pronoun",det:"determiner",num:"number",interj:"interjection"};
-ST.words=ST.words||{}; ST.words.c=ST.words.c||{}; ST.words.log=ST.words.log||{}; ST.words.nlog=ST.words.nlog||{}; ST.words.xtra=ST.words.xtra||{};
+ST.words=ST.words||{}; ST.words.c=ST.words.c||{}; ST.words.log=ST.words.log||{}; ST.words.nlog=ST.words.nlog||{}; ST.words.xtra=ST.words.xtra||{}; ST.words.gone=ST.words.gone||{};
 ST.words.set=Object.assign({newPer:10,ret:.9,mode:"mix"},ST.words.set||{});
 const wrClamp=(x,a,b)=>Math.min(b,Math.max(a,x));
 const wrRet=(t,s)=>Math.pow(1+WR_FAC*t/s,WR_DEC);
@@ -4281,11 +4402,11 @@ const WR_TICK_DAYS=180;
 function wrSetKnown(i,on,nosave){
   const c=ST.words.c[i], now=Date.now();
   if(on){
-    ST.words.c[i]={d:c?Math.min(c.d,4):3,s:WR_TICK_DAYS,t:now,due:wrDayStart(WR_TICK_DAYS),st:2,ivl:WR_TICK_DAYS,r:c?c.r:0,l:c?c.l:0,man:1};
+    ST.words.c[i]={d:c?Math.min(c.d,4):3,s:WR_TICK_DAYS,t:now,due:wrDayStart(WR_TICK_DAYS),st:2,ivl:WR_TICK_DAYS,r:c?c.r:0,l:c?c.l:0,man:1,u:now};
   }else if(c){
-    if(c.man&&!c.r) delete ST.words.c[i];                       // ticked by hand and never reviewed: back to new
-    else if(c.man) ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1,man:0};
-    else ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1};   // learned the slow way: bring it back today
+    if(c.man&&!c.r){delete ST.words.c[i]; ST.words.gone[i]=now}   // ticked by hand and never reviewed: back to new
+    else if(c.man) ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1,man:0,u:now};
+    else ST.words.c[i]={...c,s:Math.min(c.s,7),t:now,due:wrDayStart(0),st:2,ivl:1,u:now};   // learned the slow way: bring it back today
   }
   if(!nosave) saveLocal();
 }
