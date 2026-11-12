@@ -616,7 +616,16 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .tk-seg button[aria-pressed="true"]{background:var(--tk);border-color:var(--tk);color:#fff}
 .tk-list{display:flex;flex-direction:column;gap:8px}
 .tk-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:500}
-.tk-card .tk-em{font-size:1.7rem;line-height:1;flex:none}
+.tk-card{padding:11px 12px 11px 11px;gap:13px;box-shadow:0 1px 0 rgba(60,45,20,.04)}
+.tk-card .tk-ic{flex:none;width:44px;height:44px;border-radius:13px;background:var(--tk-soft);color:var(--tk-d);display:grid;place-items:center}
+.tk-card .tk-ic svg{width:24px;height:24px;stroke-width:1.8}
+.tk-card .tk-tx{flex:1}
+.tk-card .tk-go{flex:none;color:var(--tk-dash);display:grid;place-items:center;margin-left:auto}
+.tk-card .tk-go svg{width:18px;height:18px;stroke-width:2.2}
+.tk-card .tk-star{margin-left:auto;margin-right:2px}
+.vc-mic svg{width:20px;height:20px;display:block;margin:auto}
+.actions .vlite .tkv{display:inline-flex;align-items:center;gap:5px}
+.actions .vlite .tkv svg{width:16px;height:16px}
 .tk-card .tk-tx{display:flex;flex-direction:column;min-width:0}
 .tk-card b{font-family:var(--f-display);font-weight:400;font-size:1.05rem}
 .tk-card small{color:var(--muted);font-size:.82rem}
@@ -781,7 +790,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 11:40</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 13:08</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4258,7 +4267,7 @@ function renderVQ(){
           :`<form id="f" autocomplete="off" onsubmit="return false"><div id="ans" ${FIELD_ATTRS} enterkeyhint="done" data-ph="Type the form" aria-label="Your answer"></div></form>`}
     <p class="hint" id="hint" hidden>${vHint(q)}</p>`;
   V.lv=false;
-  $("actions").innerHTML=pick?`<button type="button" class="vlite h" id="vHintB">Hint</button><button type="button" class="vlite h" id="vTypeB">⌨️ Type it</button><button type="button" class="vlite vc-mic" id="vcMic" aria-label="Answer by voice">🎤</button><button type="button" class="vlite" id="vSkip">I don’t know</button>`
+  $("actions").innerHTML=pick?`<button type="button" class="vlite h" id="vHintB">Hint</button><button type="button" class="vlite h" id="vTypeB"><span class="tkv">${tki("kbd")}Type it</span></button><button type="button" class="vlite vc-mic" id="vcMic" aria-label="Answer by voice">${tki("mic")}</button><button type="button" class="vlite" id="vSkip">I don’t know</button>`
     :`<button type="button" class="ghost" id="vHintB">Hint</button><button type="button" class="ghost" id="vSkip">Show</button>${vcBtnHTML()}<button type="button" class="grow" id="vCheck">Check</button>`;
   if($("vTypeB")) $("vTypeB").onclick=()=>{ if(V.answered) return; S2.mode="type"; vSave(); renderVQ() };
   vcBind(t=>{ if(!V.answered){ V.lv=true; vAnswer(t) } });
@@ -4864,6 +4873,21 @@ const TALK_SC=[
  {id:"opin",e:"🗣️",t:"Dar tu opinión",en:"Sharing opinions",lv:"B1",you:"a friend with opinions",w:"a friend who disagrees politely",at:"a dinner with friends",goal:"agreeing, disagreeing and giving reasons",focus:"subjunctive and connectors"}
 ];
 const TKI={
+ sc_intro:'<path d="M6 21V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21M3.5 21h17M14.5 12v.01"/>',
+ sc_cafe:'<path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8.5 3.5v2M12 3.5v2"/>',
+ sc_mercado:'<path d="M5 9h14l-1.2 9.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8zM9 9V7a3 3 0 0 1 6 0v2"/>',
+ sc_direc:'<circle cx="12" cy="12" r="9"/><path d="m15.6 8.4-2.1 5.1-5.1 2.1 2.1-5.1z"/>',
+ sc_cita:'<path d="M12 20s-7-4.3-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.7-7 10-7 10z"/>',
+ sc_resta:'<path d="M7 3v18M4.5 3v5a2.5 2.5 0 0 0 5 0V3M17 21V3c-2.2 1.4-3.2 4-3.2 7 0 2 1 3 3.2 3"/>',
+ sc_hotel:'<path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-8v6"/><circle cx="6.5" cy="11.5" r="1.5"/>',
+ sc_farm:'<rect x="4" y="4" width="16" height="16" rx="4.5"/><path d="M12 8v8M8 12h8"/>',
+ sc_plan:'<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+ sc_viaje:'<path d="M21 3 10 14M21 3l-6.5 18-4.5-7-7-4.5z"/>',
+ sc_entre:'<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 13h18"/>',
+ sc_apto:'<path d="M4 11 12 4l8 7v9H4zM10 20v-5h4v5"/>',
+ sc_opin:'<path d="M4 5h16v11h-8l-4 4v-4H4z"/><path d="M8 9h8M8 12h5"/>',
+ sc_custom:'<path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3"/>',
+ sc_chev:'<path d="m9 6 6 6-6 6"/>',
  play:'<path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/>',
  tr:'<path d="M4 5h9M8.5 3v2M6 5c.6 3 2.6 5.5 5.5 7M12 5c-.6 3-3 6-7 8M12 20l4.5-10L21 20M13.5 17h6"/>',
  cap:'<path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',
@@ -4918,7 +4942,7 @@ function renderTalk(){
   const T=ST.talk, lv=tkLevel();
   const seg=(id,opts,cur)=>`<div class="tk-seg" id="${id}">${opts.map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${String(cur)===String(v)}">${l}</button>`).join("")}</div>`;
   const group=L=>`<div><p class="label" style="margin-bottom:8px">${L}${L===lv?" · your level":""}</p><div class="tk-list">${TALK_SC.filter(s=>s.lv===L).map(s=>{const b=T.best[s.id]||0;
-    return `<button type="button" class="tk-card" data-sc="${s.id}"><span class="tk-em" aria-hidden="true">${s.e}</span><span class="tk-tx"><b>${s.t}</b><small>${s.en}</small></span>${b?`<span class="tk-star" aria-label="${b} of 3 stars">${"★".repeat(b)}${"☆".repeat(3-b)}</span>`:""}</button>`}).join("")}</div></div>`;
+    return `<button type="button" class="tk-card" data-sc="${s.id}"><span class="tk-ic" aria-hidden="true">${tki("sc_"+s.id)}</span><span class="tk-tx"><b>${s.t}</b><small>${s.en}</small></span>${b?`<span class="tk-star" aria-label="${b} of 3 stars">${"★".repeat(b)}${"☆".repeat(3-b)}</span>`:""}<span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>`}).join("")}</div></div>`;
   $("drill").innerHTML=`<div class="tk tk-home">
     <div><h2 class="hello">Talk</h2><p class="sub">Have a spoken conversation in Spanish. Your partner speaks first, you get ideas for what to say, and every answer is checked.</p></div>
     <p class="tk-stat" id="tkStat"></p>
@@ -5293,7 +5317,7 @@ async function vcStart(btn,onText){
   }catch(e){ r.max=setTimeout(()=>vcStop(true),4000) }
   r.max=r.max||setTimeout(()=>vcStop(true),9000);
 }
-function vcBtnHTML(){ return `<button type="button" class="ghost vc-mic" id="vcMic" aria-label="Answer by voice">🎤</button>` }
+function vcBtnHTML(){ return `<button type="button" class="ghost vc-mic" id="vcMic" aria-label="Answer by voice">${tki("mic")}</button>` }
 function vcBind(onText){ const b=$("vcMic"); if(b) b.onclick=()=>vcStart(b,onText) }
 function vcAbort(){ if(vcRec) vcStop(false); const t=$("vcToast"); if(t) t.classList.remove("on") }
 
