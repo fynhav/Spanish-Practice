@@ -606,72 +606,109 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 
 .dot.subj{background:var(--subj)} .dot.ind{background:var(--ind)} .subj-t{color:var(--subj)} .ind-t{color:var(--ind)}
 /* Talk */
-.tk{display:flex;flex-direction:column;gap:12px}
-.tk-stat{margin:0;font-size:.82rem;color:var(--muted)}.tk-stat.ok{color:var(--ok)}.tk-stat.bad{color:var(--bad)}
+.tk{--tk:#1B8794;--tk-d:#13727D;--tk-soft:#D3EFF2;--tk-bub:#B3EBF2;--tk-grey:#EFE8D6;--tk-dash:#CBBF9F;display:flex;flex-direction:column;gap:12px}
+.tk-stat{margin:0;font-size:.82rem;color:var(--muted)}.tk-stat.tk-ok{color:var(--ok)}.tk-stat.tk-bad{color:var(--bad)}
 .tk-set{display:flex;flex-direction:column;gap:10px}
 .tk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .tk-row>span{font-size:.85rem;font-weight:600;color:var(--muted)}
 .tk-seg{display:flex;gap:4px;flex-wrap:wrap}
 .tk-seg button{padding:6px 10px;font-size:.8rem;border-radius:9px;background:var(--card);color:var(--ink);border:1px solid var(--line);min-height:34px}
-.tk-seg button[aria-pressed="true"]{background:var(--both);border-color:var(--both);color:#fff}
+.tk-seg button[aria-pressed="true"]{background:var(--tk);border-color:var(--tk);color:#fff}
 .tk-list{display:flex;flex-direction:column;gap:8px}
 .tk-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:500}
-.tk-card .em{font-size:1.7rem;line-height:1;flex:none}
-.tk-card .tx{display:flex;flex-direction:column;min-width:0}
+.tk-card .tk-em{font-size:1.7rem;line-height:1;flex:none}
+.tk-card .tk-tx{display:flex;flex-direction:column;min-width:0}
 .tk-card b{font-family:var(--f-display);font-weight:400;font-size:1.05rem}
 .tk-card small{color:var(--muted);font-size:.82rem}
-.tk-card .st{margin-left:auto;color:#C99A2E;letter-spacing:1px;font-size:.9rem;white-space:nowrap}
+.tk-card .tk-star{margin-left:auto;color:#C99A2E;letter-spacing:1px;font-size:.9rem;white-space:nowrap}
 #tkCust{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--tile);color:var(--ink);resize:none}
-.tk-sc{background:var(--both-soft);border-radius:14px;padding:10px 14px;font-size:.88rem;line-height:1.8}
-.tk-fill{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0 8px;line-height:1.5;font-weight:600}
-.tk-m{display:flex;flex-direction:column;gap:6px;max-width:92%}
-.tk-m.ai{align-self:flex-start}.tk-m.me{align-self:flex-end;align-items:flex-end}
-.tk-b{position:relative;border-radius:18px;padding:11px 14px;background:var(--card);border:1px solid var(--line)}
-.tk-m.me .tk-b{background:var(--both-soft);border-color:transparent;padding-right:40px}
-.tk-es{margin:0;font-size:1.08rem;line-height:1.4}
-.tk-en{margin:4px 0 0;font-size:.88rem;color:var(--muted);line-height:1.4}
+/* scenario sheet */
+.tk-pd{margin:0;color:var(--muted);font-size:.98rem;line-height:1.45}
+.tk-fills{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.tk-fr{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tk-fr>span{color:var(--muted);font-size:.95rem;flex:none}
+.tk-fill{display:inline-block;background:var(--tk-soft);color:var(--ink);border-radius:10px;padding:6px 12px;font-weight:600;font-size:.88rem;text-align:right;line-height:1.3}
+.tk-fr input{flex:1;min-width:0;font:inherit;font-size:16px;text-align:right;border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--tile);color:var(--ink)}
+/* chat */
+#tkLog{padding-bottom:34vh}
+@keyframes tkin{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+.tk-enter{animation:tkin .34s cubic-bezier(.2,.8,.3,1) both}
+.tk-m{display:flex;flex-direction:column;gap:4px;max-width:94%}
+.tk-m.tk-ai{align-self:flex-start}.tk-m.tk-me{align-self:flex-end;align-items:flex-end}
+.tk-b{border-radius:18px;padding:11px 14px;background:var(--tk-grey)}
+.tk-b.tk-me{background:var(--tk-bub);border-radius:18px}
+.tk-es{margin:0;font-size:1.05rem;line-height:1.38}.tk-es.tk-bold{font-weight:700}
+.tk-en{margin:5px 0 0;font-size:.86rem;color:var(--muted);line-height:1.38}
 .blur{filter:blur(6px);user-select:none;-webkit-user-select:none;cursor:pointer}
-.tk-v{position:absolute;right:10px;top:11px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:800;color:#fff;line-height:1}
-.tk-b.great .tk-v,.tk-v.great{background:var(--ok)}.tk-b.ok .tk-v,.tk-v.ok{background:#D99A2B}.tk-b.retry .tk-v,.tk-v.retry{background:var(--bad)}
-.tk-bt{display:flex;gap:6px;align-items:center}
-.tk-ib{width:34px;height:34px;border-radius:50%;padding:0;display:inline-grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--muted);flex:none}
-.tk-ib.sm{width:28px;height:28px;vertical-align:middle;margin-left:4px}
-.tk-ib svg{width:17px;height:17px}.tk-ib.sm svg{width:14px;height:14px}
-.tk-ib[aria-pressed="true"],.tk-ib.on{background:var(--both-soft);color:var(--both);border-color:var(--both-soft)}
-.tk-fix{background:var(--card);border:1px solid var(--line);border-left:4px solid #D99A2B;border-radius:12px;padding:10px 12px;align-self:stretch}
-.tk-fix.retry{border-left-color:var(--bad)}
-.tk-tut{background:#FFF6DD;border:1px solid #F0E0AE;border-radius:12px;padding:10px 12px;align-self:stretch}
-.tk-tut p{margin:0 0 6px;font-size:.92rem;line-height:1.45}.tk-q{font-weight:700}
-.tk-ask{display:flex;gap:8px;align-items:center}
+.tk-wb{display:flex;align-items:center;color:var(--tk-d);padding:2px 4px}.tk-wg{width:150px;height:24px}
+.tk-bt{display:flex;gap:2px;align-items:center;margin-left:-6px}.tk-bt.tk-me{align-self:flex-start;margin-left:34px}
+.tk-ib{width:36px;height:34px;border-radius:10px;padding:0;display:inline-grid;place-items:center;background:none;border:0;color:#8A7F6D;flex:none}
+.tk-ib svg{width:19px;height:19px}.tk-ib.tk-sm{width:30px;height:30px;vertical-align:middle}.tk-ib.tk-sm svg{width:16px;height:16px}
+.tk-ib[aria-pressed="true"],.tk-ib.tk-on{color:var(--tk-d)}
+.tk-ib:disabled{opacity:.35}
+.tk-ur{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.tk-more{width:22px;height:30px;padding:0;background:none;border:0;color:#7A7064;display:grid;place-items:center}.tk-more svg{width:16px;height:20px}
+.tk-badge{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:.85rem;font-weight:800;color:#fff;flex:none;background:var(--line)}
+.tk-badge.tk-ok{background:#4DBB5F}.tk-badge.tk-fix{background:#7E63B8}.tk-badge svg{width:15px;height:15px}
+.tk-badge.tk-spin{background:none;border:2.5px solid var(--line);border-top-color:var(--tk);animation:tksp .8s linear infinite}
+@keyframes tksp{to{transform:rotate(360deg)}}
+.tk-badge.tk-pop{animation:tkpop .55s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes tkpop{0%{transform:scale(.2);box-shadow:0 0 0 0 rgba(77,187,95,.7)}55%{transform:scale(1.25)}100%{transform:scale(1);box-shadow:0 0 0 14px rgba(77,187,95,0)}}
+.tk-card2{background:none;border:1.5px dashed var(--tk-dash);border-radius:14px;padding:10px 14px;align-self:flex-end;width:86%;position:relative}
+.tk-card2 hr{border:0;border-top:1px solid var(--line);margin:8px 0}
+.tk-cl{margin:0 0 4px;font-size:.78rem;color:var(--muted)}.tk-cl span{color:#4DBB5F;font-weight:800;margin-right:4px}
+.tk-tut{border:1.5px dashed var(--tk-dash);border-radius:14px;padding:10px 14px;margin:2px 0 0 14px;position:relative;align-self:stretch}
+.tk-tut::before{content:"";position:absolute;left:-12px;top:-8px;width:10px;height:22px;border-left:1.5px solid var(--tk-dash);border-bottom:1.5px solid var(--tk-dash);border-bottom-left-radius:8px}
+.tk-tut p{margin:0 0 6px;font-size:.9rem;line-height:1.45;color:var(--muted)}.tk-tut p:last-child{margin:0}.tk-q{font-weight:700;color:var(--ink)!important}
+.tk-asklink{display:inline-flex;align-items:center;gap:6px;margin:2px 0 0 12px;padding:4px;font-size:.85rem;color:var(--muted);align-self:flex-start}.tk-asklink svg{width:11px;height:11px}
+.tk-ask{display:flex;gap:8px;align-items:center;align-self:stretch;margin-left:14px}
 .tk-ask input,.tk-form input{flex:1;min-width:0;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:22px;padding:10px 14px;background:var(--tile);color:var(--ink)}
-.tk-link{background:none;border:0;color:var(--both);font-weight:600;font-size:.88rem;padding:6px 4px;align-self:center;min-height:32px}
-.tk-dots{display:inline-flex;gap:4px;align-items:center;height:18px}
-.tk-dots i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:tkd 1s infinite ease-in-out}
-.tk-dots i:nth-child(2){animation-delay:.15s}.tk-dots i:nth-child(3){animation-delay:.3s}
-@keyframes tkd{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
-.actions:has(.tk-comp){display:block;padding-block:8px 10px}
-.tk-comp{display:flex;flex-direction:column;gap:8px}
-.tk-try{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px}
-.tk-th{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.tk-goal{margin:0;text-align:center;color:var(--muted);font-size:.9rem}.tk-goal.warn{color:var(--bad)}
-.tk-mrow{display:flex;align-items:center;justify-content:center;gap:12px;min-height:68px}
-.tk-mic{width:66px;height:66px;border-radius:50%;background:var(--both);border:0;color:#fff;padding:0;display:grid;place-items:center;box-shadow:0 4px 14px rgba(107,78,140,.35)}
-.tk-mic:disabled{opacity:.4;box-shadow:none}.tk-mic svg{width:30px;height:30px}
-.tk-circ{width:46px;height:46px;border-radius:50%;padding:0;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--ink);flex:none}
-.tk-circ.go{background:var(--both);border-color:var(--both);color:#fff}.tk-circ.sm{width:36px;height:36px}.tk-circ svg{width:20px;height:20px}
-.tk-wave{flex:1;height:46px;display:flex;align-items:center;gap:3px;justify-content:center;background:var(--both-soft);border-radius:23px;padding:0 14px;overflow:hidden}
-.tk-wave i{flex:1;max-width:5px;height:10%;background:var(--both);border-radius:3px;transition:height .07s}
-.tk-wave.pulse i{animation:tkp .9s infinite ease-in-out}.tk-wave.pulse i:nth-child(3n){animation-delay:.2s}.tk-wave.pulse i:nth-child(3n+1){animation-delay:.4s}
-@keyframes tkp{0%,100%{height:15%}50%{height:70%}}
-.tk-time{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--muted);min-width:34px}
-.tk-form{display:flex;gap:8px;align-items:center}
-.tk-err{background:var(--bad-soft);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}.tk-err p{margin:0;font-size:.9rem;color:var(--bad)}
+.tk-link{background:none;border:0;color:var(--tk-d);font-weight:600;font-size:.9rem;padding:6px 4px;align-self:center;min-height:32px}
+/* typing dots */
+.tk-typ{display:inline-flex;gap:5px;align-items:center;height:36px;padding:0 15px;border-radius:18px;background:var(--tk-grey)}
+.tk-typ i{width:7px;height:7px;border-radius:50%;background:#8A7F6D;animation:tkd 1s infinite ease-in-out}
+.tk-typ i:nth-child(2){animation-delay:.15s}.tk-typ i:nth-child(3){animation-delay:.3s}
+.tk-typ.tk-me{background:var(--tk-bub);align-self:flex-end}.tk-typ.tk-me i{background:var(--tk-d)}
+.tk-typ.tk-ph{background:none;border:1.5px dashed var(--tk-dash);height:34px;align-self:flex-end}
+.tk-typ.tk-inl{background:none;height:18px;padding:0}
+@keyframes tkd{0%,80%,100%{opacity:.35;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+/* Try Saying */
+.tk-try{align-self:flex-end;width:76%;display:flex;flex-direction:column;gap:2px}
+.tk-tc{border:1.5px dashed var(--tk-dash);border-radius:14px;padding:6px 12px 10px}
+.tk-th{width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:0;padding:6px 0 6px;color:var(--ink);font-size:.82rem;font-weight:600;border-bottom:1px solid var(--line);border-radius:0}
+.tk-th .tk-chev svg{width:16px;height:16px;transition:transform .25s}.tk-th .tk-chev.tk-shut svg{transform:rotate(180deg)}
+.tk-tb{padding-top:8px}
+/* bottom dock */
+.actions:has(.tk-comp){display:block;padding-block:6px 10px}
+.tk-comp{--tk:#1B8794;--tk-d:#13727D;display:flex;flex-direction:column;gap:6px;min-height:152px;justify-content:flex-end}
+.tk-comp.tk-fade{animation:tkfade .3s ease-out both}
+@keyframes tkfade{from{opacity:0}to{opacity:1}}
+.tk-goal{margin:0;text-align:center;color:var(--tk-d);font-size:.84rem;font-weight:500}.tk-goal.warn{color:var(--bad)}
+.tk-wv{display:flex;align-items:center;justify-content:center;gap:3px;height:30px}
+.tk-wv i{width:2px;height:2px;border-radius:2px;background:#9DB9BC;flex:none;transition:height .09s}
+.tk-wv i.tk-hot{background:var(--tk)}
+.tk-mrow{display:flex;align-items:center;justify-content:center;gap:18px;min-height:78px}
+.tk-side{width:44px;flex:none}
+.tk-main{--lv:0;width:70px;height:70px;border-radius:50%;background:var(--tk);border:0;color:#fff;padding:0;display:grid;place-items:center;flex:none;
+  box-shadow:0 0 0 calc(var(--lv)*10px) rgba(27,135,148,.18),0 0 calc(8px + var(--lv)*30px) rgba(27,135,148,.45),0 4px 14px rgba(27,135,148,.28);transition:box-shadow .08s}
+.tk-main svg{width:32px;height:32px}.tk-main:not(.tk-send) svg{width:26px;height:26px}
+.tk-circ{width:44px;height:44px;border-radius:50%;padding:0;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--ink);flex:none}
+.tk-circ.tk-bin{color:#B5524A;border-color:#E3B5B0;background:#FBEDEA;width:38px;height:38px}.tk-circ.tk-bin svg{width:17px;height:17px}
+.tk-circ.tk-go{background:var(--tk);border-color:var(--tk);color:#fff}.tk-circ.tk-sm{width:36px;height:36px}.tk-circ svg{width:20px;height:20px}
+.tk-time{position:absolute;opacity:0;pointer-events:none}
+.tk-form{display:flex;gap:8px;align-items:center;padding-bottom:4px}
+.tk-err{background:var(--bad-soft);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;margin-bottom:6px}.tk-err p{margin:0;font-size:.9rem;color:var(--bad)}
+/* End pill in the header */
+.tk-end{background:#C0594A!important;border-color:#C0594A!important;color:#fff!important;border-radius:18px!important;padding:6px 12px!important;font-weight:700;font-size:.82rem;gap:4px}
+.tk-end svg{width:16px;height:16px}
+/* summary */
 .tk-stars{font-size:2.2rem;letter-spacing:4px;color:#E0A526;line-height:1}.tk-stars span{color:var(--line)}
 .tk-nums{display:flex;justify-content:space-around;margin-top:12px}.tk-nums div{display:flex;flex-direction:column;align-items:center}.tk-nums b{font-size:1.3rem}.tk-nums span{font-size:.75rem;color:var(--muted)}
 .tk-nw{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0}.tk-nw i{color:var(--muted);font-style:normal;font-size:.88rem}
 .tk-sl{position:relative;padding:8px 0;border-top:1px solid var(--line)}.tk-sl:first-of-type{border-top:0}
-.tk-sl .who{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.tk-sl.me{padding-right:30px}.tk-sl .tk-v{top:30px}
+.tk-sl .tk-who{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tk-sl.tk-me{padding-right:30px}.tk-sl .tk-v{position:absolute;right:0;top:30px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:800;color:#fff}
+.tk-v.v-great{background:var(--ok)}.tk-v.v-ok{background:#D99A2B}.tk-v.v-retry{background:var(--bad)}
 </style>
 
 <div class="splash" id="splash" aria-live="polite">
@@ -736,7 +773,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 09:00</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 09:21</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2650,10 +2687,11 @@ function streak(has){
 const isDrill=()=>screen==="dsetup"||screen==="dq"||screen==="dsum";
 const isStory=()=>screen==="slist"||screen==="story"||screen==="easy";
 function setCourseColour(c){
-  const k=/^(wr|talk|tchat|tsum)/.test(screen)?"both":isV()?(screen==="vlearn"&&V.ln?VTK[V.ln.tk].cc:screen==="vq"&&V.q[V.i]?VTK[V.q[V.i].tk].cc:(VTK[V.tense]||{cc:"mix"}).cc):isStory()?(storyKind==="pron"?"both":"pret"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
+  const k=/^(wr|talk|tchat|tsum|tpre)/.test(screen)?"both":isV()?(screen==="vlearn"&&V.ln?VTK[V.ln.tk].cc:screen==="vq"&&V.q[V.i]?VTK[V.q[V.i].tk].cc:(VTK[V.tense]||{cc:"mix"}).cc):isStory()?(storyKind==="pron"?"both":"pret"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
   s.setProperty("--cc",`var(--${k})`); s.setProperty("--cc-soft",`var(--${k}-soft)`);
 }
 function chrome(){
+  $("quit").className="iconbtn sq"; $("quit").textContent="✕"; $("quit").setAttribute("aria-label","Leave session (progress is saved)");
   closeGloss(); $("fb").style.maxHeight=""; $("fb").style.top=""; $("drill").style.paddingBottom=""; $("app").classList.remove("typing");
   document.querySelectorAll("#accents .nav").forEach(b=>b.hidden=true);
   document.querySelectorAll("#accents .ex").forEach(b=>b.hidden=screen==="story");
@@ -2662,7 +2700,7 @@ function chrome(){
   const tb=tabOf(); $("tabbar").hidden=!tb; if(tb) tabDraw(tb);
   $("backBtn").hidden=!!tb||!(screen==="vhome"||screen==="prog"||screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm"&&screen!=="wr")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq"||screen==="vm"||screen==="wr");
   $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":screen==="wrlist"?"‹ Words":"‹ "+rootName;
-  $("title").textContent=/^(talk|tchat|tsum)$/.test(screen)?"Talk":screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
+  $("title").textContent=/^(talk|tchat|tsum|tpre)$/.test(screen)?"Talk":screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
   $("progress").hidden=!(inS||screen==="vq"||screen==="vm"||screen==="wr"); $("openRules").hidden=$("openSettings").hidden=screen==="vq"||screen==="vm"||screen==="wr";
   $("score").textContent=screen==="wr"?`${WR.fin} / ${WR.total}`:screen==="vq"||screen==="vm"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
   if(screen==="wr") $("progress").innerHTML=`<span class="p-v" style="flex:1"><i style="width:${WR.total?Math.min(100,WR.fin/WR.total*100):0}%"></i></span>`;
@@ -2673,9 +2711,9 @@ function chrome(){
       return `<span class="p-${p.key}" style="flex:${p.n}"><i style="width:${n/p.n*100}%"></i></span>`}).join("");
   }
   setCourseColour(course);
-  if(screen==="talk"||screen==="tchat"||screen==="tsum") tkChrome();
+  if(screen==="talk"||screen==="tchat"||screen==="tsum"||screen==="tpre") tkChrome();
 }
-$("backBtn").onclick=()=>{drillOn=false; if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
+$("backBtn").onclick=()=>{drillOn=false; if(screen==="tchat"){talkQuit();return} if(screen==="tpre"){renderTalk();return} if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
 $("quit").onclick=()=>{if(screen==="tchat"){talkQuit();return} if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
 function vTitle(){return screen==="wrset"||screen==="wr"?"Word review":screen==="wrsum"?"Session done":screen==="wrlist"?WORDS.length+" words":screen==="vmset"||screen==="vm"?"Verb meanings":screen==="vmsum"?"Round done":screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
 // swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
@@ -4794,39 +4832,52 @@ const TALK_SC=[
  {id:"opin",e:"🗣️",t:"Dar tu opinión",en:"Sharing opinions",lv:"B1",you:"a friend with opinions",w:"a friend who disagrees politely",at:"a dinner with friends",goal:"agreeing, disagreeing and giving reasons",focus:"subjunctive and connectors"}
 ];
 const TKI={
- play:'<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>',
+ play:'<path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/>',
  tr:'<path d="M4 5h9M8.5 3v2M6 5c.6 3 2.6 5.5 5.5 7M12 5c-.6 3-3 6-7 8M12 20l4.5-10L21 20M13.5 17h6"/>',
  cap:'<path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',
  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
  eyeoff:'<path d="M3 3l18 18M10.6 5.1A9.8 9.8 0 0 1 12 5c6 0 10 7 10 7a17 17 0 0 1-3.2 4M6.5 6.6A17 17 0 0 0 2 12s4 7 10 7a9.6 9.6 0 0 0 4-.9"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
  refresh:'<path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/>',
  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',
  up:'<path d="M12 19V5M5 12l7-7 7 7"/>',
- mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ pause:'<path d="M9 5v14M15 5v14" stroke-width="3.4"/>',
+ kbd:'<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+ chev:'<path d="M6 15l6-6 6 6"/>',
+ dots:'<circle cx="12" cy="5" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="19" r="1.4" fill="currentColor"/>',
+ phone:'<path d="M4 15c4-4 12-4 16 0l-1.5 2.5-3-1.2V13.5a10 10 0 0 0-6 0v1.8l-3 1.2z" fill="currentColor"/>',
+ chat:'<path d="M4 5h12v8H9l-4 3zM10 15v1.5a1.5 1.5 0 0 0 1.5 1.5H16l3 2v-7h-2"/>',
+ spark:'<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z" fill="currentColor"/>'
 };
 const tki=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TKI[n]}</svg>`;
-const TLK={sc:null,lv:"A2",msgs:[],st:"idle",id:0,t0:0,sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:true,rev:false,res:null};
-const tkAudio=new Audio(); tkAudio.preload="auto"; const tkCache=new Map(); let tkRec=null;
+const TLK={sc:null,lv:"A2",msgs:[],st:"idle",id:0,t0:0,sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:true,rev:false,res:null,micOK:false,sugReady:false,tryOpen:true,sugAt:0};
+const tkAudio=new Audio(); tkAudio.preload="auto"; const tkCache=new Map(); let tkRec=null, tkCtx=null;
+const tkSleep=ms=>new Promise(r=>setTimeout(r,ms));
 const tkSetup=sc=>sc.custom?sc.custom:`The learner plays ${sc.you}. You play ${sc.w}. Setting: ${sc.at}. Purpose of the scene: ${sc.goal}.`;
 const tkMax=sc=>sc.max||8;
 function tkLevel(){ if(ST.talk.lv) return ST.talk.lv; let n=0; for(const r of cefrCalc()){ if(r.p>=.7) n++; else break } return n===0?"A1":n===1?"A2":"B1" }
-function tkUnlock(){ try{ tkAudio.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="; tkAudio.play().catch(()=>{}) }catch(e){} }
+function tkUnlock(){
+  try{ tkAudio.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="; tkAudio.play().catch(()=>{}) }catch(e){}
+  try{ const AC=window.AudioContext||window.webkitAudioContext; if(AC){ tkCtx=tkCtx||new AC(); if(tkCtx.state==="suspended") tkCtx.resume() } }catch(e){}
+}
+function tkStopRec(r){ if(!r) return; clearTimeout(r.auto); cancelAnimationFrame(r.raf); try{r.src&&r.src.disconnect()}catch(e){} try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){} }
 function tkLeave(){
   TLK.id++;
-  if(tkRec){ const r=tkRec; r.send=false; tkRec=null; clearTimeout(r.auto); cancelAnimationFrame(r.raf); try{r.ctx&&r.ctx.close()}catch(e){} try{r.mr.stop()}catch(e){} try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){} }
+  if(tkRec){ const r=tkRec; r.send=false; tkRec=null; tkStopRec(r); try{r.mr.stop()}catch(e){} }
   try{ tkAudio.pause() }catch(e){}
 }
-async function tkSpeak(text,btn){
+async function tkSpeak(text,btn,done){
   lastAct=Date.now(); try{ tkAudio.pause() }catch(e){}
-  document.querySelectorAll(".tk .on,.tk-comp .on").forEach(b=>b.classList.remove("on"));
-  if(btn) btn.classList.add("on");
-  const off=()=>{ if(btn) btn.classList.remove("on") };
+  document.querySelectorAll(".tk .tk-on").forEach(b=>b.classList.remove("tk-on"));
+  if(btn) btn.classList.add("tk-on");
+  let fin=false; const off=()=>{ if(btn) btn.classList.remove("tk-on"); if(!fin){ fin=true; if(done) done() } };
   try{
     let u=tkCache.get(text);
     if(!u){ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify({text}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); u=URL.createObjectURL(await r.blob()); tkCache.set(text,u) }
     tkAudio.src=u; tkAudio.playbackRate=S.rate==="slow"?.8:1; tkAudio.onended=tkAudio.onerror=off;
     await tkAudio.play();
-  }catch(e){ off(); try{ speak(text,btn) }catch(x){} }
+  }catch(e){ try{ speak(text,btn) }catch(x){} setTimeout(off,Math.max(1200,text.length*65)) }
 }
 
 // ---------- home
@@ -4835,7 +4886,7 @@ function renderTalk(){
   const T=ST.talk, lv=tkLevel();
   const seg=(id,opts,cur)=>`<div class="tk-seg" id="${id}">${opts.map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${String(cur)===String(v)}">${l}</button>`).join("")}</div>`;
   const group=L=>`<div><p class="label" style="margin-bottom:8px">${L}${L===lv?" · your level":""}</p><div class="tk-list">${TALK_SC.filter(s=>s.lv===L).map(s=>{const b=T.best[s.id]||0;
-    return `<button type="button" class="tk-card" data-sc="${s.id}"><span class="em" aria-hidden="true">${s.e}</span><span class="tx"><b>${s.t}</b><small>${s.en}</small></span>${b?`<span class="st" aria-label="${b} of 3 stars">${"★".repeat(b)}${"☆".repeat(3-b)}</span>`:""}</button>`}).join("")}</div></div>`;
+    return `<button type="button" class="tk-card" data-sc="${s.id}"><span class="tk-em" aria-hidden="true">${s.e}</span><span class="tk-tx"><b>${s.t}</b><small>${s.en}</small></span>${b?`<span class="tk-star" aria-label="${b} of 3 stars">${"★".repeat(b)}${"☆".repeat(3-b)}</span>`:""}</button>`}).join("")}</div></div>`;
   $("drill").innerHTML=`<div class="tk tk-home">
     <div><h2 class="hello">Talk</h2><p class="sub">Have a spoken conversation in Spanish. Your partner speaks first, you get ideas for what to say, and every answer is checked.</p></div>
     <p class="tk-stat" id="tkStat"></p>
@@ -4851,76 +4902,119 @@ function renderTalk(){
     <p class="syncline"></p></div>`;
   $("actions").innerHTML="";
   [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
-  $("drill").querySelectorAll(".tk-card").forEach(b=>b.onclick=()=>{ if(!tkReady()) return; tkStart(TALK_SC.find(s=>s.id===b.dataset.sc)) });
+  $("drill").querySelectorAll(".tk-card").forEach(b=>b.onclick=()=>{ if(!tkReady()) return; renderTalkPre(TALK_SC.find(s=>s.id===b.dataset.sc)) });
   $("tkCustGo").onclick=()=>{ const v=$("tkCust").value.trim(); if(v.length<8){$("tkCust").focus(); return} if(!tkReady()) return;
     tkStart({id:"custom",e:"✏️",t:"Tu escena",en:"Your own scene",lv:"",custom:v,w:"the other person in the scene described",focus:""}) };
   updateSync(); tkPing();
 }
 function tkReady(){
-  if(!RL.code){ const el=$("tkStat"); if(el){el.textContent="Add your sync code in Settings first. Talk signs in to your own server with it."; el.className="tk-stat bad"; el.scrollIntoView({block:"center"})} return false }
+  if(!RL.code){ const el=$("tkStat"); if(el){el.textContent="Add your sync code in Settings first. Talk signs in to your own server with it."; el.className="tk-stat tk-bad"; el.scrollIntoView({block:"center"})} return false }
   return true;
 }
 function tkPing(){
   const el=$("tkStat"); if(!el) return;
-  if(!RL.code){ el.textContent="Add your sync code in Settings first. Talk signs in to your own server with it."; el.className="tk-stat bad"; return }
-  if(navigator.onLine===false){ el.textContent="You are offline. Talk needs the internet."; el.className="tk-stat bad"; return }
+  if(!RL.code){ el.textContent="Add your sync code in Settings first. Talk signs in to your own server with it."; el.className="tk-stat tk-bad"; return }
+  if(navigator.onLine===false){ el.textContent="You are offline. Talk needs the internet."; el.className="tk-stat tk-bad"; return }
   rfetch("/talk/ping",{ms:9000}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{ const e=$("tkStat"); if(!e) return;
     const miss=[!j.anthropic&&"Claude",!j.openai&&"OpenAI"].filter(Boolean);
-    if(miss.length){ e.textContent="Your server is missing the "+miss.join(" and ")+" key."; e.className="tk-stat bad" } else { e.textContent="Ready · voice and replies run on your server."; e.className="tk-stat ok" }
-  }).catch(()=>{ const e=$("tkStat"); if(e){ e.textContent="Can’t reach your server right now."; e.className="tk-stat bad" } });
+    if(miss.length){ e.textContent="Your server is missing the "+miss.join(" and ")+" key."; e.className="tk-stat tk-bad" } else { e.textContent="Ready · voice and replies run on your server."; e.className="tk-stat tk-ok" }
+  }).catch(()=>{ const e=$("tkStat"); if(e){ e.textContent="Can’t reach your server right now."; e.className="tk-stat tk-bad" } });
+}
+
+// ---------- scenario sheet (before the chat)
+function renderTalkPre(sc,edit){
+  screen="tpre"; TLK.pre=sc; $("fb").hidden=true; tkLeave(); chrome();
+  const rows=[["I’m","you"],["Chatting with","w"],["At","at"],["Practising","goal"]];
+  $("drill").innerHTML=`<div class="tk tk-pre"><div><h2 class="hello">${esc(sc.t)}</h2><p class="sub">${esc(sc.en)}</p></div>
+    <p class="tk-pd">You will practise ${esc(sc.goal)}.</p>
+    <div class="tk-fills">${rows.map(([l,k])=>`<div class="tk-fr"><span>${l}</span>${edit?`<input data-k="${k}" value="${esc(sc[k])}" maxlength="90" aria-label="${l}">`:`<b class="tk-fill">${esc(sc[k])}</b>`}</div>`).join("")}</div>
+    <button type="button" class="tk-link" id="tkCz">${edit?"Reset to the original":"Customize Scenario"}</button></div>`;
+  $("actions").innerHTML=`<button type="button" class="grow" id="tkGo">Continue</button>`;
+  $("tkCz").onclick=()=>{ if(edit) renderTalkPre(TALK_SC.find(s=>s.id===sc.id)); else renderTalkPre({...sc},true) };
+  $("tkGo").onclick=()=>{ const s2={...sc}; $("drill").querySelectorAll("input[data-k]").forEach(i=>{ if(i.value.trim()) s2[i.dataset.k]=i.value.trim() }); tkStart(s2) };
 }
 
 // ---------- conversation
 function tkStart(sc){
   tkUnlock(); tkLeave();
-  Object.assign(TLK,{sc,lv:tkLevel(),msgs:[],sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:tkLevel()!=="B1",rev:false,res:null,t0:Date.now(),st:"ai"});
+  Object.assign(TLK,{sc,lv:tkLevel(),msgs:[],sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:tkLevel()!=="B1",rev:false,res:null,t0:Date.now(),st:"ai",sugReady:false,tryOpen:true,end:false});
   renderTalkChat(); tkTurn();
 }
 function renderTalkChat(){
   screen="tchat"; $("fb").hidden=true; chrome();
   $("drill").innerHTML=`<div class="tk" id="tkLog"></div>`;
   $("tkLog").onclick=tkLogClick; $("tkLog").onsubmit=tkLogSubmit;
-  tkDraw(true);
+  tkDraw("top");
 }
+const tkGraded=()=>TLK.msgs.filter(m=>m.role==="user"&&m.grade).length;
 function tkChrome(){
-  const s=screen, n=TLK.msgs.filter(m=>m.role==="user"&&m.grade).length, mx=TLK.sc?tkMax(TLK.sc):8;
-  $("backBtn").hidden=s!=="tsum"; $("backBtn").textContent="‹ Talk"; $("quit").hidden=s!=="tchat";
-  $("progress").hidden=s!=="tchat"; if(s==="tchat") $("progress").innerHTML=`<span class="p-both" style="flex:1"><i style="width:${Math.min(100,n/mx*100)}%"></i></span>`;
-  $("openRules").hidden=true; $("openSettings").hidden=s==="tchat"; $("score").textContent=s==="tchat"?`${n} / ${mx}`:"";
-  $("title").textContent=s==="tchat"&&TLK.sc?TLK.sc.t:s==="tsum"?"Conversation done":"Talk";
+  const s=screen, n=tkGraded();
+  $("backBtn").hidden=!(s==="tsum"||s==="tchat"||s==="tpre"); $("backBtn").textContent=s==="tchat"?"‹":"‹ Talk";
+  $("quit").hidden=!(s==="tchat"&&n>=3);
+  if(s==="tchat"){ $("quit").className="iconbtn tk-end"; $("quit").innerHTML=tki("phone")+"<span>End</span>"; $("quit").setAttribute("aria-label","End the conversation") }
+  $("progress").hidden=true; $("openRules").hidden=true; $("openSettings").hidden=false; $("score").textContent="";
+  $("title").textContent=s==="tchat"&&TLK.sc?TLK.sc.t:s==="tpre"?"Scenario":s==="tsum"?"Conversation done":"Talk";
 }
-const tkBtn=(a,ic,label,i,on)=>`<button type="button" class="tk-ib" data-a="${a}"${i!=null?` data-i="${i}"`:""} aria-label="${label}"${on!=null&&a!=="say"?` aria-pressed="${!!on}"`:""}>${tki(ic)}</button>`;
-function tkScene(sc){
-  if(sc.custom) return `<div class="tk-sc"><p class="label" style="margin:0 0 4px">Scene</p>${esc(sc.custom)}</div>`;
-  const f=x=>`<span class="tk-fill">${esc(x)}</span>`;
-  return `<div class="tk-sc"><p class="label" style="margin:0 0 4px">Scene</p>You are ${f(sc.you)} talking with ${f(sc.w)} at ${f(sc.at)}, practising ${f(sc.goal)}</div>`;
-}
+const tkBtn=(a,ic,label,i,pressed,dis)=>`<button type="button" class="tk-ib" data-a="${a}"${i!=null?` data-i="${i}"`:""} aria-label="${label}"${pressed!=null?` aria-pressed="${!!pressed}"`:""}${dis?" disabled":""}>${tki(ic)}</button>`;
+const tkDots=cls=>`<div class="tk-typ ${cls||""}" aria-label="Typing"><i></i><i></i><i></i></div>`;
+const tkEnter=at=>{ const e=Date.now()-(at||0); return at&&e<380?` tk-enter" style="animation-delay:-${e}ms`:"" };
+const tkWaveGlyph='<svg viewBox="0 0 120 22" class="tk-wg" aria-hidden="true"><path d="M2 11h6M12 11v0M14 6v10M18 3v16M22 8v6M26 11h4M34 5v12M38 9v4M42 2v18M46 7v8M50 11h6M60 4v14M64 8v6M68 11h4M76 6v10M80 2v18M84 8v6M88 11h4M96 5v12M100 9v4M104 11h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>';
 function tkMsgHTML(m,i){
   if(m.role==="ai"){
-    const tut=m.tp?`<div class="tk-tut"><p class="label" style="margin:0 0 4px">Tutor</p>${(m.tut||[]).map(t=>`${t.q?`<p class="tk-q">${esc(t.q)}</p>`:""}<p class="tk-a">${t.a==null?'<span class="tk-dots"><i></i><i></i><i></i></span>':esc(t.a)}</p>`).join("")}
-      ${m.ask?`<form class="tk-ask" data-i="${i}"><input name="q" maxlength="200" autocomplete="off" placeholder="Ask the tutor in English" aria-label="Question for the tutor"><button type="submit" class="tk-circ go sm" aria-label="Send">${tki("up")}</button></form>`:`<button type="button" class="tk-link" data-a="ask" data-i="${i}">Ask Tutor</button>`}</div>`:"";
-    return `<div class="tk-m ai"><div class="tk-b"><p class="tk-es${m.hid?" blur":""}"${m.hid?` data-a="unhide" data-i="${i}"`:""}>${esc(m.es)}</p>${m.tr&&m.en?`<p class="tk-en">${esc(m.en)}</p>`:""}</div>
-      <div class="tk-bt">${tkBtn("say","play","Hear it again",i)}${tkBtn("tr","tr","Show English",i,!!m.tr)}${tkBtn("tutor","cap","Explain this line",i,!!m.tp)}${tkBtn("hide",m.hid?"eyeoff":"eye",m.hid?"Show the text":"Hide the text",i,!!m.hid)}</div>${tut}</div>`;
+    const live=TLK.st==="ai"&&i===TLK.msgs.length-1;
+    const tut=m.tp?tkTutHTML(m,i):"";
+    return `<div class="tk-m tk-ai${tkEnter(m.at)}"><div class="tk-b">${m.hid?`<div class="tk-wb">${tkWaveGlyph}</div>`:`<p class="tk-es">${esc(m.es)}</p>${m.tr&&m.en?`<p class="tk-en">${esc(m.en)}</p>`:""}`}</div>
+      <div class="tk-bt">${tkBtn("say","play","Hear it again",i)}${tkBtn("tr","tr","Show English",i,!!m.tr)}${tkBtn("tutor","cap","Explain this line",i,!!m.tp)}${tkBtn("hide",m.hid?"eye":"eyeoff",m.hid?"Show the text":"Hide the text",i,!!m.hid)}${tkBtn("flag","flag","Flag this line",i,!!m.flag)}</div>${tut}</div>`;
   }
-  const g=m.grade, v=g?g.verdict:"";
-  return `<div class="tk-m me"><div class="tk-b ${v}"><p class="tk-es">${esc(m.es)}</p>${g?`<span class="tk-v" aria-label="${v==="great"?"Great":v==="ok"?"Needs a fix":"Try again"}">${v==="great"?"✓":v==="ok"?"!":"×"}</span>`:""}</div>
-    ${g&&v!=="great"?`<div class="tk-fix ${v}"><p class="label" style="margin:0 0 4px">Correct answer</p><p class="tk-es">${esc(g.corrected||m.es)} <button type="button" class="tk-ib sm" data-a="say" data-t="${esc(g.corrected||m.es)}" aria-label="Hear the correct answer">${tki("play")}</button></p>${g.note_en?`<p class="tk-en">${esc(g.note_en)}</p>`:""}</div>`:""}</div>`;
+  if(m.pend) return `<div class="tk-m tk-me tk-ub">${tkDots("tk-me"+tkEnter(m.at))}</div>`;
+  const g=m.grade, v=g?g.verdict:"", good=v==="great";
+  const badge=m.busy?`<span class="tk-badge tk-spin" aria-label="Checking"></span>`:g?`<span class="tk-badge ${good?"tk-ok":"tk-fix"}${m.pop&&Date.now()-m.pop<900?" tk-pop":""}" aria-label="${good?"Great":"Has a correction"}">${good?"✓":tki("chat")}</span>`:`<span class="tk-badge"></span>`;
+  const fix=g&&!good?`<div class="tk-card2${tkEnter(m.fixAt)}"><p class="tk-cl"><span>✓</span> Correct Answer</p><p class="tk-es tk-bold">${esc(g.corrected||m.es)}</p>${g.note_en?`<hr><p class="tk-en">${esc(g.note_en)}</p>`:""}</div>`:"";
+  return `<div class="tk-m tk-me tk-ub${tkEnter(m.at)}"><div class="tk-ur">${badge}<button type="button" class="tk-more" data-a="tutor" data-i="${i}" aria-label="Explain this line">${tki("dots")}</button><div class="tk-b tk-me"><p class="tk-es">${esc(m.es)}</p></div></div>
+    <div class="tk-bt tk-me">${tkBtn("say","play","Hear it",i,null,m.busy)}</div>${fix}${m.tp?tkTutHTML(m,i):""}</div>`;
+}
+function tkTutHTML(m,i){
+  return `<div class="tk-tut">${(m.tut||[]).map(t=>{ const w=(t.a||"").split(" "), part=t.a==null?null:(t.n!=null&&t.n<w.length?w.slice(0,t.n).join(" ")+" …":t.a);
+    return `${t.q?`<p class="tk-q">${esc(t.q)}</p>`:""}<p class="tk-a">${part==null?'<span class="tk-typ tk-inl"><i></i><i></i><i></i></span>':esc(part)}</p>`}).join("")}</div>
+    ${m.ask?`<form class="tk-ask" data-i="${i}"><input name="q" maxlength="200" autocomplete="off" placeholder="Ask the tutor in English" aria-label="Question for the tutor"><button type="submit" class="tk-circ tk-go tk-sm" aria-label="Send">${tki("up")}</button></form>`:`<button type="button" class="tk-link tk-asklink" data-a="ask" data-i="${i}">${tki("spark")}<span>Ask Tutor</span></button>`}`;
+}
+function tkTryHTML(){
+  const sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null, st=TLK.st, sup=ST.talk.sup;
+  if(!sg||st==="ai"||st==="stt"||st==="end") return "";
+  if(!TLK.sugReady) return `<div class="tk-m tk-me">${tkDots("tk-ph tk-enter")}</div>`;
+  const dim=st==="say";
+  return `<div class="tk-try${tkEnter(TLK.sugAt)}"><div class="tk-tc"><button type="button" class="tk-th" data-a="tryopen" aria-expanded="${TLK.tryOpen}"><span>Try Saying</span><span class="tk-chev${TLK.tryOpen?"":" tk-shut"}">${tki("chev")}</span></button>
+    ${TLK.tryOpen?`<div class="tk-tb"><p class="tk-es" data-a="reveal">${tkBlur(sg.es,sup,TLK.rev)}</p>${TLK.enOn&&sg.en?`<p class="tk-en">${esc(sg.en)}</p>`:""}</div>`:""}</div>
+    ${TLK.tryOpen?`<div class="tk-bt">${tkBtn("sugsay","play","Hear the suggestion",null,null,dim)}${tkBtn("sugtr","tr","Show English",null,TLK.enOn)}${TLK.sug.length>1?tkBtn("sugnext","refresh","Another idea"):""}</div>`:""}</div>`;
 }
 function tkDraw(scroll){
   if(screen!=="tchat"||!$("tkLog")) return;
-  const log=$("tkLog"), body=$("drill"), atEnd=scroll||body.scrollHeight-body.scrollTop-body.clientHeight<80;
-  log.innerHTML=tkScene(TLK.sc)+TLK.msgs.map(tkMsgHTML).join("")
-    +(TLK.st==="stt"?`<div class="tk-m me"><div class="tk-b"><span class="tk-dots"><i></i><i></i><i></i></span></div></div>`:"")
-    +(TLK.st==="ai"&&!TLK.err?`<div class="tk-m ai"><div class="tk-b"><span class="tk-dots"><i></i><i></i><i></i></span></div></div>`:"");
+  const log=$("tkLog"), body=$("drill");
+  const last=TLK.msgs[TLK.msgs.length-1];
+  log.innerHTML=TLK.msgs.map(tkMsgHTML).join("")
+    +(TLK.st==="ai"&&!TLK.err&&!(last&&last.role==="ai")?`<div class="tk-m tk-ai">${tkDots("tk-enter")}</div>`:"")
+    +tkTryHTML();
   tkChrome(); tkComposer();
-  if(atEnd) requestAnimationFrame(()=>{body.scrollTop=body.scrollHeight});
+  if(scroll) tkScroll(scroll);
+}
+function tkScroll(mode){
+  const body=$("drill"), us=[...document.querySelectorAll("#tkLog .tk-m.ub")], el=us[us.length-1];
+  if(mode==="top"||!el){ body.scrollTo({top:0,behavior:"smooth"}); return }
+  const y=el.getBoundingClientRect().top-body.getBoundingClientRect().top+body.scrollTop-10;
+  body.scrollTo({top:Math.max(0,y),behavior:"smooth"});
 }
 function tkLogClick(e){
-  const b=e.target.closest("[data-a]"); if(!b) return; const a=b.dataset.a, i=+b.dataset.i, m=TLK.msgs[i];
+  const b=e.target.closest("[data-a]"); if(!b||b.disabled) return; const a=b.dataset.a, i=+b.dataset.i, m=TLK.msgs[i], sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null;
   if(a==="say") tkSpeak(b.dataset.t||(m&&m.es),b);
+  else if(a==="tryopen"){ TLK.tryOpen=!TLK.tryOpen; tkDraw() }
+  else if(a==="sugsay"&&sg) tkSpeak(sg.es,b);
+  else if(a==="sugtr"){ TLK.enOn=!TLK.enOn; tkDraw() }
+  else if(a==="sugnext"){ TLK.tryI++; TLK.rev=false; tkDraw() }
+  else if(a==="reveal"){ TLK.rev=true; tkDraw() }
   else if(!m) return;
   else if(a==="tr"){m.tr=!m.tr; tkDraw()}
-  else if(a==="hide"||a==="unhide"){m.hid=!m.hid; tkDraw()}
+  else if(a==="hide"){m.hid=!m.hid; tkDraw()}
+  else if(a==="flag"){m.flag=!m.flag; tkDraw(); haptic(8)}
   else if(a==="tutor"){m.tp=!m.tp; if(m.tp&&!m.tut) tkAsk(i,""); else tkDraw()}
   else if(a==="ask"){m.ask=true; tkDraw(); const q=document.querySelector(".tk-ask input"); if(q) q.focus()}
 }
@@ -4934,83 +5028,110 @@ async function tkAsk(i,q){
     const r=await rfetch("/talk/tutor",{method:"POST",body:JSON.stringify({es:m.es,question:q,level:TLK.lv}),ms:30000}); if(!r.ok) throw new Error("x");
     ent.a=(await r.json()).answer||"No answer came back.";
   }catch(x){ ent.a="Couldn’t reach the tutor. Close this and try again in a moment." }
-  if(id===TLK.id) tkDraw();
+  const w=ent.a.split(" ").length; ent.n=0;
+  const iv=setInterval(()=>{ if(id!==TLK.id){clearInterval(iv);return} ent.n+=2; if(ent.n>=w){ ent.n=null; clearInterval(iv) } tkDraw() },45);
 }
 async function tkTurn(){
-  const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; tkDraw(true); lastAct=Date.now();
-  const sc=TLK.sc, body={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),history:TLK.msgs.map(m=>({role:m.role,es:m.es})),suggested:TLK.sug.map(s=>s.es)};
+  const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; TLK.sug=[]; TLK.sugReady=false; tkDraw(TLK.msgs.length?"user":"top"); lastAct=Date.now();
+  const sc=TLK.sc, body={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),history:TLK.msgs.filter(m=>m.es).map(m=>({role:m.role,es:m.es})),suggested:[]};
   try{
     const r=await rfetch("/talk/chat",{method:"POST",body:JSON.stringify(body),ms:50000});
     if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
     if(r.status===401) throw Object.assign(new Error("auth"),{auth:true});
     if(!r.ok) throw new Error("chat "+r.status);
     const j=await r.json(); if(id!==TLK.id) return;
-    const last=TLK.msgs[TLK.msgs.length-1]; if(last&&last.role==="user") last.grade=j.grade&&j.grade.verdict?j.grade:{verdict:"ok",corrected:"",note_en:""};
-    TLK.msgs.push({role:"ai",es:j.reply.es,en:j.reply.en||"",hid:!!ST.talk.hide});
-    TLK.sug=(j.suggestions||[]).filter(s=>s&&s.es); TLK.tryI=0; TLK.rev=false; TLK.goal=j.goal_en||"";
+    const lastU=TLK.msgs[TLK.msgs.length-1];
+    if(lastU&&lastU.role==="user"){
+      lastU.busy=false; lastU.grade=j.grade&&j.grade.verdict?j.grade:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now();
+      tkDraw(); haptic(lastU.grade.verdict==="great"?12:6); await tkSleep(700); if(id!==TLK.id) return;
+    }
+    TLK.msgs.push({role:"ai",es:j.reply.es,en:j.reply.en||"",hid:!!ST.talk.hide,tr:TLK.enOn,at:Date.now()});
+    TLK.sug=(j.suggestions||[]).filter(s=>s&&s.es); TLK.tryI=0; TLK.rev=false; TLK.tryOpen=true; TLK.goal=j.goal_en||"";
     (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
-    TLK.st=j.end?"end":"idle"; tkDraw(true);
-    if(S.auto==="on"){ const i=TLK.msgs.length-1; tkSpeak(j.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${i}"]`)) }
+    TLK.end=!!j.end; TLK.st="say"; TLK.sugReady=false; tkDraw("user");
+    const ai=TLK.msgs.length-1;
+    setTimeout(()=>{ if(id===TLK.id&&!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now(); tkDraw() } },700);
+    const next=()=>{ if(id===TLK.id) tkOpenDock() };
+    if(S.auto==="on") tkSpeak(j.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900);
   }catch(e){
     if(id!==TLK.id) return;
-    TLK.st="idle"; TLK.err={kind:"chat",msg:e.limit?"You have used today’s Talk allowance. It resets tomorrow.":e.auth?"Your sync code was not accepted. Check it in Settings.":navigator.onLine===false?"You are offline. Reconnect and try again.":"Couldn’t reach your server. Try again in a moment.",stop:!!(e.limit||e.auth)};
+    TLK.st="idle"; const lastU=TLK.msgs[TLK.msgs.length-1]; if(lastU&&lastU.busy) lastU.busy=false;
+    TLK.err={kind:"chat",msg:e.limit?"You have used today’s Talk allowance. It resets tomorrow.":e.auth?"Your sync code was not accepted. Check it in Settings.":navigator.onLine===false?"You are offline. Reconnect and try again.":"Couldn’t reach your server. Try again in a moment.",stop:!!(e.limit||e.auth)};
     tkDraw();
   }
 }
+function tkOpenDock(){
+  if(TLK.st==="end") { tkComposer(); return }
+  if(TLK.sc&&TLK.end){ TLK.st="end"; tkDraw(); return }
+  TLK.st="idle"; tkDraw(); if(TLK.micOK&&!TLK.tyOn) tkMicStart();
+}
 async function tkSend(blob,mime){
-  const id=TLK.id; TLK.st="stt"; TLK.err=null; tkDraw(true); lastAct=Date.now();
+  const id=TLK.id; TLK.st="stt"; TLK.err=null; TLK.sug=[]; const m={role:"user",es:"",pend:true,at:Date.now()}; TLK.msgs.push(m); tkDraw("user"); lastAct=Date.now();
+  const drop=()=>{ const k=TLK.msgs.indexOf(m); if(k>=0) TLK.msgs.splice(k,1) };
   try{
     const r=await rfetch("/talk/stt",{method:"POST",body:blob,headers:{"content-type":mime},ms:40000});
     if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
     if(!r.ok) throw new Error("stt "+r.status);
     const text=String((await r.json()).text||"").trim(); if(id!==TLK.id) return;
-    if(!text){ TLK.st="idle"; TLK.note="I didn’t catch anything. Tap the mic and try again."; tkDraw(); return }
-    TLK.msgs.push({role:"user",es:text}); tkTurn();
+    if(!text){ drop(); TLK.st="idle"; TLK.note="I didn’t catch anything. Try again."; tkDraw(); if(TLK.micOK&&!TLK.tyOn) setTimeout(()=>{ if(id===TLK.id&&TLK.st==="idle") tkMicStart() },400); return }
+    m.pend=false; m.es=text; m.busy=true; m.at=Date.now(); tkTurn();
   }catch(e){
     if(id!==TLK.id) return;
-    TLK.st="idle"; TLK.err={kind:"stt",blob,mime,msg:e.limit?"You have used today’s Talk allowance. It resets tomorrow.":"Couldn’t turn your voice into text. Try again, or type your answer.",stop:!!e.limit}; tkDraw();
+    drop(); TLK.st="idle"; TLK.err={kind:"stt",blob,mime,msg:e.limit?"You have used today’s Talk allowance. It resets tomorrow.":"Couldn’t turn your voice into text. Try again, or type your answer.",stop:!!e.limit}; tkDraw();
   }
 }
-// ---------- microphone
+// ---------- microphone (listens by itself once the partner has finished; the first time needs a tap)
 async function tkMicStart(){
   if(TLK.st!=="idle"||tkRec) return;
-  tkUnlock(); try{ tkAudio.pause() }catch(e){}
   const id=TLK.id; let stream;
   try{ stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}) }
-  catch(e){ TLK.note="The microphone isn’t available here. Allow it in your phone’s settings, or type your answer."; TLK.tyOn=true; tkComposer(); return }
-  if(id!==TLK.id||TLK.st!=="idle"){ stream.getTracks().forEach(t=>t.stop()); return }
+  catch(e){ TLK.micOK=false; TLK.note="The microphone isn’t available here. Allow it in your phone’s settings, or tap the keyboard to type."; tkComposer(); return }
+  if(id!==TLK.id||TLK.st!=="idle"||tkRec){ stream.getTracks().forEach(t=>t.stop()); return }
   const mt=["audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||"";
-  let mr; try{ mr=new MediaRecorder(stream,mt?{mimeType:mt}:undefined) }catch(e){ stream.getTracks().forEach(t=>t.stop()); TLK.note="Recording isn’t supported here. Type your answer instead."; TLK.tyOn=true; tkComposer(); return }
-  const chunks=[], rec={mr,stream,send:false,id,t0:Date.now(),mt:mr.mimeType||mt||"audio/mp4"};
+  let mr; try{ mr=new MediaRecorder(stream,mt?{mimeType:mt}:undefined) }catch(e){ stream.getTracks().forEach(t=>t.stop()); TLK.note="Recording isn’t supported here. Tap the keyboard to type."; tkComposer(); return }
+  TLK.micOK=true;
+  const chunks=[], rec={mr,stream,send:false,id,t0:Date.now(),mt:mr.mimeType||mt||"audio/mp4",voiced:false,hist:new Array(44).fill(0),lv:0,loud:0,flat:0};
   mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data) };
   mr.onstop=()=>{
-    try{ stream.getTracks().forEach(t=>t.stop()) }catch(e){}
-    if(rec.id!==TLK.id) return; if(tkRec===rec) tkRec=null;
-    if(!rec.send){ TLK.st="idle"; tkComposer(); return }
+    tkStopRec(rec); if(rec.id!==TLK.id) return; if(tkRec===rec) tkRec=null;
+    if(!rec.send){ if(TLK.st==="rec"||TLK.st==="stt"){ TLK.st="idle"; tkComposer() } return }
     const blob=new Blob(chunks,{type:rec.mt});
-    if(Date.now()-rec.t0<700||blob.size<1500){ TLK.st="idle"; TLK.note="That was too short. Tap the mic and try again."; tkComposer(); return }
+    if(Date.now()-rec.t0<700||blob.size<1500){ TLK.st="idle"; TLK.note="That was too short. Try again."; tkComposer(); return }
     tkSend(blob,rec.mt);
   };
-  tkRec=rec; mr.start(250); TLK.st="rec"; TLK.note=""; tkComposer(); tkWave(rec); haptic(8);
-  rec.auto=setTimeout(()=>tkMicStop(true),45000);
+  tkRec=rec; mr.start(250); TLK.st="rec"; TLK.note=""; tkComposer(); tkMeter(rec); haptic(8);
+  rec.auto=setTimeout(()=>tkMicStop(rec.voiced),45000);
 }
 function tkMicStop(send){
-  const r=tkRec; if(!r) return; r.send=!!send; clearTimeout(r.auto); cancelAnimationFrame(r.raf); try{r.ctx&&r.ctx.close()}catch(e){}
-  TLK.st=send?"stt":"idle"; if(send) tkDraw(true); else tkComposer();
+  const r=tkRec; if(!r) return; r.send=!!send; clearTimeout(r.auto); cancelAnimationFrame(r.raf);
+  TLK.st=send?"stt":"idle"; if(!send) tkComposer();
   try{ r.mr.stop() }catch(e){ if(tkRec===r) tkRec=null; TLK.st="idle"; tkComposer() }
 }
-function tkWave(rec){
-  const bars=[...document.querySelectorAll("#tkWave i")], tm=$("tkTime");
+function tkMeter(rec){
+  let an=null, d=null;
   try{
-    const AC=window.AudioContext||window.webkitAudioContext, ctx=new AC(), src=ctx.createMediaStreamSource(rec.stream), an=ctx.createAnalyser();
-    an.fftSize=64; src.connect(an); if(ctx.state==="suspended") ctx.resume(); rec.ctx=ctx;
-    const d=new Uint8Array(an.frequencyBinCount);
-    const loop=()=>{ if(tkRec!==rec) return; an.getByteFrequencyData(d);
-      bars.forEach((b,i)=>{ const v=d[Math.min(d.length-1,1+(i>>1))]/255; b.style.height=(10+Math.min(1,v*1.5)*90)+"%" });
-      if(tm){const s=Math.floor((Date.now()-rec.t0)/1000); tm.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
-      rec.raf=requestAnimationFrame(loop) };
-    loop();
-  }catch(e){ const w=$("tkWave"); if(w) w.classList.add("pulse") }
+    const AC=window.AudioContext||window.webkitAudioContext; tkCtx=tkCtx||new AC(); if(tkCtx.state==="suspended") tkCtx.resume();
+    rec.src=tkCtx.createMediaStreamSource(rec.stream); an=tkCtx.createAnalyser(); an.fftSize=512; rec.src.connect(an); d=new Uint8Array(an.fftSize);
+  }catch(e){ an=null }
+  let tick=0;
+  const loop=()=>{
+    if(tkRec!==rec) return;
+    let lv=0;
+    if(an){ an.getByteTimeDomainData(d); let s=0; for(let i=0;i<d.length;i++){ const x=(d[i]-128)/128; s+=x*x } lv=Math.min(1,Math.sqrt(s/d.length)*5); rec.flat=lv<.002?rec.flat+1:0 }
+    else rec.flat=999;
+    rec.lv=rec.lv*.6+lv*.4;
+    if(!rec.voiced){ rec.loud=rec.lv>.12?rec.loud+1:0; if(rec.loud>=3||rec.flat>90||(!an&&Date.now()-rec.t0>1200)){ rec.voiced=true; tkComposer() } }
+    if(++tick%3===0){ rec.hist.push(rec.lv); rec.hist.shift(); tkPaintWave(rec) }
+    const b=document.getElementById("tkMain"); if(b) b.style.setProperty("--lv",rec.lv.toFixed(3));
+    const tm=document.getElementById("tkTime"); if(tm){ const s=Math.floor((Date.now()-rec.t0)/1000); tm.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0") }
+    rec.raf=requestAnimationFrame(loop);
+  };
+  loop();
+}
+function tkPaintWave(rec){
+  const w=document.getElementById("tkWv"); if(!w) return;
+  if(w.children.length!==rec.hist.length) w.innerHTML=rec.hist.map(()=>"<i></i>").join("");
+  [...w.children].forEach((b,i)=>{ b.style.height=(2+Math.min(1,rec.hist[i]*1.6)*26)+"px"; b.classList.toggle("tk-hot",rec.hist[i]>.04) });
 }
 // ---------- bottom area
 function tkBlur(es,mode,rev){
@@ -5021,41 +5142,35 @@ function tkBlur(es,mode,rev){
 }
 function tkComposer(){
   const a=$("actions"); if(screen!=="tchat") return;
-  const st=TLK.st, busy=st==="ai"||st==="stt", sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null, sup=ST.talk.sup;
-  let h="";
+  const st=TLK.st, r=tkRec; let h="";
+  const busy=st==="ai"||st==="stt"||st==="say";
   if(TLK.err) h+=`<div class="tk-err"><p>${esc(TLK.err.msg)}</p>${TLK.err.stop?"":`<button type="button" class="grow" data-a="retry">Try again</button>`}</div>`;
-  if(st==="end") h+=`<p class="tk-goal">Nicely done. That’s the end of the scene.</p><button type="button" class="grow" data-a="results" style="width:100%">See your results</button>`;
-  else if(st==="rec") h+=`<p class="tk-goal">${esc(TLK.goal)}</p><div class="tk-mrow"><button type="button" class="tk-circ" data-a="cancel" aria-label="Discard this recording">${tki("trash")}</button><div class="tk-wave" id="tkWave" aria-hidden="true">${"<i></i>".repeat(24)}</div><span class="tk-time" id="tkTime">0:00</span><button type="button" class="tk-circ go" data-a="send" aria-label="Send">${tki("up")}</button></div>`;
-  else{
-    if(sg&&!busy&&!TLK.err) h+=`<div class="tk-try"><div class="tk-th"><span class="label">Try saying</span><span class="tk-bt">${tkBtn("sugsay","play","Hear the suggestion")}${tkBtn("sugtr","tr","Show English",null,TLK.enOn)}${TLK.sug.length>1?tkBtn("sugnext","refresh","Another idea"):""}</span></div>
-      <p class="tk-es" data-a="reveal">${tkBlur(sg.es,sup,TLK.rev)}</p>${TLK.enOn&&sg.en?`<p class="tk-en">${esc(sg.en)}</p>`:""}</div>`;
-    if(busy) h+=`<p class="tk-goal">${st==="stt"?"Listening to what you said…":"Your partner is answering…"}</p>`;
-    else if(!TLK.err){ if(TLK.note) h+=`<p class="tk-goal warn">${esc(TLK.note)}</p>`; else if(TLK.goal) h+=`<p class="tk-goal">${esc(TLK.goal)}</p>` }
-    if(!TLK.err||TLK.err.kind==="stt"&&!TLK.err.stop){
-      h+=TLK.tyOn&&!busy?`<form class="tk-form" id="tkForm"><input id="tkIn" name="t" lang="es" maxlength="300" autocomplete="off" autocapitalize="sentences" placeholder="Escribe en español…" aria-label="Type your answer in Spanish"><button type="submit" class="tk-circ go" aria-label="Send">${tki("up")}</button></form>`
-        :`<div class="tk-mrow"><button type="button" class="tk-mic" data-a="mic"${busy?" disabled":""} aria-label="Record your answer">${tki("mic")}</button></div>`;
-      if(!busy) h+=`<button type="button" class="tk-link" data-a="typetoggle">${TLK.tyOn?"Use the microphone":"Type instead"}</button>`;
-    }
+  if(st==="end"){ h+=`<p class="tk-goal">That’s the end of the scene. Nicely done.</p><button type="button" class="grow" data-a="results" style="width:100%">See your results</button>` }
+  else if(busy&&!TLK.err){ h+="" }
+  else if(!TLK.err||(TLK.err.kind==="stt"&&!TLK.err.stop)){
+    const hint=TLK.note?`<p class="tk-goal warn">${esc(TLK.note)}</p>`:TLK.goal?`<p class="tk-goal">${esc(TLK.goal)}</p>`:"";
+    if(TLK.tyOn) h+=`${hint}<form class="tk-form" id="tkForm"><button type="button" class="tk-circ" data-a="typetoggle" aria-label="Use the microphone">${tki("mic")}</button><input id="tkIn" name="t" lang="es" maxlength="300" autocomplete="off" autocapitalize="sentences" placeholder="Escribe en español…" aria-label="Type your answer in Spanish"><button type="submit" class="tk-circ tk-go" aria-label="Send">${tki("up")}</button></form>`;
+    else if(st==="rec"&&r) h+=`${hint}<div class="tk-wv" id="tkWv" aria-hidden="true">${r.hist.map(()=>"<i></i>").join("")}</div>
+      <div class="tk-mrow"><span class="tk-side"></span><button type="button" class="tk-main${r.voiced?" tk-send":""}" id="tkMain" data-a="${r.voiced?"send":"pause"}" aria-label="${r.voiced?"Send your answer":"Stop listening"}">${tki(r.voiced?"up":"pause")}</button><button type="button" class="tk-circ tk-bin" data-a="cancel" aria-label="Discard this recording">${tki("trash")}</button></div><span class="tk-time" id="tkTime" aria-hidden="true">0:00</span>`;
+    else h+=`${hint}<div class="tk-wv tk-idle" aria-hidden="true">${"<i></i>".repeat(44)}</div><div class="tk-mrow"><button type="button" class="tk-circ" data-a="typetoggle" aria-label="Type instead">${tki("kbd")}</button><button type="button" class="tk-main" id="tkMain" data-a="mic" aria-label="Record your answer">${tki("mic")}</button><span class="tk-side"></span></div>`;
   }
-  a.innerHTML=`<div class="tk-comp">${h}</div>`;
+  const dk=st+"|"+(r&&r.voiced)+"|"+TLK.tyOn+"|"+(TLK.err?1:0)+"|"+TLK.msgs.length, fade=dk!==TLK.dk; TLK.dk=dk;
+  a.innerHTML=`<div class="tk-comp${fade?" tk-fade":""}">${h}</div>`;
   const c=a.firstElementChild; c.onclick=tkCompClick;
-  c.onsubmit=e=>{ e.preventDefault(); const v=$("tkIn").value.trim(); if(!v||TLK.st!=="idle") return; TLK.msgs.push({role:"user",es:v}); tkTurn() };
+  c.onsubmit=e=>{ e.preventDefault(); const v=$("tkIn").value.trim(); if(!v||TLK.st!=="idle") return; TLK.sug=[]; TLK.msgs.push({role:"user",es:v,busy:true,at:Date.now()}); tkTurn() };
+  if(st==="rec"&&r) tkPaintWave(r);
 }
 function tkCompClick(e){
-  const b=e.target.closest("[data-a]"); if(!b||b.disabled) return; const a=b.dataset.a, sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null;
+  const b=e.target.closest("[data-a]"); if(!b||b.disabled) return; const a=b.dataset.a;
   if(a==="mic") tkMicStart();
   else if(a==="send") tkMicStop(true);
-  else if(a==="cancel") tkMicStop(false);
-  else if(a==="typetoggle"){ TLK.tyOn=!TLK.tyOn; TLK.note=""; tkComposer(); if(TLK.tyOn&&$("tkIn")) $("tkIn").focus() }
-  else if(a==="sugsay"&&sg) tkSpeak(sg.es,b);
-  else if(a==="sugtr"){ TLK.enOn=!TLK.enOn; tkComposer() }
-  else if(a==="sugnext"){ TLK.tryI++; TLK.rev=false; tkComposer() }
-  else if(a==="reveal"){ TLK.rev=true; tkComposer() }
+  else if(a==="pause"||a==="cancel") tkMicStop(false);
+  else if(a==="typetoggle"){ if(tkRec) tkMicStop(false); TLK.tyOn=!TLK.tyOn; TLK.note=""; tkComposer(); if(TLK.tyOn&&$("tkIn")) $("tkIn").focus() }
   else if(a==="retry"&&TLK.err){ const er=TLK.err; TLK.err=null; if(er.kind==="stt") tkSend(er.blob,er.mime); else tkTurn() }
   else if(a==="results") tkFinish(false);
 }
 // ---------- finish
-const talkQuit=()=>{ if(TLK.msgs.some(m=>m.role==="user"&&m.grade)) tkFinish(true); else renderTalk() };
+const talkQuit=()=>{ if(tkGraded()) tkFinish(true); else renderTalk() };
 function tkFinish(early){
   const g=TLK.msgs.filter(m=>m.role==="user"&&m.grade); tkLeave();
   if(!g.length){ renderTalk(); return }
@@ -5070,14 +5185,15 @@ function tkFinish(early){
   commit("talk"); renderTalkSum();
 }
 function renderTalkSum(){
-  screen="tsum"; $("fb").hidden=true; chrome(); const R=TLK.res, nw=Object.entries(TLK.words);
-  const line=m=>m.role==="ai"?`<div class="tk-sl"><span class="who">Partner</span><p class="tk-es">${esc(m.es)}</p><button type="button" class="tk-ib sm" data-a="say" data-t="${esc(m.es)}" aria-label="Hear this line">${tki("play")}</button></div>`
-    :`<div class="tk-sl me"><span class="who">You</span><p class="tk-es">${esc(m.es)}</p>${m.grade?`<span class="tk-v ${m.grade.verdict}">${m.grade.verdict==="great"?"✓":m.grade.verdict==="ok"?"!":"×"}</span>`:""}${m.grade&&m.grade.verdict!=="great"&&m.grade.corrected?`<p class="tk-en">→ ${esc(m.grade.corrected)}</p>`:""}</div>`;
+  screen="tsum"; $("fb").hidden=true; chrome(); const R=TLK.res, nw=Object.entries(TLK.words), fl=TLK.msgs.filter(m=>m.flag);
+  const line=m=>m.role==="ai"?`<div class="tk-sl"><span class="tk-who">Partner${m.flag?" · flagged":""}</span><p class="tk-es">${esc(m.es)}</p><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(m.es)}" aria-label="Hear this line">${tki("play")}</button></div>`
+    :`<div class="tk-sl tk-me"><span class="tk-who">You</span><p class="tk-es">${esc(m.es)}</p>${m.grade?`<span class="tk-v v-${m.grade.verdict}">${m.grade.verdict==="great"?"✓":m.grade.verdict==="ok"?"!":"×"}</span>`:""}${m.grade&&m.grade.verdict!=="great"&&m.grade.corrected?`<p class="tk-en">→ ${esc(m.grade.corrected)}</p>`:""}</div>`;
   $("drill").innerHTML=`<div class="tk tk-sum">${xpStrip(R.xp)}
     <div class="vcard" style="text-align:center"><div class="tk-stars" aria-label="${R.stars} of 3 stars">${"★".repeat(R.stars)}<span>${"★".repeat(3-R.stars)}</span></div>
       <div class="vscore" style="color:var(--cc)">${R.great}/${R.total}</div><p class="sub">Great responses${R.early?" · ended early":""}</p>
       <div class="tk-nums"><div><b>${R.mins}</b><span>${R.mins===1?"minute":"minutes"}</span></div><div><b>${R.words}</b><span>words used</span></div><div><b>${nw.length}</b><span>new phrases</span></div></div></div>
-    ${nw.length?`<div class="vcard"><p class="label" style="margin-bottom:6px">New phrases</p>${nw.map(([k,v])=>`<div class="tk-nw"><span><b>${esc(k)}</b> <i>${esc(v)}</i></span><button type="button" class="tk-ib sm" data-a="say" data-t="${esc(k)}" aria-label="Hear ${esc(k)}">${tki("play")}</button></div>`).join("")}</div>`:""}
+    ${nw.length?`<div class="vcard"><p class="label" style="margin-bottom:6px">New phrases</p>${nw.map(([k,v])=>`<div class="tk-nw"><span><b>${esc(k)}</b> <i>${esc(v)}</i></span><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(k)}" aria-label="Hear ${esc(k)}">${tki("play")}</button></div>`).join("")}</div>`:""}
+    ${fl.length?`<div class="vcard"><p class="label" style="margin-bottom:6px">Flagged</p>${fl.map(m=>`<div class="tk-nw"><span><b>${esc(m.es)}</b> <i>${esc(m.en||"")}</i></span><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(m.es)}" aria-label="Hear this line">${tki("play")}</button></div>`).join("")}</div>`:""}
     <div class="vcard"><p class="label" style="margin-bottom:8px">Conversation summary</p>${TLK.msgs.map(line).join("")}</div></div>`;
   $("actions").innerHTML=`<button type="button" class="ghost" id="tkCont">Continue</button><button type="button" class="grow" id="tkAgain">Replay</button>`;
   $("tkCont").onclick=()=>renderTalk(); $("tkAgain").onclick=()=>tkStart(TLK.sc);
