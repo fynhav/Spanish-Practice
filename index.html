@@ -726,6 +726,16 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 @keyframes vcp{50%{box-shadow:0 0 0 6px rgba(178,58,58,.18)}}
 .vc-toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);max-width:min(86vw,420px);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:.92rem;font-weight:600;box-shadow:0 6px 20px rgba(60,45,20,.16);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9999;text-align:center}
 .vc-toast.on{opacity:1;transform:translate(-50%,0)}
+
+.tk-off{border-color:#D9A441;background:#FBF1DA}
+.tk-off .tk-cl span{color:#B5791A}
+.tk-wait{opacity:.5}
+.tk-blindtag{display:flex;align-items:center;gap:8px;margin:0 0 2px;padding:8px 12px;border-radius:12px;background:var(--tk-soft);color:var(--tk-d);font-size:.8rem;font-weight:600}
+.tk-blindtag svg{width:16px;height:16px;flex:none}
+.tk-card.tk-blind{border-style:dashed;border-color:var(--tk);background:linear-gradient(0deg,rgba(27,135,148,.06),rgba(27,135,148,.06)),var(--card)}
+.tk-card.tk-blind .tk-ic{background:var(--tk);color:#fff}
+.tk-modeRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tk-sub2{margin:6px 0 0;font-size:.82rem;color:var(--muted)}
 </style>
 
 <div class="splash" id="splash" aria-live="polite">
@@ -790,7 +800,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 13:08</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 13:24</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4910,6 +4920,7 @@ const tki=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 const TLK={sc:null,lv:"A2",msgs:[],st:"idle",id:0,t0:0,sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:true,rev:false,res:null,micOK:false,sugReady:false,tryOpen:true,sugAt:0};
 const tkAudio=new Audio(); tkAudio.preload="auto"; const tkCache=new Map(); let tkRec=null, tkCtx=null;
 const tkSleep=ms=>new Promise(r=>setTimeout(r,ms));
+const tkHide=()=>TLK.blind?1:+ST.talk.hide, tkSupN=()=>TLK.blind?2:ST.talk.sup;
 const tkSetup=sc=>sc.custom?sc.custom:`The learner plays ${sc.you}. You play ${sc.w}. Setting: ${sc.at}. Purpose of the scene: ${sc.goal}.`;
 const tkMax=sc=>sc.max||8;
 function tkLevel(){ if(ST.talk.lv) return ST.talk.lv; let n=0; for(const r of cefrCalc()){ if(r.p>=.7) n++; else break } return n===0?"A1":n===1?"A2":"B1" }
@@ -4951,6 +4962,7 @@ function renderTalk(){
       <div class="tk-row"><span>Ideas for what to say</span>${seg("tkSup",[[0,"Full"],[1,"Half hidden"],[2,"Hidden"]],T.sup)}</div>
       <div class="tk-row"><span>Partner’s text</span>${seg("tkHide",[[0,"Shown"],[1,"Hidden"]],T.hide)}</div>
     </div>
+    <button type="button" class="tk-card tk-blind" id="tkBlind"><span class="tk-ic" aria-hidden="true">${tki("eyeoff")}</span><span class="tk-tx"><b>Blind session</b><small>No text, no ideas. A surprise scene with the odd curveball question.</small></span><span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>
     ${["A1","A2","B1"].map(group).join("")}
     <div class="vcard"><p class="label" style="margin-bottom:6px">Your own scene</p>
       <textarea id="tkCust" rows="2" maxlength="300" placeholder="e.g. I am returning a jacket that is too small at a clothes shop"></textarea>
@@ -4959,6 +4971,7 @@ function renderTalk(){
   $("actions").innerHTML="";
   [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
   $("drill").querySelectorAll(".tk-card").forEach(b=>b.onclick=()=>{ if(!tkReady()) return; renderTalkPre(TALK_SC.find(s=>s.id===b.dataset.sc)) });
+  $("tkBlind").onclick=()=>{ if(!tkReady()) return; const pool=TALK_SC.filter(x=>x.lv===lv), last=TLK.lastBlind; const c=pool.filter(x=>x.id!==last), sc=(c.length?c:pool)[Math.floor(Math.random()*(c.length?c.length:pool.length))]; TLK.lastBlind=sc.id; tkStart(sc,{blind:true}) };
   $("tkCustGo").onclick=()=>{ const v=$("tkCust").value.trim(); if(v.length<8){$("tkCust").focus(); return} if(!tkReady()) return;
     tkStart({id:"custom",e:"✏️",t:"Tu escena",en:"Your own scene",lv:"",custom:v,w:"the other person in the scene described",focus:""}) };
   updateSync(); tkPing();
@@ -4984,16 +4997,18 @@ function renderTalkPre(sc,edit){
   $("drill").innerHTML=`<div class="tk tk-pre"><div><h2 class="hello">${esc(sc.t)}</h2><p class="sub">${esc(sc.en)}</p></div>
     <p class="tk-pd">You will practise ${esc(sc.goal)}.</p>
     <div class="tk-fills">${rows.map(([l,k])=>`<div class="tk-fr"><span>${l}</span>${edit?`<input data-k="${k}" value="${esc(sc[k])}" maxlength="90" aria-label="${l}">`:`<b class="tk-fill">${esc(sc[k])}</b>`}</div>`).join("")}</div>
+    <div class="tk-row tk-modeRow"><span>Mode</span><div class="tk-seg" id="tkMode"><button type="button" data-v="0" aria-pressed="${!TLK.preBlind}">Normal</button><button type="button" data-v="1" aria-pressed="${!!TLK.preBlind}">Blind</button></div></div>
     <button type="button" class="tk-link" id="tkCz">${edit?"Reset to the original":"Customize Scenario"}</button></div>`;
+  $("tkMode").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; TLK.preBlind=b.dataset.v==="1"; $("tkMode").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))) };
   $("actions").innerHTML=`<button type="button" class="grow" id="tkGo">Continue</button>`;
   $("tkCz").onclick=()=>{ if(edit) renderTalkPre(TALK_SC.find(s=>s.id===sc.id)); else renderTalkPre({...sc},true) };
-  $("tkGo").onclick=()=>{ const s2={...sc}; $("drill").querySelectorAll("input[data-k]").forEach(i=>{ if(i.value.trim()) s2[i.dataset.k]=i.value.trim() }); tkStart(s2) };
+  $("tkGo").onclick=()=>{ const s2={...sc}; $("drill").querySelectorAll("input[data-k]").forEach(i=>{ if(i.value.trim()) s2[i.dataset.k]=i.value.trim() }); tkStart(s2,{blind:!!TLK.preBlind}) };
 }
 
 // ---------- conversation
-function tkStart(sc){
+function tkStart(sc,opts){
   tkUnlock(); tkLeave();
-  Object.assign(TLK,{sc,lv:tkLevel(),msgs:[],sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:tkLevel()!=="B1",rev:false,res:null,t0:Date.now(),st:"ai",sugReady:false,tryOpen:true,end:false});
+  Object.assign(TLK,{blind:!!(opts&&opts.blind),peeks:0,offs:0,tm:[],sc,lv:tkLevel(),msgs:[],sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:tkLevel()!=="B1",rev:false,res:null,t0:Date.now(),st:"ai",sugReady:false,tryOpen:true,end:false});
   renderTalkChat(); tkTurn();
 }
 function renderTalkChat(){
@@ -5019,15 +5034,16 @@ function tkMsgHTML(m,i){
   if(m.role==="ai"){
     const live=TLK.st==="ai"&&i===TLK.msgs.length-1;
     const tut=m.tp?tkTutHTML(m,i):"";
-    return `<div class="tk-m tk-ai${tkEnter(m.at)}"><div class="tk-b">${m.hid?`<div class="tk-wb">${tkWaveGlyph}</div>`:`<p class="tk-es">${esc(m.es)}</p>${m.tr&&m.en?`<p class="tk-en">${esc(m.en)}</p>`:""}`}</div>
+    return `<div class="tk-m tk-ai${tkEnter(m.at)}"><div class="tk-b">${m.hid?`<div class="tk-wb">${tkWaveGlyph}</div>`:`<p class="tk-es">${esc(m.es)}</p>${m.tr&&m.en?`<p class="tk-en">${esc(m.en)}</p>`:m.tr&&m.enP?`<p class="tk-en tk-wait">…</p>`:""}`}</div>
       <div class="tk-bt">${tkBtn("say","play","Hear it again",i)}${tkBtn("tr","tr","Show English",i,!!m.tr)}${tkBtn("tutor","cap","Explain this line",i,!!m.tp)}${tkBtn("hide",m.hid?"eye":"eyeoff",m.hid?"Show the text":"Hide the text",i,!!m.hid)}${tkBtn("flag","flag","Flag this line",i,!!m.flag)}</div>${tut}</div>`;
   }
   if(m.pend) return `<div class="tk-m tk-me tk-ub">${tkDots("tk-me"+tkEnter(m.at))}</div>`;
   const g=m.grade, v=g?g.verdict:"", good=v==="great";
   const badge=m.busy?`<span class="tk-badge tk-spin" aria-label="Checking"></span>`:g?`<span class="tk-badge ${good?"tk-ok":"tk-fix"}${m.pop&&Date.now()-m.pop<900?" tk-pop":""}" aria-label="${good?"Great":"Has a correction"}">${good?"✓":tki("chat")}</span>`:`<span class="tk-badge"></span>`;
   const fix=g&&!good?`<div class="tk-card2${tkEnter(m.fixAt)}"><p class="tk-cl"><span>✓</span> Correct Answer</p><p class="tk-es tk-bold">${esc(g.corrected||m.es)}</p>${g.note_en?`<hr><p class="tk-en">${esc(g.note_en)}</p>`:""}</div>`:"";
+  const off=m.off?`<div class="tk-card2 tk-off${tkEnter(m.offAt)}"><p class="tk-cl"><span>!</span> That didn’t fit</p><p class="tk-en">${esc(m.off)}</p></div>`:"";
   return `<div class="tk-m tk-me tk-ub${tkEnter(m.at)}"><div class="tk-ur">${badge}<button type="button" class="tk-more" data-a="tutor" data-i="${i}" aria-label="Explain this line">${tki("dots")}</button><div class="tk-b tk-me"><p class="tk-es">${esc(m.es)}</p></div></div>
-    <div class="tk-bt tk-me">${tkBtn("say","play","Hear it",i,null,m.busy)}</div>${fix}${m.tp?tkTutHTML(m,i):""}</div>`;
+    <div class="tk-bt tk-me">${tkBtn("say","play","Hear it",i,null,m.busy)}</div>${off}${fix}${m.tp?tkTutHTML(m,i):""}</div>`;
 }
 function tkTutHTML(m,i){
   return `<div class="tk-tut">${(m.tut||[]).map((t,k)=>{ const w=(t.a||"").split(" "), part=t.a==null?null:(t.n!=null&&t.n<w.length?w.slice(0,t.n).join(" ")+" …":t.a);
@@ -5035,7 +5051,7 @@ function tkTutHTML(m,i){
     ${m.ask?`<form class="tk-ask" data-i="${i}"><input name="q" maxlength="200" autocomplete="off" placeholder="Ask the tutor in English" aria-label="Question for the tutor"><button type="submit" class="tk-circ tk-go tk-sm" aria-label="Send">${tki("up")}</button></form>`:`<button type="button" class="tk-link tk-asklink" data-a="ask" data-i="${i}">${tki("spark")}<span>Ask Tutor</span></button>`}`;
 }
 function tkTryHTML(){
-  const sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null, st=TLK.st, sup=ST.talk.sup;
+  const sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null, st=TLK.st, sup=tkSupN();
   if(!sg||st==="ai"||st==="stt"||st==="end") return "";
   if(!TLK.sugReady) return `<div class="tk-m tk-me">${tkDots("tk-ph tk-enter")}</div>`;
   const dim=st==="say";
@@ -5047,7 +5063,7 @@ function tkDraw(scroll){
   if(screen!=="tchat"||!$("tkLog")) return;
   const log=$("tkLog"), body=$("drill"), y0=body.scrollTop;
   const last=TLK.msgs[TLK.msgs.length-1];
-  log.innerHTML=TLK.msgs.map(tkMsgHTML).join("")
+  log.innerHTML=(TLK.blind?`<p class="tk-blindtag">${tki("eyeoff")}<span>Blind session · no text, no ideas, watch for curveballs</span></p>`:"")+TLK.msgs.map(tkMsgHTML).join("")
     +(TLK.st==="ai"&&!TLK.err&&!(last&&last.role==="ai")?`<div class="tk-m tk-ai">${tkDots("tk-enter")}</div>`:"")
     +tkTryHTML();
   tkChrome(); tkComposer();
@@ -5071,10 +5087,10 @@ function tkLogClick(e){
   else if(a==="sugsay"&&sg) tkSpeak(sg.es,b);
   else if(a==="sugtr"){ TLK.enOn=!TLK.enOn; tkDraw() }
   else if(a==="sugnext"){ TLK.tryI++; TLK.rev=false; tkDraw() }
-  else if(a==="reveal"){ TLK.rev=true; tkDraw() }
+  else if(a==="reveal"){ if(TLK.blind&&!TLK.rev) TLK.peeks++; TLK.rev=true; tkDraw() }
   else if(!m) return;
   else if(a==="tr"){m.tr=!m.tr; tkDraw()}
-  else if(a==="hide"){m.hid=!m.hid; tkDraw()}
+  else if(a==="hide"){ if(TLK.blind&&m.hid) TLK.peeks++; m.hid=!m.hid; tkDraw()}
   else if(a==="flag"){m.flag=!m.flag; tkDraw(); haptic(8)}
   else if(a==="tutor"){m.tp=!m.tp; if(m.tp&&!m.tut) tkAsk(i,""); else tkDraw()}
   else if(a==="ask"){m.ask=true; tkDraw(); const q=document.querySelector(".tk-ask input"); if(q) q.focus()}
@@ -5096,31 +5112,42 @@ async function tkAsk(i,q){
     if(ent.n>=w){ ent.n=null; clearInterval(iv); if(el) el.textContent=ent.a; else tkDraw() }
     else if(el) el.textContent=words.slice(0,ent.n).join(" ")+" …"; else clearInterval(iv) },45);
 }
+async function tkPost(path,body,ms){
+  const r=await rfetch(path,{method:"POST",body:JSON.stringify(body),ms:ms||30000});
+  if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
+  if(r.status===401) throw Object.assign(new Error("auth"),{auth:true});
+  if(!r.ok) throw new Error(path+" "+r.status);
+  return r.json();
+}
+// One turn, built for speed: the partner's line comes from a small fast call and is spoken as soon as it arrives;
+// the grade of your last line runs in parallel, and the translation + ideas load while the audio plays.
 async function tkTurn(){
   const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; TLK.sug=[]; TLK.sugReady=false; tkDraw(TLK.msgs.length?"end":"top"); lastAct=Date.now();
-  const sc=TLK.sc, body={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),history:TLK.msgs.filter(m=>m.es).map(m=>({role:m.role,es:m.es})),suggested:[]};
+  const sc=TLK.sc, base={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),blind:!!TLK.blind};
+  const hist=()=>TLK.msgs.filter(m=>m.es&&!m.pend).map(m=>({role:m.role,es:m.es}));
+  const lastU=TLK.msgs[TLK.msgs.length-1], hasU=!!(lastU&&lastU.role==="user"), t0=Date.now();
   try{
-    const r=await rfetch("/talk/chat",{method:"POST",body:JSON.stringify(body),ms:50000});
-    if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
-    if(r.status===401) throw Object.assign(new Error("auth"),{auth:true});
-    if(!r.ok) throw new Error("chat "+r.status);
-    const j=await r.json(); if(id!==TLK.id) return;
-    const lastU=TLK.msgs[TLK.msgs.length-1];
-    if(lastU&&lastU.role==="user"){
-      lastU.busy=false; lastU.grade=j.grade&&j.grade.verdict?j.grade:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now();
-      tkDraw("end"); haptic(lastU.grade.verdict==="great"?12:6); await tkSleep(700); if(id!==TLK.id) return;
-    }
-    TLK.msgs.push({role:"ai",es:j.reply.es,en:j.reply.en||"",hid:!!ST.talk.hide,tr:TLK.enOn,at:Date.now()});
-    TLK.sug=(j.suggestions||[]).filter(s=>s&&s.es); TLK.tryI=0; TLK.rev=false; TLK.tryOpen=true; TLK.goal=j.goal_en||"";
-    (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
-    TLK.end=!!j.end; TLK.st="say"; TLK.sugReady=false; tkDraw("end");
+    if(hasU) tkPost("/talk/grade",{...base,history:hist()},40000).then(g=>{
+      if(id!==TLK.id) return;
+      lastU.busy=false; lastU.grade=g.grade&&g.grade.verdict?g.grade:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now();
+      tkDraw(); haptic(lastU.grade.verdict==="great"?12:6);
+    }).catch(()=>{ if(id!==TLK.id) return; lastU.busy=false; lastU.grade=lastU.grade||{verdict:"ok",corrected:"",note_en:""}; tkDraw() });
+    const A=await tkPost("/talk/reply",{...base,history:hist()},30000); if(id!==TLK.id) return;
+    TLK.tm.push(Date.now()-t0);
+    if(hasU&&A.off){ lastU.off=A.off_en||"That didn’t answer what they asked."; lastU.offAt=Date.now(); TLK.offs++; haptic(18) }
+    const am={role:"ai",es:A.reply.es,en:"",enP:true,hid:tkHide(),tr:TLK.enOn,at:Date.now()}; TLK.msgs.push(am);
+    TLK.sug=[]; TLK.tryI=0; TLK.rev=false; TLK.tryOpen=!TLK.blind; TLK.goal=""; TLK.end=!!A.end; TLK.st="say"; TLK.sugReady=false; tkDraw("end");
     const ai=TLK.msgs.length-1;
-    setTimeout(()=>{ if(id===TLK.id&&!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now(); tkDraw("end") } },700);
-    const next=()=>{ if(id===TLK.id) tkOpenDock() };
-    if(S.auto==="on") tkSpeak(j.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900);
+    const help=tkPost("/talk/next",{...base,history:hist()},40000).then(j=>{
+      if(id!==TLK.id) return; am.en=j.reply_en||""; am.enP=false;
+      TLK.sug=(j.suggestions||[]).filter(x=>x&&x.es); TLK.goal=j.goal_en||""; (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
+    }).catch(()=>{ am.enP=false }).then(()=>tkSleep(Math.max(0,700-(Date.now()-am.at)))).then(()=>{
+      if(id!==TLK.id) return; if(!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now(); tkDraw("end") } });
+    const next=()=>help.then(()=>{ if(id===TLK.id) tkOpenDock() });
+    if(S.auto==="on") tkSpeak(A.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900);
   }catch(e){
     if(id!==TLK.id) return;
-    TLK.st="idle"; const lastU=TLK.msgs[TLK.msgs.length-1]; if(lastU&&lastU.busy) lastU.busy=false;
+    TLK.st="idle"; if(lastU&&lastU.busy) lastU.busy=false;
     TLK.err={kind:"chat",msg:e.limit?"You have used today’s Talk allowance. It resets tomorrow.":e.auth?"Your sync code was not accepted. Check it in Settings.":navigator.onLine===false?"You are offline. Reconnect and try again.":"Couldn’t reach your server. Try again in a moment.",stop:!!(e.limit||e.auth)};
     tkDraw();
   }
@@ -5214,7 +5241,7 @@ function tkComposer(){
   if(st==="end"){ h+=`<p class="tk-goal">That’s the end of the scene. Nicely done.</p><button type="button" class="grow" data-a="results" style="width:100%">See your results</button>` }
   else if(busy&&!TLK.err){ h+="" }
   else if(!TLK.err||(TLK.err.kind==="stt"&&!TLK.err.stop)){
-    const hint=TLK.note?`<p class="tk-goal warn">${esc(TLK.note)}</p>`:TLK.goal?`<p class="tk-goal">${esc(TLK.goal)}</p>`:"";
+    const hint=TLK.note?`<p class="tk-goal warn">${esc(TLK.note)}</p>`:TLK.goal&&!TLK.blind?`<p class="tk-goal">${esc(TLK.goal)}</p>`:"";
     if(TLK.tyOn) h+=`${hint}<form class="tk-form" id="tkForm"><button type="button" class="tk-circ" data-a="typetoggle" aria-label="Use the microphone">${tki("mic")}</button><input id="tkIn" name="t" lang="es" maxlength="300" autocomplete="off" autocapitalize="sentences" placeholder="Escribe en español…" aria-label="Type your answer in Spanish"><button type="submit" class="tk-circ tk-go" aria-label="Send">${tki("up")}</button></form>`;
     else if(st==="rec"&&r) h+=`${hint}<div class="tk-wv" id="tkWv" aria-hidden="true">${r.hist.map(()=>"<i></i>").join("")}</div>
       <div class="tk-mrow"><span class="tk-side"></span><button type="button" class="tk-main${r.voiced?" tk-send":""}" id="tkMain" data-a="${r.voiced?"send":"pause"}" aria-label="${r.voiced?"Send your answer":"Stop listening"}">${tki(r.voiced?"up":"pause")}</button><button type="button" class="tk-circ tk-bin" data-a="cancel" aria-label="Discard this recording">${tki("trash")}</button></div><span class="tk-time" id="tkTime" aria-hidden="true">0:00</span>`;
@@ -5257,12 +5284,12 @@ function renderTalkSum(){
   $("drill").innerHTML=`<div class="tk tk-sum">${xpStrip(R.xp)}
     <div class="vcard" style="text-align:center"><div class="tk-stars" aria-label="${R.stars} of 3 stars">${"★".repeat(R.stars)}<span>${"★".repeat(3-R.stars)}</span></div>
       <div class="vscore" style="color:var(--cc)">${R.great}/${R.total}</div><p class="sub">Great responses${R.early?" · ended early":""}</p>
-      <div class="tk-nums"><div><b>${R.mins}</b><span>${R.mins===1?"minute":"minutes"}</span></div><div><b>${R.words}</b><span>words used</span></div><div><b>${nw.length}</b><span>new phrases</span></div></div></div>
+      ${TLK.blind?`<p class="tk-sub2">Blind session · ${TLK.peeks?`peeked ${TLK.peeks} ${TLK.peeks===1?"time":"times"}`:"no peeking"}${TLK.offs?` · ${TLK.offs} off-topic ${TLK.offs===1?"answer":"answers"}`:""}</p>`:""}<div class="tk-nums"><div><b>${R.mins}</b><span>${R.mins===1?"minute":"minutes"}</span></div><div><b>${R.words}</b><span>words used</span></div><div><b>${nw.length}</b><span>new phrases</span></div></div>${TLK.tm.length?`<p class="tk-sub2">Average reply time ${(TLK.tm.reduce((a,b)=>a+b,0)/TLK.tm.length/1000).toFixed(1)}s</p>`:""}</div>
     ${nw.length?`<div class="vcard"><p class="label" style="margin-bottom:6px">New phrases</p>${nw.map(([k,v])=>`<div class="tk-nw"><span><b>${esc(k)}</b> <i>${esc(v)}</i></span><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(k)}" aria-label="Hear ${esc(k)}">${tki("play")}</button></div>`).join("")}</div>`:""}
     ${fl.length?`<div class="vcard"><p class="label" style="margin-bottom:6px">Flagged</p>${fl.map(m=>`<div class="tk-nw"><span><b>${esc(m.es)}</b> <i>${esc(m.en||"")}</i></span><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(m.es)}" aria-label="Hear this line">${tki("play")}</button></div>`).join("")}</div>`:""}
     <div class="vcard"><p class="label" style="margin-bottom:8px">Conversation summary</p>${TLK.msgs.map(line).join("")}</div></div>`;
   $("actions").innerHTML=`<button type="button" class="ghost" id="tkCont">Continue</button><button type="button" class="grow" id="tkAgain">Replay</button>`;
-  $("tkCont").onclick=()=>renderTalk(); $("tkAgain").onclick=()=>tkStart(TLK.sc);
+  $("tkCont").onclick=()=>renderTalk(); $("tkAgain").onclick=()=>tkStart(TLK.sc,{blind:TLK.blind});
   $("drill").firstElementChild.onclick=e=>{ const b=e.target.closest('[data-a="say"]'); if(b) tkSpeak(b.dataset.t,b) };
   $("drill").scrollTop=0;
 }
