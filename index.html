@@ -773,7 +773,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 10:01</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 10:06</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2280,6 +2280,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")$("ov").hidden=true}
 // ================= listen: Spanish text read aloud with the best natural voice the phone has =================
 const SPK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
 const spkBtn=(text,cls)=>(TTS_OK||REC_KEYS.size)&&text?`<button type="button" class="spk${cls?" "+cls:""}" data-say="${esc(text)}" aria-label="Listen">${SPK_SVG}</button>`:"";
+try{ if(navigator.audioSession) navigator.audioSession.type="ambient" }catch(e){}
 const TTS_OK=typeof window!=="undefined"&&"speechSynthesis" in window&&typeof SpeechSynthesisUtterance!=="undefined";
 if(!S.autoV2){S.auto="on"; S.autoV2=1} if(!S.auto) S.auto="on"; if(!S.rate) S.rate="normal"; if(S.voice==null) S.voice="";
 const ttsVoices=()=>TTS_OK?speechSynthesis.getVoices().filter(v=>/^es([-_]|$)/i.test(v.lang)):[];
@@ -4816,6 +4817,7 @@ setInterval(()=>{
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden") saveLocal()});
 addEventListener("pagehide",saveLocal);
 
+function tkAmbient(){ try{ if(navigator.audioSession) navigator.audioSession.type="ambient" }catch(e){} }
 // ================= Talk: spoken conversation practice (runs through your Railway server) =================
 const TALK_SC=[
  {id:"intro",e:"👋",t:"Conocer a un vecino",en:"Meeting a new neighbour",lv:"A1",you:"a new neighbour",w:"a friendly neighbour",at:"the hallway of an apartment building",goal:"introducing yourself and making small talk"},
@@ -4862,7 +4864,7 @@ function tkUnlock(){
   try{ tkAudio.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="; tkAudio.play().catch(()=>{}) }catch(e){}
   try{ const AC=window.AudioContext||window.webkitAudioContext; if(AC){ tkCtx=tkCtx||new AC(); if(tkCtx.state==="suspended") tkCtx.resume() } }catch(e){}
 }
-function tkStopRec(r){ if(!r) return; clearTimeout(r.auto); cancelAnimationFrame(r.raf); try{r.src&&r.src.disconnect()}catch(e){} try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){} }
+function tkStopRec(r){ if(!r) return; clearTimeout(r.auto); cancelAnimationFrame(r.raf); try{r.src&&r.src.disconnect()}catch(e){} try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){} tkAmbient() }
 function tkLeave(){
   TLK.id++;
   if(tkRec){ const r=tkRec; r.send=false; tkRec=null; tkStopRec(r); try{r.mr.stop()}catch(e){} }
@@ -5094,11 +5096,12 @@ async function tkSend(blob,mime){
 async function tkMicStart(){
   if(TLK.st!=="idle"||tkRec) return;
   const id=TLK.id; let stream;
+  try{ if(navigator.audioSession) navigator.audioSession.type="play-and-record" }catch(e){}
   try{ stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}) }
-  catch(e){ TLK.micOK=false; TLK.note="The microphone isn’t available here. Allow it in your phone’s settings, or tap the keyboard to type."; tkComposer(); return }
-  if(id!==TLK.id||TLK.st!=="idle"||tkRec){ stream.getTracks().forEach(t=>t.stop()); return }
+  catch(e){ tkAmbient(); TLK.micOK=false; TLK.note="The microphone isn’t available here. Allow it in your phone’s settings, or tap the keyboard to type."; tkComposer(); return }
+  if(id!==TLK.id||TLK.st!=="idle"||tkRec){ stream.getTracks().forEach(t=>t.stop()); tkAmbient(); return }
   const mt=["audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||"";
-  let mr; try{ mr=new MediaRecorder(stream,mt?{mimeType:mt}:undefined) }catch(e){ stream.getTracks().forEach(t=>t.stop()); TLK.note="Recording isn’t supported here. Tap the keyboard to type."; tkComposer(); return }
+  let mr; try{ mr=new MediaRecorder(stream,mt?{mimeType:mt}:undefined) }catch(e){ stream.getTracks().forEach(t=>t.stop()); tkAmbient(); TLK.note="Recording isn’t supported here. Tap the keyboard to type."; tkComposer(); return }
   TLK.micOK=true;
   const chunks=[], rec={mr,stream,send:false,id,t0:Date.now(),mt:mr.mimeType||mt||"audio/mp4",voiced:false,hist:new Array(44).fill(0),lv:0,loud:0,flat:0};
   mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data) };
