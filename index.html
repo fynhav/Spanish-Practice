@@ -781,7 +781,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 11:37</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 11:40</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -5296,6 +5296,18 @@ async function vcStart(btn,onText){
 function vcBtnHTML(){ return `<button type="button" class="ghost vc-mic" id="vcMic" aria-label="Answer by voice">🎤</button>` }
 function vcBind(onText){ const b=$("vcMic"); if(b) b.onclick=()=>vcStart(b,onText) }
 function vcAbort(){ if(vcRec) vcStop(false); const t=$("vcToast"); if(t) t.classList.remove("on") }
+
+// ---------- first tap on a bottom-bar button must work while the keyboard is open ----------
+// On iOS, tapping a button outside the field blurs it, the keyboard drops, the layout moves and the tap is lost.
+// Same trick as the accent keys: act on pointerdown and keep focus where it is.
+(function(){
+  const A=$("actions"); if(!A) return; let t=0;
+  const typing=()=>{ const a=document.activeElement; return !!a&&(a.isContentEditable||/^(INPUT|TEXTAREA)$/.test(a.tagName)) };
+  A.addEventListener("pointerdown",e=>{ const b=e.target.closest("button"); if(!b||b.disabled||!typing()||!A.contains(b)) return; e.preventDefault(); t=Date.now(); b.click() },true);
+  ["mousedown","touchstart"].forEach(ev=>A.addEventListener(ev,e=>{ if(e.target.closest("button")&&typing()) e.preventDefault() },{passive:false,capture:true}));
+  // the real click that follows the press must not land on whatever replaced the button (Check becomes Next)
+  document.addEventListener("click",e=>{ if(e.isTrusted&&Date.now()-t<700){ e.stopImmediatePropagation(); e.preventDefault() } },true);
+})();
 
 renderMenu();
 // ================= opening screen: progress at a glance while the app loads =================
