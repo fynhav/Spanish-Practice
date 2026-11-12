@@ -630,7 +630,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .tk-fill{display:inline-block;background:var(--tk-soft);color:var(--ink);border-radius:10px;padding:6px 12px;font-weight:600;font-size:.88rem;text-align:right;line-height:1.3}
 .tk-fr input{flex:1;min-width:0;font:inherit;font-size:16px;text-align:right;border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--tile);color:var(--ink)}
 /* chat */
-#tkLog{padding-bottom:34vh}
+#tkLog{padding-bottom:14px}
 @keyframes tkin{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
 .tk-enter{animation:tkin .34s cubic-bezier(.2,.8,.3,1) both}
 .tk-m{display:flex;flex-direction:column;gap:4px;max-width:94%}
@@ -680,7 +680,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .tk-tb{padding-top:8px}
 /* bottom dock */
 .actions:has(.tk-comp){display:block;padding-block:6px 10px}
-.tk-comp{--tk:#1B8794;--tk-d:#13727D;display:flex;flex-direction:column;gap:6px;min-height:152px;justify-content:flex-end}
+.tk-comp{--tk:#1B8794;--tk-d:#13727D;display:flex;flex-direction:column;gap:6px;min-height:140px;justify-content:flex-end}
 .tk-comp.tk-fade{animation:tkfade .3s ease-out both}
 @keyframes tkfade{from{opacity:0}to{opacity:1}}
 .tk-goal{margin:0;text-align:center;color:var(--tk-d);font-size:.84rem;font-weight:500}.tk-goal.warn{color:var(--bad)}
@@ -773,7 +773,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 09:21</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 10:01</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2432,6 +2432,7 @@ function fit(){
   const ae=document.activeElement, editing=!!ae&&(ae.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName));
   baseH=editing?Math.max(baseH,window.innerHeight,h):Math.max(window.innerHeight,h);
   const kb=baseH-h>120;
+  if(!kb&&vv&&(vv.offsetTop>0||vv.pageTop>0)){ r.setProperty("--vt","0px"); if(window.scrollY||document.scrollingElement.scrollTop) window.scrollTo(0,0) }
   if(kb) r.setProperty("--kb-pad","0px"); else r.removeProperty("--kb-pad");
   document.documentElement.classList.toggle("kbd",kb);
   const fb=$("fb");
@@ -4974,8 +4975,8 @@ function tkMsgHTML(m,i){
     <div class="tk-bt tk-me">${tkBtn("say","play","Hear it",i,null,m.busy)}</div>${fix}${m.tp?tkTutHTML(m,i):""}</div>`;
 }
 function tkTutHTML(m,i){
-  return `<div class="tk-tut">${(m.tut||[]).map(t=>{ const w=(t.a||"").split(" "), part=t.a==null?null:(t.n!=null&&t.n<w.length?w.slice(0,t.n).join(" ")+" …":t.a);
-    return `${t.q?`<p class="tk-q">${esc(t.q)}</p>`:""}<p class="tk-a">${part==null?'<span class="tk-typ tk-inl"><i></i><i></i><i></i></span>':esc(part)}</p>`}).join("")}</div>
+  return `<div class="tk-tut">${(m.tut||[]).map((t,k)=>{ const w=(t.a||"").split(" "), part=t.a==null?null:(t.n!=null&&t.n<w.length?w.slice(0,t.n).join(" ")+" …":t.a);
+    return `${t.q?`<p class="tk-q">${esc(t.q)}</p>`:""}<p class="tk-a" data-ti="${i}-${k}">${part==null?'<span class="tk-typ tk-inl"><i></i><i></i><i></i></span>':esc(part)}</p>`}).join("")}</div>
     ${m.ask?`<form class="tk-ask" data-i="${i}"><input name="q" maxlength="200" autocomplete="off" placeholder="Ask the tutor in English" aria-label="Question for the tutor"><button type="submit" class="tk-circ tk-go tk-sm" aria-label="Send">${tki("up")}</button></form>`:`<button type="button" class="tk-link tk-asklink" data-a="ask" data-i="${i}">${tki("spark")}<span>Ask Tutor</span></button>`}`;
 }
 function tkTryHTML(){
@@ -4989,19 +4990,24 @@ function tkTryHTML(){
 }
 function tkDraw(scroll){
   if(screen!=="tchat"||!$("tkLog")) return;
-  const log=$("tkLog"), body=$("drill");
+  const log=$("tkLog"), body=$("drill"), y0=body.scrollTop;
   const last=TLK.msgs[TLK.msgs.length-1];
   log.innerHTML=TLK.msgs.map(tkMsgHTML).join("")
     +(TLK.st==="ai"&&!TLK.err&&!(last&&last.role==="ai")?`<div class="tk-m tk-ai">${tkDots("tk-enter")}</div>`:"")
     +tkTryHTML();
   tkChrome(); tkComposer();
+  if(scroll!=="top") body.scrollTop=y0;   // a redraw must never move the reader
   if(scroll) tkScroll(scroll);
 }
 function tkScroll(mode){
-  const body=$("drill"), us=[...document.querySelectorAll("#tkLog .tk-m.ub")], el=us[us.length-1];
-  if(mode==="top"||!el){ body.scrollTo({top:0,behavior:"smooth"}); return }
-  const y=el.getBoundingClientRect().top-body.getBoundingClientRect().top+body.scrollTop-10;
-  body.scrollTo({top:Math.max(0,y),behavior:"smooth"});
+  requestAnimationFrame(()=>{
+    const body=$("drill"), log=$("tkLog"); if(!body||!log||screen!=="tchat") return;
+    if(mode==="top"){ body.scrollTop=0; return }
+    const br=body.getBoundingClientRect(), us=log.querySelectorAll(".tk-ub"), u=us[us.length-1], last=log.lastElementChild; if(!last) return;
+    const endY=last.getBoundingClientRect().bottom-br.top+body.scrollTop-body.clientHeight+16;
+    const target=Math.max(0,endY);
+    if(target>body.scrollTop+1) body.scrollTop=target;   // only ever moves down, never jumps back up
+  });
 }
 function tkLogClick(e){
   const b=e.target.closest("[data-a]"); if(!b||b.disabled) return; const a=b.dataset.a, i=+b.dataset.i, m=TLK.msgs[i], sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null;
@@ -5029,10 +5035,14 @@ async function tkAsk(i,q){
     ent.a=(await r.json()).answer||"No answer came back.";
   }catch(x){ ent.a="Couldn’t reach the tutor. Close this and try again in a moment." }
   const w=ent.a.split(" ").length; ent.n=0;
-  const iv=setInterval(()=>{ if(id!==TLK.id){clearInterval(iv);return} ent.n+=2; if(ent.n>=w){ ent.n=null; clearInterval(iv) } tkDraw() },45);
+  const words=ent.a.split(" "), k=m.tut.indexOf(ent);
+  const iv=setInterval(()=>{ if(id!==TLK.id||screen!=="tchat"){clearInterval(iv);return} ent.n+=2;
+    const el=document.querySelector(`[data-ti="${i}-${k}"]`);
+    if(ent.n>=w){ ent.n=null; clearInterval(iv); if(el) el.textContent=ent.a; else tkDraw() }
+    else if(el) el.textContent=words.slice(0,ent.n).join(" ")+" …"; else clearInterval(iv) },45);
 }
 async function tkTurn(){
-  const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; TLK.sug=[]; TLK.sugReady=false; tkDraw(TLK.msgs.length?"user":"top"); lastAct=Date.now();
+  const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; TLK.sug=[]; TLK.sugReady=false; tkDraw(TLK.msgs.length?"end":"top"); lastAct=Date.now();
   const sc=TLK.sc, body={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),history:TLK.msgs.filter(m=>m.es).map(m=>({role:m.role,es:m.es})),suggested:[]};
   try{
     const r=await rfetch("/talk/chat",{method:"POST",body:JSON.stringify(body),ms:50000});
@@ -5043,14 +5053,14 @@ async function tkTurn(){
     const lastU=TLK.msgs[TLK.msgs.length-1];
     if(lastU&&lastU.role==="user"){
       lastU.busy=false; lastU.grade=j.grade&&j.grade.verdict?j.grade:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now();
-      tkDraw(); haptic(lastU.grade.verdict==="great"?12:6); await tkSleep(700); if(id!==TLK.id) return;
+      tkDraw("end"); haptic(lastU.grade.verdict==="great"?12:6); await tkSleep(700); if(id!==TLK.id) return;
     }
     TLK.msgs.push({role:"ai",es:j.reply.es,en:j.reply.en||"",hid:!!ST.talk.hide,tr:TLK.enOn,at:Date.now()});
     TLK.sug=(j.suggestions||[]).filter(s=>s&&s.es); TLK.tryI=0; TLK.rev=false; TLK.tryOpen=true; TLK.goal=j.goal_en||"";
     (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
-    TLK.end=!!j.end; TLK.st="say"; TLK.sugReady=false; tkDraw("user");
+    TLK.end=!!j.end; TLK.st="say"; TLK.sugReady=false; tkDraw("end");
     const ai=TLK.msgs.length-1;
-    setTimeout(()=>{ if(id===TLK.id&&!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now(); tkDraw() } },700);
+    setTimeout(()=>{ if(id===TLK.id&&!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now(); tkDraw("end") } },700);
     const next=()=>{ if(id===TLK.id) tkOpenDock() };
     if(S.auto==="on") tkSpeak(j.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900);
   }catch(e){
@@ -5066,7 +5076,7 @@ function tkOpenDock(){
   TLK.st="idle"; tkDraw(); if(TLK.micOK&&!TLK.tyOn) tkMicStart();
 }
 async function tkSend(blob,mime){
-  const id=TLK.id; TLK.st="stt"; TLK.err=null; TLK.sug=[]; const m={role:"user",es:"",pend:true,at:Date.now()}; TLK.msgs.push(m); tkDraw("user"); lastAct=Date.now();
+  const id=TLK.id; TLK.st="stt"; TLK.err=null; TLK.sug=[]; const m={role:"user",es:"",pend:true,at:Date.now()}; TLK.msgs.push(m); tkDraw("end"); lastAct=Date.now();
   const drop=()=>{ const k=TLK.msgs.indexOf(m); if(k>=0) TLK.msgs.splice(k,1) };
   try{
     const r=await rfetch("/talk/stt",{method:"POST",body:blob,headers:{"content-type":mime},ms:40000});
