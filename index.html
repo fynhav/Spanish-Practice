@@ -800,7 +800,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-12 · 13:24</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 08:59</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1440,11 +1440,11 @@ function parseHand([s,inf,ans,alt,tense,why,alsoOk=[]]){
 
 // ================= courses + 30-day pools =================
 const COURSES={
-  pron:{name:"Object pronouns",short:"Pronouns",sub:"lo · la · le · les · se",cc:"do",parts:[
+  pron:{name:"Object pronouns",short:"Pronouns",sub:"lo · la · le · les · se",cc:"do",days:14,parts:[
     {key:"do",n:10,name:"Direct objects",pill:"Part 1 · Direct",rule:`Replace <b class="do-t">what</b> is acted on with <b class="do-t">lo · la · los · las</b>. Match the noun’s gender and number.`,ex:"Compro las flores → Las compro"},
     {key:"io",n:10,name:"Indirect objects",pill:"Part 2 · Indirect",rule:`Replace <b class="io-t">to whom</b> with <b class="io-t">le</b> (one person) or <b class="io-t">les</b> (several). No gender. Keep the other noun.`,ex:"Escribo un mensaje a Carlos → Le escribo un mensaje"},
     {key:"both",n:5,typing:true,name:"Both together",pill:"Part 3 · Both together",rule:`Use both: <b class="io-t">indirect</b> first, then <b class="do-t">direct</b>. <b class="io-t">le/les</b> turns into <b class="io-t">se</b> before lo/la/los/las.`,ex:"Juan da el libro a María → Juan se lo da"}]},
-  past:{name:"Past tense",short:"Past tense",sub:"pretérito · imperfecto",cc:"pret",parts:[
+  past:{name:"Past tense",short:"Past tense",sub:"pretérito · imperfecto",cc:"pret",days:14,parts:[
     {key:"pret",n:10,name:"Pretérito",pill:"Part 1 · Pretérito",rule:`Finished actions at a specific time take the <b class="pret-t">pretérito</b>: <b class="pret-t">ayer, anoche, el sábado pasado, una vez</b>.`,ex:"Ayer (yo) ___ (comer) paella → comí"},
     {key:"imp",n:10,name:"Imperfecto",pill:"Part 2 · Imperfecto",rule:`Habits, repeated actions and background take the <b class="imp-t">imperfecto</b>: <b class="imp-t">siempre, todos los días, antes, normalmente</b>.`,ex:"Siempre (yo) ___ (comer) paella → comía"},
     {key:"mix",n:5,typing:true,name:"Choose the tense",pill:"Part 3 · Mixed",rule:`Decide which tense fits, then type the form. Look for the time phrase, or for an action that gets interrupted.`,ex:"Mientras (yo) ___ (leer), sonó el teléfono → leía"}]},
@@ -1468,6 +1468,7 @@ const COURSES={
 const GEN_READY={fut:1,narr:1,conn:1};
 Object.keys(GEN_READY).forEach(k=>{if(!GEN_READY[k]) delete COURSES[k]});
 const daysOf=c=>COURSES[c].days||DAYS;
+const dN=c=>Object.keys(ST[c].done).filter(d=>+d>=1&&+d<=daysOf(c)).length;
 const COURSE_IDS=Object.keys(COURSES);
 const courseLog=k=>COURSE_IDS.some(c=>ST[c]&&ST[c].log[k]!=null);
 const TOTAL=c=>COURSES[c].parts.reduce((s,p)=>s+p.n,0);
@@ -2791,7 +2792,7 @@ const homeRing=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=COURSE_
 function courseCardsHTML(lvl){
   const tk=todayKey();
   return Object.keys(COURSES).filter(c=>!lvl||COURSE_LV[c]===lvl).map(c=>{
-    const C=COURSES[c], s=activeSession(c), nd=nextDay(c), doneN=Object.keys(ST[c].done).length, tdone=ST[c].log[tk]!=null;
+    const C=COURSES[c], s=activeSession(c), nd=nextDay(c), doneN=dN(c), tdone=ST[c].log[tk]!=null;
     const status=s?`<span class="now">In progress · Day ${s.day}, ${s.pos}/${TOTAL(c)}</span>`
       :tdone?`<span class="now">Done today ✓</span> · next: Day ${nd}`:`<span class="now">Day ${nd} ready</span>`;
     return `<button type="button" class="course" data-c="${c}" style="--cc:var(--${C.cc});--cc-soft:var(--${C.cc}-soft)">
@@ -2855,8 +2856,8 @@ function renderAll(){
   $("drill").innerHTML=`
     <div><p class="label" style="margin:0 0 6px 2px">Practise</p><div class="all-grid">
       ${tile("aWr","both","Word review",st.todo?`${st.due} due · ${st.nw} new`:"All done today ✓")}${tile("aVb","pres","Verb trainer","A1–B1 tenses")}${tile("aSt","io","Stories",`A2 · ${sd} of ${ids.size}`)}${tile("aDr","io","Endless drill",`best ${(ST.drill.best||0).toLocaleString()} pts`)}</div></div>
-    ${sec("Courses · A2",Object.keys(COURSES).filter(c=>COURSE_LV[c]==="A2").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${Object.keys(ST[c].done).length} / ${daysOf(c)} days · Day ${nextDay(c)} ready`)).join(""))}
-    ${sec("Courses · B1",Object.keys(COURSES).filter(c=>COURSE_LV[c]==="B1").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${Object.keys(ST[c].done).length} / ${daysOf(c)} days · Day ${nextDay(c)} ready`)).join("")+soonRows())}
+    ${sec("Courses · A2",Object.keys(COURSES).filter(c=>COURSE_LV[c]==="A2").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${dN(c)} / ${daysOf(c)} days · Day ${nextDay(c)} ready`)).join(""))}
+    ${sec("Courses · B1",Object.keys(COURSES).filter(c=>COURSE_LV[c]==="B1").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${dN(c)} / ${daysOf(c)} days · Day ${nextDay(c)} ready`)).join("")+soonRows())}
     ${sec("Words",row("aWl","both",`All ${WORDS.length.toLocaleString()} words`,"tick the ones you know")+row("aWk","both","Known list",`${st.known} known well`))}
     ${sec("You",row("aLv","both","Level and XP",`Level ${xpInfo(xpTotal()).L} · ${xpInfo(xpTotal()).title}`)+row("aDy","io","Days practised",`${streak(homeHas)}-day streak`)+row("aSe","mix","Settings","sound, speed, sync")+row("aHe","mix","Help","how it works"))}
     <p class="syncline"></p>`;
@@ -2901,7 +2902,7 @@ function renderCourse(c){
     return `<div class="planrow"><span class="pill ${pt.key}">${pt.pill}</span><span class="meter m-${pt.key}"><i style="width:${got==null?0:got/pt.n*100}%"></i></span><span class="num">${got==null?pt.n+" sent.":got+" / "+pt.n}</span></div>`}).join("");
   const head=justDone&&justDone.c===c
     ?`<div class="banner"><b>Day ${justDone.day} complete.</b> You scored ${justDone.score} / ${TOTAL(c)}.${justDone.day<daysOf(c)?` Day ${nextDay(c)} is next.`:""}</div>${xpStrip(justDone.xp)}`
-    :`<div><h2 class="hello">${C.name}${lvChip(COURSE_LV[c])}</h2><p class="sub">${Object.keys(D.done).length} of ${daysOf(c)} days complete${has(tk)?" · done today ✓":""}</p></div>`;
+    :`<div><h2 class="hello">${C.name}${lvChip(COURSE_LV[c])}</h2><p class="sub">${dN(c)} of ${daysOf(c)} days complete${has(tk)?" · done today ✓":""}</p></div>`;
   $("drill").innerHTML=`
     ${head}
     <div><p class="label" style="margin-bottom:8px">${daysOf(c)}-day programme · tap a day</p><div class="days14">${grid}</div></div>
@@ -4798,7 +4799,7 @@ const VT_LV={pres:"A1",near:"A1",pret:"A2",imp:"A2",perf:"A2",fut:"B1",cond:"B1"
 const lvChip=(l,t)=>`<span class="lv"${t?` title="${t}"`:""}>${l}</span>`;
 function cefrCalc(){
   const lv={A1:[],A2:[],B1:[]};
-  Object.entries(COURSE_LV).filter(([c])=>COURSES[c]).forEach(([c,L])=>lv[L].push({n:COURSES[c].name,f:Object.keys(ST[c].done).length/daysOf(c),d:Object.keys(ST[c].done).length+" of "+daysOf(c)+" days",w:30,go:"c:"+c,cc:COURSES[c].cc}));
+  Object.entries(COURSE_LV).filter(([c])=>COURSES[c]).forEach(([c,L])=>lv[L].push({n:COURSES[c].name,f:dN(c)/daysOf(c),d:dN(c)+" of "+daysOf(c)+" days",w:30,go:"c:"+c,cc:COURSES[c].cc}));
   ["A1","A2","B1"].forEach(L=>{const ids=new Set([...STORIES.filter(x=>(x.lv||"A2")===L).map(x=>x.id),...TAP_STORIES.filter(x=>(x.lv||"A2")===L).map(x=>"e:"+x.id)]), sd=Object.keys(ST.stories.best).filter(k=>ids.has(k)).length;
     lv[L].push({n:L==="B1"?"B1 stories":L==="A1"?"A1 stories":"Stories",f:ids.size?sd/ids.size:0,d:sd+" of "+ids.size+" done",w:30,go:"stories",cc:"io"})});
   const top=VBX.slice(0,100);
@@ -5372,9 +5373,9 @@ renderMenu();
   const storyIds=new Set([...STORIES.map(x=>x.id),...TAP_STORIES.map(x=>"e:"+x.id)]);
   const storyDone=Object.keys(ST.stories.best).filter(k=>storyIds.has(k)).length;
   const rows=[
-    ["Object pronouns",Object.keys(ST.pron.done).length,DAYS,"do"],
-    ["Past tense",Object.keys(ST.past.done).length,DAYS,"pret"],
-    ["B1 courses",COURSE_IDS.filter(c=>COURSE_LV[c]==="B1").reduce((a,c)=>a+Object.keys(ST[c].done).length,0),COURSE_IDS.filter(c=>COURSE_LV[c]==="B1").reduce((a,c)=>a+daysOf(c),0),"subj"],
+    ["Object pronouns",dN("pron"),daysOf("pron"),"do"],
+    ["Past tense",dN("past"),daysOf("past"),"pret"],
+    ["B1 courses",COURSE_IDS.filter(c=>COURSE_LV[c]==="B1").reduce((a,c)=>a+dN(c),0),COURSE_IDS.filter(c=>COURSE_LV[c]==="B1").reduce((a,c)=>a+daysOf(c),0),"subj"],
     ["Stories",storyDone,storyIds.size,"both"]];
   $("spRows").innerHTML=rows.map(([n,v,t,c])=>`<div class="sp-row"><span>${n}</span><span>${v} / ${t}${n==="Stories"?"":" days"}</span><div class="sm"><i data-w="${t?v/t*100:0}" style="background:var(--${c})"></i></div></div>`).join("")+
     ((ST.drill.best||0)?`<div class="sp-row"><span>Endless drill best</span><span>${(ST.drill.best||0).toLocaleString()} pts</span></div>`:"");
