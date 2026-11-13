@@ -736,6 +736,81 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .tk-card.tk-blind .tk-ic{background:var(--tk);color:#fff}
 .tk-modeRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .tk-sub2{margin:6px 0 0;font-size:.82rem;color:var(--muted)}
+/* Scenarios */
+.sc,.sc-card,.sc-chip{--sn:#B0562A;--sn-d:#8F431F;--sn-soft:#F7E3D5;--sn-line:#E6C9B4}
+.sc{display:flex;flex-direction:column;gap:12px}
+.sc-list{display:flex;flex-direction:column;gap:8px}
+.sc-card{display:flex;align-items:center;gap:13px;text-align:left;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-weight:500;box-shadow:0 1px 0 rgba(60,45,20,.04)}
+.sc-card .sc-ic,.sc-head .sc-ic{flex:none;width:46px;height:46px;border-radius:13px;background:var(--sn-soft);color:var(--sn-d);display:grid;place-items:center}
+.sc-ic svg,.sc-i{width:25px;height:25px;display:block}
+.sc-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sc-card b{font-family:var(--f-display);font-weight:400;font-size:1.05rem}
+.sc-card small{color:var(--muted);font-size:.82rem}
+.sc-go{flex:none;color:#C9B99A;font-size:1.5rem;line-height:1;margin-left:auto}
+.sc-tick{flex:none;color:var(--ok);display:grid;place-items:center}.sc-tick svg{width:22px;height:22px;stroke-width:2.4}
+.sc-lock{opacity:.5}.sc-lock .sc-ic{background:var(--mix-soft);color:var(--muted)}
+.sc-bar{display:block;height:6px;border-radius:4px;background:#EFE8D6;overflow:hidden;margin-top:5px}
+.sc-bar i{display:block;height:100%;background:var(--sn);border-radius:4px;min-width:3px}
+.sc-head{display:flex;align-items:center;gap:13px}.sc-head .sc-ic.big{width:56px;height:56px;border-radius:16px}.sc-head .sc-ic.big svg{width:30px;height:30px}
+.sc-prog small{color:var(--muted);font-size:.8rem;display:block;margin-top:5px}
+.sc-prog .sc-bar{margin:0}
+.sc-talk{align-items:flex-start}.sc-two{display:flex;gap:8px;margin-top:8px}
+.sc-pill{padding:7px 16px;border-radius:999px;border:1.5px solid var(--sn);background:var(--sn-soft);color:var(--sn-d);font-weight:600;font-size:.88rem;min-height:36px}
+.sc-pill+.sc-pill{background:var(--sn);color:#fff}
+.sc-nt{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
+.sc-chip{flex:none;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:.78rem;min-height:32px}
+.sc-chip[aria-pressed="true"]{background:var(--sn-soft);border-color:var(--sn-line);color:var(--sn-d)}
+.sc-tools{display:flex;align-items:center;justify-content:space-between;gap:10px}
+/* word grid */
+.sc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.sc-tp{width:46px;height:46px;border-radius:13px;background:var(--sn-soft);color:var(--sn-d);display:grid;place-items:center;overflow:hidden}
+.sc-tp svg{width:28px;height:28px}.sc-tp img,.sc-pic img{width:100%;height:100%;object-fit:cover}
+.sc-tw{font-size:.82rem;font-weight:600;text-align:center;line-height:1.15}
+.sc-tile i{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:#D9D0BC}
+.sc-tile[data-s="learning"] i{background:#E0A23A}.sc-tile[data-s="known"] i{background:var(--ok)}
+.sc-d0{color:#9A9078}.sc-d1{color:#B98318}.sc-d2{color:var(--ok)}
+/* cards + quiz */
+.sc-cv,.sc-q{align-items:stretch}
+.sc-pic{width:132px;height:132px;border-radius:28px;background:var(--sn-soft);color:var(--sn-d);display:grid;place-items:center;margin:4px auto 0;overflow:hidden}
+.sc-pic svg{width:76px;height:76px;stroke-width:1.5}
+.sc-wd{display:flex;align-items:center;justify-content:center;gap:10px}
+.sc-es{font-family:var(--f-display);font-size:1.9rem;line-height:1.1}
+.sc-en{margin:0;text-align:center;color:var(--muted);font-size:1.05rem}
+.sc-reg{margin:0;text-align:center;color:var(--sn-d);font-size:.82rem}
+.sc-ex{display:flex;flex-direction:column;gap:4px}.sc-exl{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.sc-exes{margin:0;font-size:1.02rem;font-weight:600}.sc-exen{margin:0;color:var(--muted);font-size:.88rem}
+.sc-q{min-height:100%;justify-content:flex-end}
+.sc-qb{display:flex;flex-direction:column;gap:14px;margin-top:auto}
+.sc-ask{margin:0;text-align:center;color:var(--muted);font-size:1rem}
+.sc-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sc-opts.three{grid-template-columns:1fr}
+.sc-opt{padding:14px 10px;border-radius:14px;border:1.5px solid var(--line);background:var(--tile);color:var(--ink);font-size:1.02rem;font-weight:600;min-height:58px;display:grid;place-items:center}
+.sc-opt.pic svg{width:44px;height:44px;stroke-width:1.5;color:var(--sn-d)}.sc-opt.pic{min-height:84px}
+.sc-opt.sc-ok{border-color:var(--ok);background:var(--ok-soft)}.sc-opt.sc-no{border-color:var(--bad);background:var(--bad-soft)}
+.sc-opt:disabled{opacity:1}
+.sc-hear{display:grid;place-items:center;margin-top:6px}.spk.sc-bigspk{width:84px;height:84px}.spk.sc-bigspk svg{width:38px;height:38px}
+.sc-type{display:flex;gap:8px}.sc-type input{flex:1;min-width:0;font:inherit;font-size:1.1rem;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--tile);color:var(--ink)}
+.sc-type input.sc-ok{border-color:var(--ok);background:var(--ok-soft)}.sc-type input.sc-no{border-color:var(--bad);background:var(--bad-soft)}
+.sc-type button{background:var(--sn);border-color:var(--sn);color:#fff;padding:0 18px}
+.sc-fbk:empty{display:none}
+.sc-r{border-radius:14px;padding:10px 12px;font-size:.92rem}.sc-r p{margin:6px 0 0;color:var(--ink)}.sc-r i{color:var(--muted)}
+.sc-rok{background:var(--ok-soft);border:1px solid #BFD9BB}.sc-rno{background:var(--bad-soft);border:1px solid #E5B9B4}
+.sc-r .spk{vertical-align:middle}
+/* phrases */
+.sc-pl{display:flex;flex-direction:column;padding:2px 14px}
+.sc-ph{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #EFE9D8}.sc-ph:last-child{border-bottom:0}
+.sc-pt{flex:1;min-width:0}.sc-pes{margin:0;font-weight:600;font-size:1rem;line-height:1.3}.sc-pen{margin:2px 0 0;color:var(--muted);font-size:.84rem}
+.sc-heard{margin:4px 0 0;font-size:.8rem}.sc-hok{color:var(--ok)}.sc-hno{color:var(--bad)}
+.sc-mic{flex:none;width:40px;height:40px;min-width:40px;padding:0;border-radius:50%;border:1.5px solid var(--sn-line);background:var(--sn-soft);color:var(--sn-d);display:grid;place-items:center}
+.sc-mic svg{width:20px;height:20px}.sc-said .sc-mic{background:var(--ok-soft);border-color:#BFD9BB;color:var(--ok)}
+.sc-mic.on{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+/* dialogue */
+.sc-chat{display:flex;flex-direction:column;gap:8px}
+.sc-bb{max-width:86%;padding:9px 12px;border-radius:16px;position:relative}.sc-bb .spk{position:absolute;right:-40px;top:6px}
+.sc-pa{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-top-left-radius:6px;margin-right:40px}
+.sc-me{align-self:flex-end;background:var(--sn-soft);border:1px solid var(--sn-line);border-top-right-radius:6px}
+.sc-me .spk{right:auto;left:-40px}.sc-me{margin-left:40px}
+.sc-gap{display:inline-block;min-width:4.2em;border-bottom:2px dashed var(--sn);text-align:center}.sc-gap.sc-filled{border-bottom-style:solid;color:var(--sn-d);font-weight:700}
 </style>
 
 <div class="splash" id="splash" aria-live="polite">
@@ -800,7 +875,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 08:59</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 09:27</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2515,6 +2590,7 @@ function docData(k){
   if(k==="verbs") return {m:ST.verbs.m,log:ST.verbs.log,updatedAt:Date.now()};
   if(k==="time") return {log:ST.time.log,shown:ST.time.shown,updatedAt:Date.now()};
   if(k==="talk") return {best:ST.talk.best,log:ST.talk.log,updatedAt:Date.now()};
+  if(k==="scn") return {w:ST.scn.w,p:ST.scn.p,log:ST.scn.log,updatedAt:Date.now()};
   const [t,c]=k.split("-");
   if(t==="prog") return {done:ST[c].done,log:ST[c].log,updatedAt:Date.now()};
   return ST.sess[c]||{cleared:true,updatedAt:0};
@@ -2532,6 +2608,7 @@ function mergeDoc(id,v){
   else if(id==="words"&&ST.words){const W=ST.words; for(const [k2,x] of Object.entries(v.c||{})){const l=W.c[k2]; if(!l||cardStamp(x)>cardStamp(l)) W.c[k2]=x} mx(W.log,v.log); mx(W.nlog,v.nlog); mx(W.xtra,v.xtra); mx(W.gone,v.gone); for(const [k2,g] of Object.entries(W.gone)){const l=W.c[k2]; if(l&&cardStamp(l)<=g) delete W.c[k2]}}
   else if(id==="verbs"&&ST.verbs){const V2=ST.verbs; for(const [tk,mm] of Object.entries(v.m||{})){const T=V2.m[tk]=V2.m[tk]||{}; for(const [inf,x] of Object.entries(mm||{})){const l=T[inf]; if(!l||(x.t||0)>(l.t||0)) T[inf]=x}} mx(V2.log,v.log)}
   else if(id==="talk"&&ST.talk){mx(ST.talk.best,v.best); mx(ST.talk.log,v.log)}
+  else if(id==="scn"&&ST.scn){ for(const [k2,x] of Object.entries(v.w||{})){const l=ST.scn.w[k2]; if(!l||(x.u||0)>(l.u||0)) ST.scn.w[k2]=x} for(const [k2,x] of Object.entries(v.p||{})){const l=ST.scn.p[k2]||(ST.scn.p[k2]={ph:{},dlg:0,talk:0}); Object.assign(l.ph,x.ph||{}); l.dlg=Math.max(l.dlg||0,x.dlg||0); l.talk=Math.max(l.talk||0,x.talk||0)} mx(ST.scn.log,v.log) }
   else if(id==="time"&&ST.time){mx(ST.time.log,v.log); for(const k2 of Object.keys(v.shown||{})) ST.time.shown[k2]=true}
   else if(id.startsWith("day-")&&v.date){ST.pron.log[v.date]=Math.max(ST.pron.log[v.date]||0,v.best||0)}
 }
@@ -2547,6 +2624,7 @@ function replaceDoc(id,v){
   else if(id==="verbs"){ST.verbs.m=v.m||{}; ST.verbs.log=v.log||{}}
   else if(id==="time"){ST.time.log=v.log||{}; ST.time.shown=v.shown||{}}
   else if(id==="talk"){ST.talk.best=v.best||{}; ST.talk.log=v.log||{}}
+  else if(id==="scn"){ST.scn.w=v.w||{}; ST.scn.p=v.p||{}; ST.scn.log=v.log||{}}
 }
 let dbCol=null, syncing=false, dbState="connecting";
 const timeout=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(new Error("timeout")),ms))]);
@@ -2599,7 +2677,7 @@ function updateSync(){
 }
 // ================= cloud copy on Railway (optional; one pairing code per person) =================
 const RAIL_URL="https://practica-sync-production.up.railway.app", RK="pd-rail";
-const RDOCS=[...COURSE_IDS.flatMap(c=>["prog-"+c,"session-"+c]),"drill","stories","xp","words","verbs","time","talk"];
+const RDOCS=[...COURSE_IDS.flatMap(c=>["prog-"+c,"session-"+c]),"drill","stories","xp","words","verbs","time","talk","scn"];
 let RL={code:"",revs:{},hash:{},pulled:0}; try{Object.assign(RL,JSON.parse(localStorage.getItem(RK)||"{}"))}catch(e){}
 const rSave=()=>{try{localStorage.setItem(RK,JSON.stringify(RL))}catch(e){}};
 let rState=RL.code?"connecting":"off", rBusy=false, rTimer=0, rAgain=false;
@@ -2737,7 +2815,7 @@ function chrome(){
   const tb=tabOf(); $("tabbar").hidden=!tb; if(tb) tabDraw(tb);
   $("backBtn").hidden=!!tb||!(screen==="vhome"||screen==="prog"||screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm"&&screen!=="wr")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq"||screen==="vm"||screen==="wr");
   $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":screen==="wrlist"?"‹ Words":"‹ "+rootName;
-  $("title").textContent=/^(talk|tchat|tsum|tpre)$/.test(screen)?"Talk":screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
+  $("title").textContent=/^(talk|tchat|tsum|tpre)$/.test(screen)?"Talk":screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":/^sc[a-z]$/.test(screen)?"Scenarios":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
   $("progress").hidden=!(inS||screen==="vq"||screen==="vm"||screen==="wr"); $("openRules").hidden=$("openSettings").hidden=screen==="vq"||screen==="vm"||screen==="wr";
   $("score").textContent=screen==="wr"?`${WR.fin} / ${WR.total}`:screen==="vq"||screen==="vm"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
   if(screen==="wr") $("progress").innerHTML=`<span class="p-v" style="flex:1"><i style="width:${WR.total?Math.min(100,WR.fin/WR.total*100):0}%"></i></span>`;
@@ -2749,8 +2827,9 @@ function chrome(){
   }
   setCourseColour(course);
   if(screen==="talk"||screen==="tchat"||screen==="tsum"||screen==="tpre") tkChrome();
+  if(/^sc[a-z]$/.test(screen)) scChrome();
 }
-$("backBtn").onclick=()=>{drillOn=false; if(screen==="tchat"){talkQuit();return} if(screen==="tpre"){renderTalk();return} if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
+$("backBtn").onclick=()=>{drillOn=false; if(/^sc[a-z]$/.test(screen)){scBack();return} if(screen==="tchat"){talkQuit();return} if(screen==="tpre"){renderTalk();return} if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
 $("quit").onclick=()=>{if(screen==="tchat"){talkQuit();return} if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
 function vTitle(){return screen==="wrset"||screen==="wr"?"Word review":screen==="wrsum"?"Session done":screen==="wrlist"?WORDS.length+" words":screen==="vmset"||screen==="vm"?"Verb meanings":screen==="vmsum"?"Round done":screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
 // swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
@@ -2786,8 +2865,8 @@ function weekHTML(ringFor){
   return `<div class="week">${weekDays().map((d,i)=>{const k=dkey(d),isT=k===tk,fut=k>tk,x=ringFor(k);
     return `<div class="day${isT?" is-today":""}"><span class="dl">${LBL[i]}</span><span class="ring${x.cls}${isT?" today":""}${fut?" future":""}" aria-label="${LBL[i]}: ${esc(x.label)}">${x.html}</span></div>`}).join("")}</div>`;
 }
-const homeHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0;
-const homeRing=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=COURSE_IDS.some(c=>c!=="pron"&&c!=="past"&&ST[c].log[k]!=null)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0;
+const homeHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
+const homeRing=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=COURSE_IDS.some(c=>c!=="pron"&&c!=="past"&&ST[c].log[k]!=null)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
   return {cls:a||b||c?" any":"",label:[a&&"object pronouns",b&&"past tense",c&&"drill, stories or verbs"].filter(Boolean).join(", ")||"nothing yet",html:`<span class="dd"><i class="${a?"a":""}"></i><i class="${b?"b":""}"></i><i class="${c?"c":""}"></i></span>`}};
 function courseCardsHTML(lvl){
   const tk=todayKey();
@@ -2825,12 +2904,13 @@ function renderMenu(){
   $("drill").innerHTML=`
     ${xpHeroHTML()}
     ${xpQuestsHTML()}
+    ${scHomeHTML()}
     <div style="display:flex;align-items:center;gap:10px"><p class="label" style="margin:0;white-space:nowrap">Your level map</p><span style="flex:1;height:1px;background:var(--line)"></span></div>
     ${lmHTML()}
     ${wordsDashHTML()}
     <p class="syncline"></p>`;
   $("actions").innerHTML="";
-  lmBind(); $("wrCard").onclick=renderWrSet;
+  lmBind(); $("wrCard").onclick=renderWrSet; $("scHome").onclick=renderScn;
   xpMenuBind();
   updateSync();
 }
@@ -4754,7 +4834,7 @@ const XP_TITLES=[[1,"Principiante"],[5,"Aprendiz"],[10,"Estudiante"],[15,"Conver
 const xpAt=L=>100*(L-1)+10*(L-1)*(L-2);
 const xpTotal=()=>ST.xp.seed+Object.values(ST.xp.log).reduce((a,b)=>a+b,0);
 function xpInfo(t){let L=1; while(xpAt(L+1)<=t) L++; const a=xpAt(L), b=xpAt(L+1); let ti=XP_TITLES[0][1]; XP_TITLES.forEach(([n,x])=>{if(L>=n) ti=x}); return {L,into:t-a,need:b-a,frac:(t-a)/(b-a),title:ti,total:t}}
-const dayHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0;
+const dayHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
 const xpQuestDefs=()=>{const tk=todayKey(); return [
   {id:"day",label:"Finish a grammar day",cur:courseLog(tk)?1:0,goal:1,xp:20},
   {id:"words",label:"Review 10 words",cur:Math.min(10,ST.words.log[tk]||0),goal:10,xp:20},
@@ -4957,6 +5037,7 @@ function renderTalk(){
     return `<button type="button" class="tk-card" data-sc="${s.id}"><span class="tk-ic" aria-hidden="true">${tki("sc_"+s.id)}</span><span class="tk-tx"><b>${s.t}</b><small>${s.en}</small></span>${b?`<span class="tk-star" aria-label="${b} of 3 stars">${"★".repeat(b)}${"☆".repeat(3-b)}</span>`:""}<span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>`}).join("")}</div></div>`;
   $("drill").innerHTML=`<div class="tk tk-home">
     <div><h2 class="hello">Talk</h2><p class="sub">Have a spoken conversation in Spanish. Your partner speaks first, you get ideas for what to say, and every answer is checked.</p></div>
+    <button type="button" class="sc-card" id="tkScn"><span class="sc-ic">${si("plate")}</span><span class="sc-tx"><b>Scenarios</b><small>Word packs with pictures, phrases and a role-play per situation</small></span><span class="sc-go">›</span></button>
     <p class="tk-stat" id="tkStat"></p>
     <div class="vcard tk-set">
       <div class="tk-row"><span>Your level</span>${seg("tkLv",[["","Auto · "+lv],["A1","A1"],["A2","A2"],["B1","B1"]],T.lv)}</div>
@@ -4972,7 +5053,7 @@ function renderTalk(){
   $("actions").innerHTML="";
   [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
   $("drill").querySelectorAll(".tk-card").forEach(b=>b.onclick=()=>{ if(!tkReady()) return; renderTalkPre(TALK_SC.find(s=>s.id===b.dataset.sc)) });
-  $("tkBlind").onclick=()=>{ if(!tkReady()) return; const pool=TALK_SC.filter(x=>x.lv===lv), last=TLK.lastBlind; const c=pool.filter(x=>x.id!==last), sc=(c.length?c:pool)[Math.floor(Math.random()*(c.length?c.length:pool.length))]; TLK.lastBlind=sc.id; tkStart(sc,{blind:true}) };
+  $("tkScn").onclick=renderScn; $("tkBlind").onclick=()=>{ if(!tkReady()) return; const pool=TALK_SC.filter(x=>x.lv===lv), last=TLK.lastBlind; const c=pool.filter(x=>x.id!==last), sc=(c.length?c:pool)[Math.floor(Math.random()*(c.length?c.length:pool.length))]; TLK.lastBlind=sc.id; tkStart(sc,{blind:true}) };
   $("tkCustGo").onclick=()=>{ const v=$("tkCust").value.trim(); if(v.length<8){$("tkCust").focus(); return} if(!tkReady()) return;
     tkStart({id:"custom",e:"✏️",t:"Tu escena",en:"Your own scene",lv:"",custom:v,w:"the other person in the scene described",focus:""}) };
   updateSync(); tkPing();
@@ -5279,6 +5360,7 @@ function tkFinish(early){
   commit("talk"); renderTalkSum();
 }
 function renderTalkSum(){
+  scTalkDone();
   screen="tsum"; $("fb").hidden=true; chrome(); const R=TLK.res, nw=Object.entries(TLK.words), fl=TLK.msgs.filter(m=>m.flag);
   const line=m=>m.role==="ai"?`<div class="tk-sl"><span class="tk-who">Partner${m.flag?" · flagged":""}</span><p class="tk-es">${esc(m.es)}</p><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(m.es)}" aria-label="Hear this line">${tki("play")}</button></div>`
     :`<div class="tk-sl tk-me"><span class="tk-who">You</span><p class="tk-es">${esc(m.es)}</p>${m.grade?`<span class="tk-v v-${m.grade.verdict}">${m.grade.verdict==="great"?"✓":m.grade.verdict==="ok"?"!":"×"}</span>`:""}${m.grade&&m.grade.verdict!=="great"&&m.grade.corrected?`<p class="tk-en">→ ${esc(m.grade.corrected)}</p>`:""}</div>`;
@@ -5288,9 +5370,10 @@ function renderTalkSum(){
       ${TLK.blind?`<p class="tk-sub2">Blind session · ${TLK.peeks?`peeked ${TLK.peeks} ${TLK.peeks===1?"time":"times"}`:"no peeking"}${TLK.offs?` · ${TLK.offs} off-topic ${TLK.offs===1?"answer":"answers"}`:""}</p>`:""}<div class="tk-nums"><div><b>${R.mins}</b><span>${R.mins===1?"minute":"minutes"}</span></div><div><b>${R.words}</b><span>words used</span></div><div><b>${nw.length}</b><span>new phrases</span></div></div>${TLK.tm.length?`<p class="tk-sub2">Average reply time ${(TLK.tm.reduce((a,b)=>a+b,0)/TLK.tm.length/1000).toFixed(1)}s</p>`:""}</div>
     ${nw.length?`<div class="vcard"><p class="label" style="margin-bottom:6px">New phrases</p>${nw.map(([k,v])=>`<div class="tk-nw"><span><b>${esc(k)}</b> <i>${esc(v)}</i></span><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(k)}" aria-label="Hear ${esc(k)}">${tki("play")}</button></div>`).join("")}</div>`:""}
     ${fl.length?`<div class="vcard"><p class="label" style="margin-bottom:6px">Flagged</p>${fl.map(m=>`<div class="tk-nw"><span><b>${esc(m.es)}</b> <i>${esc(m.en||"")}</i></span><button type="button" class="tk-ib tk-sm" data-a="say" data-t="${esc(m.es)}" aria-label="Hear this line">${tki("play")}</button></div>`).join("")}</div>`:""}
+    ${scUsedHTML()}
     <div class="vcard"><p class="label" style="margin-bottom:8px">Conversation summary</p>${TLK.msgs.map(line).join("")}</div></div>`;
   $("actions").innerHTML=`<button type="button" class="ghost" id="tkCont">Continue</button><button type="button" class="grow" id="tkAgain">Replay</button>`;
-  $("tkCont").onclick=()=>renderTalk(); $("tkAgain").onclick=()=>tkStart(TLK.sc,{blind:TLK.blind});
+  $("tkCont").onclick=()=>{TLK.sc&&TLK.sc.pack?scOpen(TLK.sc.pack):renderTalk()}; $("tkAgain").onclick=()=>tkStart(TLK.sc,{blind:TLK.blind});
   $("drill").firstElementChild.onclick=e=>{ const b=e.target.closest('[data-a="say"]'); if(b) tkSpeak(b.dataset.t,b) };
   $("drill").scrollTop=0;
 }
@@ -5361,12 +5444,395 @@ function vcAbort(){ if(vcRec) vcStop(false); const t=$("vcToast"); if(t) t.class
   document.addEventListener("click",e=>{ if(e.isTrusted&&Date.now()-t<700){ e.stopImmediatePropagation(); e.preventDefault() } },true);
 })();
 
+// ================= Scenarios: situation packs =================
+// Line icons (24x24, stroke). Photos can replace them later: a word with img:"…" shows the photo, otherwise its icon.
+const SI={
+ table:'<rect x="3" y="7" width="18" height="3" rx="1"/><path d="M6 10v9M18 10v9"/>',
+ chair:'<path d="M7 3v10M7 13h10M7 13v7M17 13v7M7 7h6"/>',
+ waiter:'<circle cx="8.5" cy="6.5" r="2.5"/><path d="M4.5 20v-4a4 4 0 0 1 8 0v4M12.5 11H21M14.5 11a3 3 0 0 1 5 0"/>',
+ menu:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+ booking:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4M9 15l2 2 4-4"/>',
+ bill:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',
+ tip:'<ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
+ plate:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/>',
+ glass:'<path d="M7 4h10l-1.3 15a1.5 1.5 0 0 1-1.5 1.4H9.8a1.5 1.5 0 0 1-1.5-1.4zM7.4 9h9.2"/>',
+ wineglass:'<path d="M8 3h8l-.5 5a3.5 3.5 0 0 1-7 0zM12 11.5V20M8.5 20h7"/>',
+ fork:'<path d="M8 3v7a3 3 0 0 0 6 0V3M11 3v7M11 13v8"/>',
+ knife:'<path d="M14 3c-3 0-5 3-5 8v3h5zM11.5 14v7"/>',
+ spoon:'<ellipse cx="12" cy="7.5" rx="3.5" ry="4.5"/><path d="M12 12v9"/>',
+ napkin:'<path d="M5 4h14v11l-5 5H5zM19 15h-5v5M9 9h6"/>',
+ water:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+ beer:'<path d="M6 9h10v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zM16 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2M6 9c0-2 1.5-3 3-3 .5-1.5 3.5-1.5 4 0 1.5 0 3 1 3 3M9.5 12v5M12.5 12v5"/>',
+ wine:'<path d="M10 3h4v4c0 1 2 2 2 4v9a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-9c0-2 2-3 2-4zM8 14h8"/>',
+ coffee:'<path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8.5 3.5v2M12 3.5v2"/>',
+ juice:'<path d="M7 8h10l-1 12H8zM13 8l2-5h3M7.5 12h9"/>',
+ bread:'<path d="M4 12c0-3.5 3.5-6 8-6s8 2.5 8 6v1a1 1 0 0 1-1 1v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-4a1 1 0 0 1-1-1zM9 9.5l1 2M13 9l1 2"/>',
+ salad:'<path d="M3.5 12h17a8.5 8.5 0 0 1-17 0zM8 12c0-3 1.5-5 4-6 .5 2.5 2.5 3 4 3.5M13 12c.5-2.5 2.5-4 5-4.5"/>',
+ soup:'<path d="M3.5 12h17a8.5 8.5 0 0 1-17 0zM8.5 3.5c-1 1.5 1 2.5 0 4M12.5 3.5c-1 1.5 1 2.5 0 4M16.5 3.5c-1 1.5 1 2.5 0 4"/>',
+ meat:'<path d="M4.5 11c0-4 4-6.5 8.5-5.5 4 .8 6.5 3.5 6 7-.6 4.5-5 6.5-9.5 6-3.5-.5-5-3.5-5-7.5z"/><path d="M10 11c1.5-1 3.5 0 3.5 1.5S12 15 10.5 14.5"/>',
+ chicken:'<ellipse cx="15" cy="9" rx="5.5" ry="4.5" transform="rotate(-40 15 9)"/><path d="M11.5 12.5 6.5 17.5"/><circle cx="5.5" cy="18" r="1.6"/><circle cx="7" cy="19.5" r="1.6"/>',
+ fish:'<path d="M2.5 12c3-4.5 7.5-5.5 11.5-3.5L19 6v12l-5-2.5c-4 2-8.5 1-11.5-3.5zM8 11.5v.01"/>',
+ rice:'<path d="M3.5 13h17a8.5 8.5 0 0 1-17 0zM6 13c0-3 2.5-5 6-5s6 2 6 5M9 10.5v.01M12 9.5v.01M15 10.5v.01"/>',
+ fries:'<path d="M6 11h12l-1.5 10h-9zM8 11l-.5-6M11 11V4M14 11l.5-7M17 11l1-5"/>',
+ veg:'<circle cx="8.5" cy="9" r="3.5"/><circle cx="15.5" cy="9" r="3.5"/><circle cx="12" cy="6" r="3.5"/><path d="M10 12.5 10.5 20h3l.5-7.5"/>',
+ cheese:'<path d="M3 17v-4L20 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM3 13h17M14 15v.01M8 16v.01"/>',
+ egg:'<path d="M12 3c-3.5 0-6 6-6 10a6 6 0 0 0 12 0c0-4-2.5-10-6-10z"/>',
+ dessert:'<path d="M6 12l1.5 8h9L18 12zM5 12c0-2.5 3-5 7-5s7 2.5 7 5zM12 7V4M12 2.5v.01"/>',
+ icecream:'<path d="M8 11h8l-4 10zM7.5 11a4.5 4.5 0 1 1 9 0"/>',
+ order:'<path d="M4 5h16v11H11l-4 4v-4H4zM8 9h8M8 12h5"/>',
+ thumb:'<path d="M7 11v9H4v-9zM7 11l4-8c1.5 0 2.5 1 2.5 2.5V9H19a1.5 1.5 0 0 1 1.5 1.8l-1.3 7.5A2 2 0 0 1 17.2 20H7"/>',
+ chili:'<path d="M6 7c5-2.5 12 0 13 9-.3 2-2.5 2.8-4.5 1.8C9 15 6 11 6 7zM6 7c-.5-2 .5-3.5 2.5-4"/>',
+ leaf:'<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15zM5 19l8-8"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+ play:'<path d="M8 5.5v13l10-6.5z"/>',
+ check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ chat:'<path d="M4 5h16v11H11l-4 4v-4H4z"/>',
+ words:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/>',
+ quiz:'<circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8M12 16.5v.01"/>',
+ dlg:'<path d="M3 5h11v7H8l-3 3v-3H3zM10 15h8l3 3v-3h0V9h-5"/>'
+};
+const si=(k,c)=>`<svg class="sc-i${c?" "+c:""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SI[k]||""}</svg>`;
+// word: [spanish with article, english, icon, example, example english, A1 (1/0), regional note, group]
+const SCN_PACKS=[{
+ id:"resta", t:"En el restaurante", en:"At a restaurant", ic:"plate", lv:"A2",
+ note:"In Spain the menu of the day (menú del día) is a cheap set lunch. In much of Latin America a tip of about 10% is normal; in Spain it is optional. Waiters are called with a polite ‘¡Perdone!’ or ‘Disculpe’, never by snapping fingers.",
+ groups:["At the table","Drinks","Food","Ordering and describing"],
+ words:[
+ ["la mesa","the table","table","¿Tiene una mesa libre?","Do you have a free table?",1,"",0],
+ ["la silla","the chair","chair","Necesitamos una silla más.","We need one more chair.",1,"",0],
+ ["el camarero","the waiter","waiter","El camarero nos trae la carta.","The waiter brings us the menu.",1,"la camarera (f.); el mesero in Latin America",0],
+ ["la carta","the menu","menu","¿Nos trae la carta, por favor?","Could you bring us the menu, please?",1,"el menú is also common",0],
+ ["la reserva","the reservation","booking","Tengo una reserva para las ocho.","I have a reservation for eight o’clock.",0,"",0],
+ ["la cuenta","the bill","bill","La cuenta, por favor.","The bill, please.",1,"",0],
+ ["la propina","the tip","tip","¿Está incluida la propina?","Is the tip included?",0,"",0],
+ ["el plato","the plate; the dish","plate","Este plato está muy rico.","This dish is very tasty.",1,"",0],
+ ["el vaso","the glass (tumbler)","glass","¿Me trae otro vaso?","Could you bring me another glass?",1,"",0],
+ ["la copa","the (wine) glass","wineglass","Una copa de vino tinto, por favor.","A glass of red wine, please.",0,"",0],
+ ["el tenedor","the fork","fork","Se me cayó el tenedor.","I dropped my fork.",0,"",0],
+ ["el cuchillo","the knife","knife","¿Puede traerme un cuchillo?","Could you bring me a knife?",0,"",0],
+ ["la cuchara","the spoon","spoon","Necesito una cuchara para la sopa.","I need a spoon for the soup.",0,"",0],
+ ["la servilleta","the napkin","napkin","¿Hay más servilletas?","Are there any more napkins?",0,"",0],
+ ["el agua","the water","water","Un agua sin gas, por favor.","A still water, please.",1,"feminine, but takes el: el agua fría",1],
+ ["la cerveza","the beer","beer","Una cerveza bien fría, por favor.","A very cold beer, please.",1,"",1],
+ ["el vino","the wine","wine","Nos trae una botella de vino blanco.","Bring us a bottle of white wine.",1,"",1],
+ ["el café","the coffee","coffee","Un café con leche, por favor.","A coffee with milk, please.",1,"",1],
+ ["el zumo","the juice","juice","Un zumo de naranja, por favor.","An orange juice, please.",1,"el jugo in Latin America",1],
+ ["el pan","the bread","bread","¿Nos trae más pan?","Could you bring us more bread?",1,"",2],
+ ["la ensalada","the salad","salad","De primero, una ensalada.","A salad to start.",1,"",2],
+ ["la sopa","the soup","soup","La sopa está muy caliente.","The soup is very hot.",1,"",2],
+ ["la carne","the meat","meat","Soy vegetariano, no como carne.","I’m vegetarian, I don’t eat meat.",1,"",2],
+ ["el pollo","the chicken","chicken","El pollo con arroz es mi plato favorito.","Chicken with rice is my favourite dish.",1,"",2],
+ ["el pescado","the fish (as food)","fish","Hoy hay pescado fresco.","There’s fresh fish today.",1,"",2],
+ ["el arroz","the rice","rice","El arroz está un poco salado.","The rice is a little salty.",1,"",2],
+ ["las patatas","the potatoes; the fries","fries","Con patatas fritas, por favor.","With fries, please.",1,"las papas in Latin America",2],
+ ["las verduras","the vegetables","veg","¿Qué verduras lleva?","Which vegetables does it have?",0,"",2],
+ ["el queso","the cheese","cheese","Sin queso, por favor.","Without cheese, please.",1,"",2],
+ ["el huevo","the egg","egg","Quiero dos huevos fritos.","I’d like two fried eggs.",1,"",2],
+ ["el postre","the dessert","dessert","¿Qué hay de postre?","What is there for dessert?",1,"",2],
+ ["el helado","the ice cream","icecream","De postre, un helado de chocolate.","A chocolate ice cream for dessert.",1,"",2],
+ ["pedir","to order; to ask for","order","¿Ya saben qué van a pedir?","Do you know what you’re going to order?",1,"verb: pido, pides, pide…",3],
+ ["recomendar","to recommend","thumb","¿Qué me recomienda?","What do you recommend?",0,"verb: recomiendo, recomienda…",3],
+ ["picante","spicy","chili","¿Este plato es muy picante?","Is this dish very spicy?",0,"",3],
+ ["vegetariano","vegetarian","leaf","¿Tiene algo vegetariano?","Do you have anything vegetarian?",0,"vegetariana (f.)",3]
+ ],
+ // phrase: [spanish, english, A1, group]
+ pgroups:["Arriving","Ordering","Allergies and wishes","Problems","Paying"],
+ phr:[
+ ["Una mesa para dos, por favor.","A table for two, please.",1,0],
+ ["Tengo una reserva a nombre de…","I have a reservation under the name of…",0,0],
+ ["¿Nos trae la carta, por favor?","Could you bring us the menu, please?",1,0],
+ ["¿Qué me recomienda?","What do you recommend?",1,1],
+ ["Quisiera una ensalada, por favor.","I’d like a salad, please.",1,1],
+ ["Para mí, el pescado.","For me, the fish.",1,1],
+ ["¿Qué lleva este plato?","What is in this dish?",0,1],
+ ["Soy alérgico a los frutos secos.","I’m allergic to nuts.",0,2],
+ ["No como carne. Soy vegetariano.","I don’t eat meat. I’m vegetarian.",1,2],
+ ["Sin cebolla, por favor.","Without onion, please.",1,2],
+ ["¿Tiene algo sin gluten?","Do you have anything gluten-free?",0,2],
+ ["Está muy rico.","It’s very tasty.",1,3],
+ ["Perdone, esto no es lo que pedí.","Excuse me, this isn’t what I ordered.",0,3],
+ ["La sopa está un poco fría.","The soup is a little cold.",0,3],
+ ["¿Puede repetir, por favor?","Could you repeat that, please?",1,3],
+ ["La cuenta, por favor.","The bill, please.",1,4],
+ ["¿Se puede pagar con tarjeta?","Can I pay by card?",1,4],
+ ["¿Está incluida la propina?","Is the tip included?",0,4]
+ ],
+ // dialogue: [who (w = waiter, y = you), spanish, english, gap word, [two wrong options]]
+ dlg:[
+ ["w","Buenas noches. ¿Tiene reserva?","Good evening. Do you have a reservation?"],
+ ["y","No, pero ¿tiene una mesa para dos?","No, but do you have a table for two?","mesa",["silla","cuenta"]],
+ ["w","Sí, por aquí, por favor. Aquí tiene la carta.","Yes, this way, please. Here is the menu."],
+ ["w","¿Quieren algo de beber?","Would you like something to drink?"],
+ ["y","Sí, una cerveza y un agua, por favor.","Yes, a beer and a water, please.","cerveza",["cuchara","carta"]],
+ ["w","Muy bien. ¿Ya saben qué van a pedir?","Very good. Do you know what you’re going to order?"],
+ ["y","¿Qué nos recomienda?","What do you recommend?","recomienda",["pide","reserva"]],
+ ["w","Hoy tenemos pescado fresco con arroz. Está muy rico.","Today we have fresh fish with rice. It’s very tasty."],
+ ["y","Perfecto. Para mí, el pescado. Mi amiga quiere la ensalada sin pollo.","Perfect. For me, the fish. My friend wants the salad without chicken.","pollo",["mesa","copa"]],
+ ["w","Enseguida. ¿Algo de postre?","Right away. Anything for dessert?"],
+ ["y","No, gracias. ¿Nos trae la cuenta, por favor?","No, thank you. Could you bring us the bill, please?","cuenta",["reserva","sopa"]],
+ ["w","Claro. ¿Pagan con tarjeta o en efectivo?","Of course. Are you paying by card or cash?"],
+ ["y","Con tarjeta. ¿Está incluida la propina?","By card. Is the tip included?","propina",["servilleta","mesa"]],
+ ["w","Sí, está incluida. Que tengan buena noche.","Yes, it’s included. Have a good evening."]
+ ],
+ talk:{t:"En el restaurante",en:"At a restaurant",you:"a diner",w:"an attentive waiter",
+  custom:"The learner plays a diner at a restaurant with a friend. You play an attentive waiter. Move through: seating, drinks, recommendations, ordering (include one dietary wish), a small problem with a dish, then the bill and the tip. Use the vocabulary naturally, and in a blind session ask one surprise, such as an allergy question or a dish that has run out.",
+  focus:"Vocabulary to work in naturally: la carta, la cuenta, pedir, recomendar, picante, la propina, el postre, vegetariano"}
+}];
+
+
+// ---------- Scenarios: state ----------
+ST.scn=ST.scn||{}; ["w","p","log"].forEach(k=>{ST.scn[k]=ST.scn[k]||{}});
+const SC_IV=[0,1,2,4,8,16];
+const scDay=()=>{const d=new Date(); return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
+const scP=id=>SCN_PACKS.find(p=>p.id===id);
+const scPS=id=>ST.scn.p[id]||(ST.scn.p[id]={ph:{},dlg:0,talk:0});
+const scWK=(p,w)=>p.id+":"+w[0];
+const scW=(p,w)=>ST.scn.w[scWK(p,w)];
+const scNorm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim();
+const scShuf=a=>{a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a};
+const scPic=(w,c)=>w[8]?`<img class="sc-img" src="${esc(w[8])}" alt="" loading="lazy">`:si(w[2],c);
+const SC={pack:null,en:true};
+function scStats(p){
+  const ps=scPS(p.id); let seen=0,known=0; p.words.forEach(w=>{const x=scW(p,w); if(x){seen++; if(x.b>=3) known++}});
+  const ph=Object.keys(ps.ph).length, dl=p.dlg.filter(l=>l[3]).length, due=p.words.filter(w=>{const x=scW(p,w); return x&&x.d<=scDay()}).length;
+  const pct=(known/p.words.length*.45+ph/p.phr.length*.2+(ps.dlg?Math.min(1,ps.dlg/dl):0)*.15+Math.min(1,ps.talk/2)*.2);
+  return {seen,known,ph,dl,due,pct:Math.min(1,pct),dlg:ps.dlg||0,talk:ps.talk||0};
+}
+function scCount(n){ const t=todayKey(); ST.scn.log[t]=(ST.scn.log[t]||0)+n }
+// act on pointerdown so the keyboard stays up and the first tap counts
+function scTap(el,fn){ if(!el) return; let at=0;
+  el.addEventListener("pointerdown",e=>{ if(el.disabled) return; e.preventDefault(); at=Date.now(); fn(e) });
+  el.addEventListener("click",e=>{ e.preventDefault(); if(Date.now()-at<800) return; if(!el.disabled) fn(e) }) }
+// ---------- chrome ----------
+function scChrome(){
+  const s=screen, p=SC.pack;
+  $("backBtn").hidden=false; $("backBtn").textContent=s==="scn"?"‹ "+rootName:s==="scp"?"‹ Scenarios":"‹ "+(p?p.t:"Back");
+  $("quit").hidden=true; $("openRules").hidden=true; $("openSettings").hidden=true; $("score").textContent="";
+  $("title").textContent=s==="scn"?"Scenarios":s==="scp"?(p?p.t:"Scenario"):s==="scw"?"Picture words":s==="scc"?"New words":s==="scq"?"Picture quiz":s==="scr"?"Key phrases":s==="scd"?"Dialogue":"Scenarios";
+  $("progress").hidden=true;
+}
+function scBar(n,total){ const pr=$("progress"); pr.hidden=false; pr.style.setProperty("--cc","#B0562A"); pr.innerHTML=`<span class="p-v" style="flex:1"><i style="width:${total?Math.min(100,n/total*100):0}%"></i></span>` }
+function scBack(){
+  const s=screen;
+  if(s==="scn") (rootRet||renderMenu)();
+  else if(s==="scp") renderScn();
+  else if(s==="scc"&&SCC.back==="grid") scGrid(SC.pack.id);
+  else if(SC.pack) scOpen(SC.pack.id); else renderScn();
+}
+function scBase(sc){ screen=sc; $("drill").onclick=null; $("fb").hidden=true; course=null; drillOn=false; chrome(); $("actions").innerHTML=""; $("drill").scrollTop=0 }
+const scEn=()=>`<button type="button" class="sc-chip" id="scEn" aria-pressed="${SC.en}">English ${SC.en?"on":"off"}</button>`;
+// ---------- hub ----------
+const SC_SOON=[["Airport and flying","plane"],["Bus, train and taxi","bus"],["Hairdresser and barber","scissors"],["At work","work"],["Hotel and Airbnb","hotel"],["Doctor and pharmacy","pill"],["Shopping for clothes","bag"],["Small talk and new friends","chat"]];
+function scHomeHTML(){
+  const p=SCN_PACKS[0], st=scStats(p);
+  return `<button type="button" class="sc-card" id="scHome"><span class="sc-ic">${si("plate")}</span><span class="sc-tx"><b>Scenarios</b><small>Words with pictures, phrases and role-plays for real situations${st.seen?` · ${st.known} words known`:""}</small></span><span class="sc-go">›</span></button>`;
+}
+function renderScn(){
+  scBase("scn"); SC.pack=null; scChrome();
+  const row=p=>{const st=scStats(p); return `<button type="button" class="sc-card" data-p="${p.id}"><span class="sc-ic">${si(p.ic)}</span><span class="sc-tx"><b>${p.t}</b><small>${p.en} · ${p.lv}</small><span class="sc-bar"><i style="width:${Math.round(st.pct*100)}%"></i></span></span><span class="sc-go">›</span></button>`};
+  $("drill").innerHTML=`<div class="sc">
+    <div><h2 class="hello">Scenarios</h2><p class="sub">Pick a situation. Learn its words with pictures, practise the key phrases, then talk it through.</p></div>
+    <div class="sc-list">${SCN_PACKS.map(row).join("")}</div>
+    <p class="label" style="margin:6px 0 0">Coming next</p>
+    <div class="sc-list">${SC_SOON.map(([t])=>`<div class="sc-card sc-lock"><span class="sc-ic">${si("lock")}</span><span class="sc-tx"><b>${t}</b></span></div>`).join("")}</div></div>`;
+  $("drill").onclick=e=>{const b=e.target.closest("[data-p]"); if(b){haptic(8); scOpen(b.dataset.p)}};
+}
+// ---------- pack path ----------
+function scOpen(id){
+  const p=scP(id); SC.pack=p; scBase("scp"); scChrome();
+  const st=scStats(p), step=(k,ic,t,sub,done,extra)=>`<button type="button" class="sc-card sc-step${done?" sc-done":""}" data-k="${k}"><span class="sc-ic">${si(ic)}</span><span class="sc-tx"><b>${t}</b><small>${sub}</small></span>${done?`<span class="sc-tick">${si("check")}</span>`:`<span class="sc-go">›</span>`}</button>`;
+  $("drill").innerHTML=`<div class="sc">
+    <div class="sc-head"><span class="sc-ic big">${si(p.ic)}</span><div><h2 class="hello">${p.t}</h2><p class="sub">${p.en} · ${p.lv}</p></div></div>
+    <div class="sc-prog"><div class="sc-bar"><i style="width:${Math.round(st.pct*100)}%"></i></div><small>${Math.round(st.pct*100)}% of this scenario</small></div>
+    <div class="sc-list">
+     ${step("w","words","Picture words",`${st.seen} of ${p.words.length} met · ${st.known} known`,st.known>=p.words.length)}
+     ${step("r","mic","Key phrases",`${st.ph} of ${p.phr.length} said out loud`,st.ph>=p.phr.length)}
+     ${step("q","quiz","Picture quiz",st.seen<4?"Meet a few words first":st.due?`${st.due} to review today`:"All caught up · practise anyway",false)}
+     ${step("d","dlg","Dialogue",st.dlg?`Best ${st.dlg} of ${st.dl} gaps`:"Listen, then fill the gaps",st.dlg>=st.dl)}
+    </div>
+    <div class="sc-card sc-talk"><span class="sc-ic">${si("chat")}</span><span class="sc-tx"><b>Talk it through</b><small>${st.talk?`${st.talk} ${st.talk===1?"session":"sessions"} so far`:"Role-play it with a partner who answers back"}</small><span class="sc-two"><button type="button" class="sc-pill" data-talk="0">Guided</button><button type="button" class="sc-pill" data-talk="1">Blind</button></span></span></div>
+    <div class="vcard sc-note"><p class="label" style="margin:0 0 4px">Good to know</p><p class="sc-nt">${esc(p.note)}</p></div></div>`;
+  $("drill").onclick=e=>{
+    const b=e.target.closest("[data-k]"), t=e.target.closest("[data-talk]");
+    if(t){haptic(8); scTalk(p.id,t.dataset.talk==="1"); return}
+    if(!b) return; haptic(8); const k=b.dataset.k;
+    if(k==="w") scGrid(p.id); else if(k==="r") scPhrases(p.id); else if(k==="q") scQuizStart(p.id); else if(k==="d") scDialogue(p.id);
+  };
+}
+// ---------- picture words: grid + cards ----------
+const SCC={id:null,idx:[],i:0,back:"",quiz:false};
+function scGrid(id){
+  const p=scP(id); SC.pack=p; scBase("scw"); scChrome();
+  const next=p.words.map((w,i)=>i).filter(i=>!scW(p,p.words[i])).slice(0,6);
+  const state=w=>{const x=scW(p,w); return !x?"new":x.b>=3?"known":"learning"};
+  const tile=(w,i)=>`<button type="button" class="sc-tile" data-i="${i}" data-s="${state(w)}"><span class="sc-tp">${scPic(w)}</span><span class="sc-tw">${esc(w[0])}</span><i></i></button>`;
+  $("drill").innerHTML=`<div class="sc">
+    <p class="sub" style="margin:0">Tap a picture to see the word. Dots: <b class="sc-d0">new</b> · <b class="sc-d1">learning</b> · <b class="sc-d2">known</b></p>
+    ${p.groups.map((g,gi)=>`<div><p class="label" style="margin:0 0 8px">${g}</p><div class="sc-grid">${p.words.map((w,i)=>w[7]===gi?tile(w,i):"").join("")}</div></div>`).join("")}</div>`;
+  $("drill").onclick=e=>{const b=e.target.closest(".sc-tile"); if(!b) return; haptic(8); scCards(id,[+b.dataset.i],"grid")};
+  $("actions").innerHTML=next.length?`<button type="button" class="grow" id="scNext">Learn the next ${next.length}</button>`:`<button type="button" class="ghost grow" id="scAll">Review everything</button>`;
+  if(next.length) $("scNext").onclick=()=>scCards(id,next,"grid",true); else $("scAll").onclick=()=>scQuizStart(id);
+}
+function scCards(id,idx,back,quiz){
+  const p=scP(id); SC.pack=p; Object.assign(SCC,{id,idx,i:0,back:back||"",quiz:!!quiz}); scCardShow(true);
+}
+function scCardShow(say){
+  const p=SC.pack, w=p.words[SCC.idx[SCC.i]], n=SCC.idx.length; scBase("scc"); scChrome(); scBar(SCC.i+1,n);
+  if(!scW(p,w)){ ST.scn.w[scWK(p,w)]={b:0,d:scDay(),u:Date.now()}; scSave() }
+  $("drill").innerHTML=`<div class="sc sc-cv">
+    <div class="sc-pic">${scPic(w)}</div>
+    <div class="sc-wd"><span class="sc-es">${esc(w[0])}</span>${spkBtn(w[0])}</div>
+    <p class="sc-en">${esc(w[1])}</p>
+    ${w[6]?`<p class="sc-reg">${esc(w[6])}</p>`:""}
+    <div class="vcard sc-ex"><div class="sc-exl"><p class="sc-exes">${esc(w[3])}</p>${spkBtn(w[3],"sm")}</div><p class="sc-exen">${esc(w[4])}</p></div></div>`;
+  const last=SCC.i===n-1;
+  $("actions").innerHTML=`${SCC.i?`<button type="button" class="ghost" id="scPrev">Back</button>`:""}<button type="button" class="grow" id="scFwd">${last?(SCC.quiz?"Quiz me on these":"Done"):"Next"}</button>`;
+  if(SCC.i) $("scPrev").onclick=()=>{SCC.i--; scCardShow(true)};
+  $("scFwd").onclick=()=>{ if(!last){SCC.i++; scCardShow(true)} else if(SCC.quiz) scQuizStart(SC.pack.id,SCC.idx); else scBack() };
+  if(say) setTimeout(()=>speak(w[0]),60);
+}
+function scSave(){ commit("scn") }
+// ---------- quiz ----------
+const SCQ={q:[],i:0,ok:0,first:0,ans:false,again:0,xp:null};
+function scQuizStart(id,idx){
+  const p=scP(id); SC.pack=p; let words;
+  if(idx) words=idx.map(i=>p.words[i]);
+  else{
+    const seen=p.words.filter(w=>scW(p,w));
+    if(seen.length<4){ scBase("scq"); scChrome(); $("drill").innerHTML=`<div class="sc"><div class="vcard" style="text-align:center"><p class="sub">Meet at least 4 words first, then the quiz can mix them.</p></div></div>`; $("actions").innerHTML=`<button type="button" class="grow" id="scL">Learn words</button>`; $("scL").onclick=()=>scGrid(id); return }
+    const t=scDay(), due=seen.filter(w=>scW(p,w).d<=t), rest=seen.filter(w=>scW(p,w).d>t).sort((a,b)=>scW(p,a).b-scW(p,b).b);
+    words=scShuf(due).concat(rest).slice(0,10);
+  }
+  SCQ.q=scShuf(words).map(w=>{const b=(scW(p,w)||{b:0}).b; return {w,t:b>=3?"type":b===2?"hear":"pick",tries:0}});
+  Object.assign(SCQ,{i:0,ok:0,first:0,ans:false,again:0,xp:null,n:SCQ.q.length}); scQShow();
+}
+function scOpts(p,w,n){
+  const same=scShuf(p.words.filter(x=>x!==w&&x[7]===w[7]&&x[2]!==w[2])), other=scShuf(p.words.filter(x=>x!==w&&x[7]!==w[7]&&x[2]!==w[2]));
+  return scShuf([w,...same.concat(other).slice(0,n-1)]);
+}
+function scQShow(){
+  const p=SC.pack, q=SCQ.q[SCQ.i]; if(!q) return scQEnd();
+  scBase("scq"); scChrome(); scBar(SCQ.i,SCQ.n); SCQ.ans=false; const w=q.w;
+  let body;
+  if(q.t==="pick"){
+    q.o=scOpts(p,w,4);
+    body=`<div class="sc-pic">${scPic(w)}</div><p class="sc-ask">What is this?</p><div class="sc-opts">${q.o.map((o,i)=>`<button type="button" class="sc-opt" data-i="${i}">${esc(o[0])}</button>`).join("")}</div>`;
+  }else if(q.t==="hear"){
+    q.o=scOpts(p,w,4);
+    body=`<div class="sc-hear">${spkBtn(w[0],"sc-bigspk")}</div><p class="sc-ask">Listen, then tap the picture</p><div class="sc-opts">${q.o.map((o,i)=>`<button type="button" class="sc-opt pic" data-i="${i}">${scPic(o)}</button>`).join("")}</div>`;
+  }else{
+    body=`<div class="sc-pic">${scPic(w)}</div><p class="sc-ask">${esc(w[1])}</p><div class="sc-type"><input id="scIn" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Type it in Spanish"><button type="button" id="scChk">Check</button></div>`;
+  }
+  $("drill").innerHTML=`<div class="sc sc-q"><div class="sc-qb">${body}</div><div class="sc-fbk" id="scFb"></div></div>`;
+  if(q.t==="hear") setTimeout(()=>speak(w[0]),80);
+  if(q.t==="type"){ const inp=$("scIn"); scTap($("scChk"),()=>scAnswer(inp.value)); inp.onkeydown=e=>{ if(e.key==="Enter"){e.preventDefault(); scAnswer(inp.value)} }; setTimeout(()=>{try{inp.focus()}catch(e){}},120) }
+  else $("drill").querySelectorAll(".sc-opt").forEach(b=>scTap(b,()=>scAnswer(+b.dataset.i)));
+}
+function scAnswer(v){
+  if(SCQ.ans) return; const p=SC.pack, q=SCQ.q[SCQ.i], w=q.w; let ok;
+  if(q.t==="type"){ const a=scNorm(v); if(!a) return; const full=scNorm(w[0]), bare=full.replace(/^(el|la|las|los) /,""); ok=a===full||a===bare }
+  else ok=q.o[v]===w;
+  SCQ.ans=true; haptic(ok?10:25);
+  if(q.t==="type"){ const inp=$("scIn"); inp.disabled=true; inp.classList.add(ok?"sc-ok":"sc-no"); $("scChk").disabled=true }
+  else $("drill").querySelectorAll(".sc-opt").forEach((b,i)=>{ b.disabled=true; if(q.o[i]===w) b.classList.add("sc-ok"); else if(i===v) b.classList.add("sc-no") });
+  // grade the word
+  const k=scWK(p,w), x=ST.scn.w[k]||{b:0,d:scDay()}, t=scDay();
+  if(ok){ if(x.d<=t){ x.b=Math.min(5,x.b+1); x.d=t+SC_IV[x.b] } } else { x.b=Math.min(x.b,1); x.d=t }
+  x.u=Date.now(); ST.scn.w[k]=x; scCount(1);
+  if(ok){ SCQ.ok++; if(!q.tries) SCQ.first++ } else { q.tries++; if(q.tries<2) SCQ.q.push({w,t:"pick",tries:q.tries}), SCQ.n++ }
+  $("scFb").innerHTML=`<div class="sc-r ${ok?"sc-rok":"sc-rno"}"><b>${ok?"Correct":"Not quite"}</b> <span>${esc(w[0])} · ${esc(w[1])}</span>${spkBtn(w[0],"sm")}<p>${esc(w[3])}<br><i>${esc(w[4])}</i></p></div>`;
+  speak(w[0]); scSave();
+  const more=SCQ.i<SCQ.q.length-1;
+  $("actions").innerHTML=`<button type="button" class="grow" id="scGo">${more?"Next":"Finish"}</button>`;
+  scTap($("scGo"),()=>{SCQ.i++; scQShow()});
+}
+function scQEnd(){
+  const p=SC.pack; scBase("scq"); scChrome(); scBar(1,1);
+  const learned=p.words.filter(w=>scKnown(p,w)).length, first=SCQ.first;
+  const ids=new Set(SCQ.q.map(x=>x.w[0])).size;
+  const xp=SCQ.xp||(SCQ.xp=xpAward([["Scenario words",first*2]]));
+  $("drill").innerHTML=`<div class="sc">${xpStrip(xp)}<div class="vcard" style="text-align:center"><div class="vscore" style="color:var(--sn)">${first}/${ids}</div><p class="sub">Right first time</p><p class="sc-nt" style="margin-top:8px">${learned} of ${p.words.length} words known in this scenario.</p></div></div>`;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="scBk">Back</button><button type="button" class="grow" id="scAg">Another round</button>`;
+  $("scBk").onclick=()=>scOpen(p.id); $("scAg").onclick=()=>scQuizStart(p.id);
+}
+const scKnown=(p,w)=>{const x=scW(p,w); return !!x&&x.b>=3};
+// ---------- key phrases ----------
+function scPhrases(id){
+  const p=scP(id); SC.pack=p; scBase("scr"); scChrome(); const ps=scPS(id);
+  const row=(ph,i)=>`<div class="sc-ph${ps.ph[i]?" sc-said":""}" data-i="${i}"><div class="sc-pt"><p class="sc-pes">${esc(ph[0])}</p>${SC.en?`<p class="sc-pen">${esc(ph[1])}</p>`:""}<p class="sc-heard" hidden></p></div>${spkBtn(ph[0],"sm")}<button type="button" class="sc-mic vc-mic" data-i="${i}" aria-label="Say it">${si(ps.ph[i]?"check":"mic")}</button></div>`;
+  $("drill").innerHTML=`<div class="sc"><div class="sc-tools"><p class="sub" style="margin:0">Listen, then say it out loud. Your voice is checked.</p>${scEn()}</div>
+   ${p.pgroups.map((g,gi)=>`<div><p class="label" style="margin:0 0 6px">${g}</p><div class="vcard sc-pl">${p.phr.map((ph,i)=>ph[3]===gi?row(ph,i):"").join("")}</div></div>`).join("")}</div>`;
+  $("scEn").onclick=()=>{SC.en=!SC.en; scPhrases(id)};
+  $("drill").querySelectorAll(".sc-mic").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i, ph=p.phr[i], rowEl=b.closest(".sc-ph"), hd=rowEl.querySelector(".sc-heard");
+    vcStart(b,txt=>{
+      const target=scNorm(ph[0]).split(" ").filter(Boolean), heard=new Set(scNorm(txt).split(" ")), hit=target.filter(t=>heard.has(t)).length/target.length;
+      hd.hidden=false; hd.textContent="Heard: "+txt;
+      if(hit>=.7){ hd.className="sc-heard sc-hok"; ps.ph[i]=1; rowEl.classList.add("sc-said"); b.innerHTML=si("check"); scCount(1); scSave(); haptic(12) }
+      else { hd.className="sc-heard sc-hno"; hd.textContent="Heard: "+txt+" · try again"; haptic(25) }
+    });
+  });
+}
+// ---------- dialogue ----------
+const SCD={i:0,first:0,gaps:0,wrong:false};
+function scDialogue(id){
+  const p=scP(id); SC.pack=p; Object.assign(SCD,{i:0,first:0,gaps:0,wrong:false}); scDlgShow();
+}
+function scDlgShow(){
+  const p=SC.pack; scBase("scd"); scChrome(); const L=p.dlg, i=SCD.i, line=L[i];
+  const total=p.dlg.filter(l=>l[3]).length; scBar(i,L.length);
+  const bub=(l,j,gap)=>{const me=l[0]==="y", t=gap?esc(l[1]).replace(esc(l[3]),`<span class="sc-gap">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`):esc(l[1]);
+    return `<div class="sc-bb ${me?"sc-me":"sc-pa"}"><p class="sc-pes">${t}</p>${SC.en?`<p class="sc-pen">${esc(l[2])}</p>`:""}${gap?"":spkBtn(l[1],"sm")}</div>`};
+  const shown=L.slice(0,i).map((l,j)=>bub(l,j,false)).join("");
+  const gapNow=line&&line[3]&&true, cur=line?bub(line,i,gapNow):"";
+  let opts=""; if(gapNow){ const o=scShuf([line[3],...line[4]]); opts=`<div class="sc-opts three">${o.map(x=>`<button type="button" class="sc-opt" data-w="${esc(x)}">${esc(x)}</button>`).join("")}</div>` }
+  $("drill").innerHTML=`<div class="sc sc-dl"><div class="sc-tools"><p class="sub" style="margin:0">You are the guest. Fill the gaps in your lines.</p>${scEn()}</div><div class="sc-chat">${shown}${cur}</div>${opts}</div>`;
+  $("scEn").onclick=()=>{SC.en=!SC.en; scDlgShow()};
+  $("drill").scrollTop=$("drill").scrollHeight;
+  if(!line) return scDlgEnd();
+  if(gapNow){
+    SCD.wrong=false;
+    $("drill").querySelectorAll(".sc-opt").forEach(b=>scTap(b,()=>{
+      const ok=b.dataset.w===line[3]; haptic(ok?10:25);
+      if(ok){ if(!SCD.wrong) SCD.first++; SCD.gaps++; b.classList.add("sc-ok"); $("drill").querySelectorAll(".sc-opt").forEach(x=>x.disabled=true); speak(line[1]); scCount(1);
+        const g=$("drill").querySelector(".sc-gap"); if(g){g.textContent=line[3]; g.classList.add("sc-filled")}
+        $("actions").innerHTML=`<button type="button" class="grow" id="scGo">${i<L.length-1?"Continue":"Finish"}</button>`; scTap($("scGo"),()=>{SCD.i++; scDlgShow()}) }
+      else { SCD.wrong=true; b.classList.add("sc-no"); b.disabled=true }
+    }));
+  }else{
+    const hasNext=i<L.length-1; $("actions").innerHTML=`<button type="button" class="grow" id="scGo">${hasNext?"Continue":"Finish"}</button>`;
+    scTap($("scGo"),()=>{SCD.i++; scDlgShow()}); setTimeout(()=>speak(line[1]),80);
+  }
+}
+function scDlgEnd(){
+  const p=SC.pack, ps=scPS(p.id), total=p.dlg.filter(l=>l[3]).length; if(SCD.first>(ps.dlg||0)){ ps.dlg=SCD.first; scSave() }
+  scBar(1,1); $("actions").innerHTML=`<button type="button" class="ghost" id="scBk">Back</button><button type="button" class="grow" id="scAg">Play again</button>`;
+  $("drill").innerHTML=`<div class="sc"><div class="vcard" style="text-align:center"><div class="vscore" style="color:var(--sn)">${SCD.first}/${total}</div><p class="sub">Gaps right first time</p></div></div>`;
+  $("scBk").onclick=()=>scOpen(p.id); $("scAg").onclick=()=>scDialogue(p.id);
+}
+// ---------- Talk ----------
+function scTalk(id,blind){
+  const p=scP(id); if(!RL.code){ vcToast("Add your sync code in Settings to use Talk.",3400); return }
+  const T=p.talk; SC.pack=p; tkStart({id:"scn-"+p.id,e:"",t:T.t,en:T.en,lv:p.lv,you:T.you,w:T.w,at:"",goal:"",custom:T.custom,focus:T.focus,pack:p.id},{blind:!!blind});
+}
+function scTalkDone(){
+  const sc=TLK.sc; if(!sc||!sc.pack||TLK.scCt===TLK.t0) return; TLK.scCt=TLK.t0;
+  const ps=scPS(sc.pack); ps.talk=(ps.talk||0)+1; scCount(1); scSave();
+}
+function scUsedHTML(){
+  const sc=TLK.sc; if(!sc||!sc.pack) return ""; const p=scP(sc.pack); if(!p) return "";
+  const said=scNorm(TLK.msgs.filter(m=>m.role==="user"&&m.es).map(m=>m.es).join(" ")), used=[];
+  p.words.forEach(w=>{ const bare=scNorm(w[0]).replace(/^(el|la|las|los) /,""); if(bare.length<4||/(ir)$/.test(bare)&&w[7]===3) return; const st=bare.replace(/s$/,""); if((" "+said+" ").includes(" "+st)) used.push(w[0]) });
+  return `<div class="vcard"><p class="label" style="margin-bottom:6px">Scenario words you used</p><p class="sc-nt">${used.length?esc(used.join(" · ")):"None yet. Try working a few of the picture words into your answers."}</p></div>`;
+}
+
 renderMenu();
 // ================= opening screen: progress at a glance while the app loads =================
 (function splash(){
   const sp=$("splash"); if(!sp) return;
   const tk=todayKey(), wk=weekDays().map(dkey);
-  const has=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0;
+  const has=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
   const str=streak(has);
   $("spStreak").innerHTML=str?`<b>${str}</b>day streak${has(tk)?" · done today":" · keep it going today"}`:(has(tk)?"Nice work today":"Ready for today’s practice");
   $("spWeek").innerHTML=wk.map((k,i)=>`<span><i class="${has(k)?"on":""}${k===tk?" today":""}" style="animation-delay:${.08*i}s"></i>${LBL[i].slice(0,1)}</span>`).join("");
