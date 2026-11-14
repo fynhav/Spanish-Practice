@@ -903,7 +903,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-14 · 09:26</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-14 · 11:06</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -5856,7 +5856,7 @@ function scOpen(id){
      ${step("d","dlg","Dialogue",st.dlg?`Best ${st.dlg} of ${st.dl} gaps`:"Listen, then fill the gaps",st.dlg>=st.dl)}
     </div>
     <div class="sc-card sc-talk"><span class="sc-ic">${si("chat")}</span><span class="sc-tx"><b>Talk it through</b><small>${st.talk?`${st.talk} ${st.talk===1?"session":"sessions"} so far`:"Role-play it with a partner who answers back"}</small><span class="sc-two"><button type="button" class="sc-pill" data-talk="0">Guided</button><button type="button" class="sc-pill" data-talk="1">Blind</button></span></span></div>
-    <div class="vcard sc-note"><p class="label" style="margin:0 0 4px">Good to know</p><p class="sc-nt">${esc(p.note)}</p></div>${Object.keys(SCPH).length?`<p class="sc-cr">Photos from Pexels</p>`:""}</div>`;
+    <div class="vcard sc-note"><p class="label" style="margin:0 0 4px">Good to know</p><p class="sc-nt">${esc(p.note)}</p></div>${Object.keys(SCPH).length?`<p class="sc-cr">Photos from ${esc([...new Set(Object.values(SCPH).map(x=>x.s||"Pexels"))].join(" and "))}</p>`:""}</div>`;
   $("drill").onclick=e=>{
     const b=e.target.closest("[data-k]"), t=e.target.closest("[data-talk]");
     if(t){haptic(8); scTalk(p.id,t.dataset.talk==="1"); return}
