@@ -738,6 +738,8 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .tk-sub2{margin:6px 0 0;font-size:.82rem;color:var(--muted)}
 .tk-bt .tk-nudge,.tk-nudge{animation:tknudge 1.1s ease-in-out infinite;color:var(--tk-d,#1F5E6A);border-radius:50%}
 @keyframes tknudge{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.tk-live{color:var(--muted)}.tk-live svg{width:19px;height:19px;display:block;margin:auto}
+.tk-live.on{background:#D6ECEF!important;border-color:#3A8190!important;color:#1F5E6A!important}
 /* Scenarios */
 .sc,.sc-card,.sc-chip{--sn:#B0562A;--sn-d:#8F431F;--sn-soft:#F7E3D5;--sn-line:#E6C9B4}
 .sc{display:flex;flex-direction:column;gap:12px}
@@ -832,6 +834,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
     <button type="button" class="iconbtn sq" id="quit" hidden aria-label="Leave session (progress is saved)">✕</button>
     <h1 id="title">Práctica diaria</h1>
     <span class="score" id="score"></span>
+    <button type="button" class="iconbtn sq tk-live" id="tkLive" hidden aria-pressed="false" aria-label="Live feedback"></button>
     <button type="button" class="iconbtn sq" id="openRules" aria-label="Rules">?</button>
     <button type="button" class="iconbtn sq" id="openSettings" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="16" cy="6" r="2.2"/><circle cx="9" cy="12" r="2.2"/><circle cx="17" cy="18" r="2.2"/></svg></button>
   </div>
@@ -877,7 +880,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 20:08</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 20:35</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -2830,6 +2833,7 @@ function chrome(){
   setCourseColour(course);
   if(screen==="talk"||screen==="tchat"||screen==="tsum"||screen==="tpre") tkChrome();
   if(/^sc[a-z]$/.test(screen)) scChrome();
+  if(screen!=="tchat"&&$("tkLive")) $("tkLive").hidden=true;
 }
 $("backBtn").onclick=()=>{drillOn=false; if(/^sc[a-z]$/.test(screen)){scBack();return} if(screen==="tchat"){talkQuit();return} if(screen==="tpre"){renderTalk();return} if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
 $("quit").onclick=()=>{if(screen==="tchat"){talkQuit();return} if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
@@ -4966,6 +4970,7 @@ const TALK_SC=[
  {id:"opin",e:"🗣️",t:"Dar tu opinión",en:"Sharing opinions",lv:"B1",you:"a friend with opinions",w:"a friend who disagrees politely",at:"a dinner with friends",goal:"agreeing, disagreeing and giving reasons",focus:"subjunctive and connectors"}
 ];
 const TKI={
+ live:'<path d="M4 5h16v11H11l-4 4v-4H4zM8.8 10.6l2.2 2.2 4.2-4.4"/>',
  sc_intro:'<path d="M6 21V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21M3.5 21h17M14.5 12v.01"/>',
  sc_cafe:'<path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8.5 3.5v2M12 3.5v2"/>',
  sc_mercado:'<path d="M5 9h14l-1.2 9.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8zM9 9V7a3 3 0 0 1 6 0v2"/>',
@@ -5023,12 +5028,21 @@ function tkLeave(){
   if(tkRec){ const r=tkRec; r.send=false; tkRec=null; tkStopRec(r); try{r.mr.stop()}catch(e){} }
   tkSeq++; tkStopAudio();
 }
+const tkPend=new Map();
+function tkPrefetch(text){
+  if(!text||tkCache.has(text)||tkPend.has(text)) return;
+  const pr=(async()=>{ try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify({text}),ms:25000}); if(!r.ok) return; const ab=await r.arrayBuffer(); if(!tkCache.has(text)) tkCache.set(text,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} tkPend.delete(text) })();
+  tkPend.set(text,pr);
+}
+function tkLiveDraw(){ const b=$("tkLive"); if(!b) return; const on=!!ST.talk.live; b.setAttribute("aria-pressed",String(on)); b.classList.toggle("on",on); b.innerHTML=tki("live"); b.setAttribute("aria-label","Live feedback "+(on?"on":"off")) }
+$("tkLive").onclick=()=>{ ST.talk.live=!ST.talk.live; saveLocal(); tkLiveDraw(); vcToast(ST.talk.live?"Live feedback on. After each answer you’ll hear how to say it.":"Live feedback off.",2800) };
+const tkNz=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim();
 async function tkSpeak(text,btn,done){
   lastAct=Date.now(); tkStopAudio(); const mine=++tkSeq;
   document.querySelectorAll(".tk .tk-on").forEach(b=>b.classList.remove("tk-on"));
   if(btn) btn.classList.add("tk-on");
   let fin=false, wd=0; const off=()=>{ clearTimeout(wd); if(btn) btn.classList.remove("tk-on"); if(!fin){ fin=true; if(done) done() } };
-  const rate=S.rate==="slow"?.8:1; let c=tkCache.get(text);
+  const rate=S.rate==="slow"?.8:1; if(tkPend.has(text)) await tkPend.get(text); let c=tkCache.get(text);
   if(!c){
     try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify({text}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); const ab=await r.arrayBuffer(); c={ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}; tkCache.set(text,c) }
     catch(e){ if(mine===tkSeq){ try{ speak(text,btn) }catch(x){} setTimeout(off,Math.max(1200,text.length*65)) } else off(); return }
@@ -5134,6 +5148,7 @@ function tkChrome(){
   $("quit").hidden=!(s==="tchat"&&n>=3);
   if(s==="tchat"){ $("quit").className="iconbtn tk-end"; $("quit").innerHTML=tki("phone")+"<span>End</span>"; $("quit").setAttribute("aria-label","End the conversation") }
   $("progress").hidden=true; $("openRules").hidden=true; $("openSettings").hidden=false; $("score").textContent="";
+  $("tkLive").hidden=s!=="tchat"; tkLiveDraw();
   $("title").textContent=s==="tchat"&&TLK.sc?TLK.sc.t:s==="tpre"?"Scenario":s==="tsum"?"Conversation done":"Talk";
 }
 const tkBtn=(a,ic,label,i,pressed,dis)=>`<button type="button" class="tk-ib" data-a="${a}"${i!=null?` data-i="${i}"`:""} aria-label="${label}"${pressed!=null?` aria-pressed="${!!pressed}"`:""}${dis?" disabled":""}>${tki(ic)}</button>`;
@@ -5237,11 +5252,12 @@ async function tkTurn(){
   const hist=()=>TLK.msgs.filter(m=>m.es&&!m.pend).map(m=>({role:m.role,es:m.es}));
   const lastU=TLK.msgs[TLK.msgs.length-1], hasU=!!(lastU&&lastU.role==="user"), t0=Date.now();
   try{
-    if(hasU) tkPost("/talk/grade",{...base,history:hist()},40000).then(g=>{
+    const gp=hasU?tkPost("/talk/grade",{...base,history:hist()},40000).then(g=>{
       if(id!==TLK.id) return;
       lastU.busy=false; lastU.grade=g.grade&&g.grade.verdict?g.grade:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now();
       tkDraw(); haptic(lastU.grade.verdict==="great"?12:6);
-    }).catch(()=>{ if(id!==TLK.id) return; lastU.busy=false; lastU.grade=lastU.grade||{verdict:"ok",corrected:"",note_en:""}; tkDraw() });
+      if(ST.talk.live&&lastU.grade.verdict!=="great"&&lastU.grade.corrected) tkPrefetch(lastU.grade.corrected);
+    }).catch(()=>{ if(id!==TLK.id) return; lastU.busy=false; lastU.grade=lastU.grade||{verdict:"ok",corrected:"",note_en:""}; tkDraw() }):null;
     const A=await tkPost("/talk/reply",{...base,history:hist()},30000); if(id!==TLK.id) return;
     TLK.tm.push(Date.now()-t0);
     if(hasU&&A.off){ lastU.off=A.off_en||"That didn’t answer what they asked."; lastU.offAt=Date.now(); TLK.offs++; haptic(18) }
@@ -5254,7 +5270,17 @@ async function tkTurn(){
     }).catch(()=>{ am.enP=false });
     // the idea for your answer appears only once the partner has finished speaking
     const next=()=>help.then(()=>{ if(id!==TLK.id) return; if(!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now() } tkOpenDock(); if(TLK.st!=="rec") tkDraw("end") });
-    if(S.auto==="on") tkSpeak(A.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900);
+    const speakReply=()=>{ if(id!==TLK.id) return; if(S.auto==="on") tkSpeak(A.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900) };
+    if(gp&&ST.talk.live&&S.auto==="on"){
+      // live feedback: hear how you should have said it, then the partner answers
+      tkPrefetch(A.reply.es);
+      Promise.race([gp,tkSleep(7000)]).then(()=>{
+        if(id!==TLK.id) return; const g=lastU.grade;
+        if(g&&g.verdict!=="great"&&g.corrected&&tkNz(g.corrected)!==tkNz(lastU.es)){
+          TLK.note="Listen: this is how to say it."; tkComposer();
+          tkSpeak(g.corrected,null,()=>{ if(id!==TLK.id) return; if(TLK.note==="Listen: this is how to say it.") TLK.note=""; tkComposer(); setTimeout(speakReply,350) });
+        } else speakReply() });
+    } else speakReply();
   }catch(e){
     if(id!==TLK.id) return;
     TLK.st="idle"; if(lastU&&lastU.busy) lastU.busy=false;
