@@ -880,7 +880,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 20:35</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 20:36</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -5028,23 +5028,23 @@ function tkLeave(){
   if(tkRec){ const r=tkRec; r.send=false; tkRec=null; tkStopRec(r); try{r.mr.stop()}catch(e){} }
   tkSeq++; tkStopAudio();
 }
-const tkPend=new Map();
-function tkPrefetch(text){
-  if(!text||tkCache.has(text)||tkPend.has(text)) return;
-  const pr=(async()=>{ try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify({text}),ms:25000}); if(!r.ok) return; const ab=await r.arrayBuffer(); if(!tkCache.has(text)) tkCache.set(text,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} tkPend.delete(text) })();
-  tkPend.set(text,pr);
+const tkPend=new Map(), TK_FB_VOICE="onyx", tkK=(t,v)=>(v||"")+"|"+t;   // feedback is spoken by a different voice from the partner
+function tkPrefetch(text,voice){
+  const K=tkK(text,voice); if(!text||tkCache.has(K)||tkPend.has(K)) return;
+  const pr=(async()=>{ try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify(voice?{text,voice}:{text}),ms:25000}); if(!r.ok) return; const ab=await r.arrayBuffer(); if(!tkCache.has(K)) tkCache.set(K,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} tkPend.delete(K) })();
+  tkPend.set(K,pr);
 }
 function tkLiveDraw(){ const b=$("tkLive"); if(!b) return; const on=!!ST.talk.live; b.setAttribute("aria-pressed",String(on)); b.classList.toggle("on",on); b.innerHTML=tki("live"); b.setAttribute("aria-label","Live feedback "+(on?"on":"off")) }
 $("tkLive").onclick=()=>{ ST.talk.live=!ST.talk.live; saveLocal(); tkLiveDraw(); vcToast(ST.talk.live?"Live feedback on. After each answer you’ll hear how to say it.":"Live feedback off.",2800) };
 const tkNz=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim();
-async function tkSpeak(text,btn,done){
+async function tkSpeak(text,btn,done,voice){
   lastAct=Date.now(); tkStopAudio(); const mine=++tkSeq;
   document.querySelectorAll(".tk .tk-on").forEach(b=>b.classList.remove("tk-on"));
   if(btn) btn.classList.add("tk-on");
   let fin=false, wd=0; const off=()=>{ clearTimeout(wd); if(btn) btn.classList.remove("tk-on"); if(!fin){ fin=true; if(done) done() } };
-  const rate=S.rate==="slow"?.8:1; if(tkPend.has(text)) await tkPend.get(text); let c=tkCache.get(text);
+  const rate=S.rate==="slow"?.8:1; const K=tkK(text,voice); if(tkPend.has(K)) await tkPend.get(K); let c=tkCache.get(K);
   if(!c){
-    try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify({text}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); const ab=await r.arrayBuffer(); c={ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}; tkCache.set(text,c) }
+    try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify(voice?{text,voice}:{text}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); const ab=await r.arrayBuffer(); c={ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}; tkCache.set(K,c) }
     catch(e){ if(mine===tkSeq){ try{ speak(text,btn) }catch(x){} setTimeout(off,Math.max(1200,text.length*65)) } else off(); return }
   }
   if(mine!==tkSeq){ off(); return }
@@ -5256,7 +5256,7 @@ async function tkTurn(){
       if(id!==TLK.id) return;
       lastU.busy=false; lastU.grade=g.grade&&g.grade.verdict?g.grade:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now();
       tkDraw(); haptic(lastU.grade.verdict==="great"?12:6);
-      if(ST.talk.live&&lastU.grade.verdict!=="great"&&lastU.grade.corrected) tkPrefetch(lastU.grade.corrected);
+      if(ST.talk.live&&lastU.grade.verdict!=="great"&&lastU.grade.corrected) tkPrefetch(lastU.grade.corrected,TK_FB_VOICE);
     }).catch(()=>{ if(id!==TLK.id) return; lastU.busy=false; lastU.grade=lastU.grade||{verdict:"ok",corrected:"",note_en:""}; tkDraw() }):null;
     const A=await tkPost("/talk/reply",{...base,history:hist()},30000); if(id!==TLK.id) return;
     TLK.tm.push(Date.now()-t0);
@@ -5278,7 +5278,7 @@ async function tkTurn(){
         if(id!==TLK.id) return; const g=lastU.grade;
         if(g&&g.verdict!=="great"&&g.corrected&&tkNz(g.corrected)!==tkNz(lastU.es)){
           TLK.note="Listen: this is how to say it."; tkComposer();
-          tkSpeak(g.corrected,null,()=>{ if(id!==TLK.id) return; if(TLK.note==="Listen: this is how to say it.") TLK.note=""; tkComposer(); setTimeout(speakReply,350) });
+          tkSpeak(g.corrected,null,()=>{ if(id!==TLK.id) return; if(TLK.note==="Listen: this is how to say it.") TLK.note=""; tkComposer(); setTimeout(speakReply,350) },TK_FB_VOICE);
         } else speakReply() });
     } else speakReply();
   }catch(e){
