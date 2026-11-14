@@ -736,6 +736,8 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .tk-card.tk-blind .tk-ic{background:var(--tk);color:#fff}
 .tk-modeRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .tk-sub2{margin:6px 0 0;font-size:.82rem;color:var(--muted)}
+.tk-bt .tk-nudge,.tk-nudge{animation:tknudge 1.1s ease-in-out infinite;color:var(--tk-d,#1F5E6A);border-radius:50%}
+@keyframes tknudge{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 /* Scenarios */
 .sc,.sc-card,.sc-chip{--sn:#B0562A;--sn-d:#8F431F;--sn-soft:#F7E3D5;--sn-line:#E6C9B4}
 .sc{display:flex;flex-direction:column;gap:12px}
@@ -875,7 +877,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 09:27</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 20:08</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4999,33 +5001,59 @@ const TKI={
 };
 const tki=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TKI[n]}</svg>`;
 const TLK={sc:null,lv:"A2",msgs:[],st:"idle",id:0,t0:0,sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:true,rev:false,res:null,micOK:false,sugReady:false,tryOpen:true,sugAt:0};
-const tkAudio=new Audio(); tkAudio.preload="auto"; const tkCache=new Map(); let tkRec=null, tkCtx=null;
+const tkAudio=new Audio(); tkAudio.preload="auto"; const tkCache=new Map(); let tkRec=null, tkCtx=null, tkSrc=null, tkSeq=0;
+const TK_SIL="data:audio/wav;base64,"+(()=>{ const n=1600, b=new Uint8Array(44+n), v=new DataView(b.buffer), w=(o,t)=>{ for(let i=0;i<t.length;i++) b[o+i]=t.charCodeAt(i) };
+  w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVEfmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true); v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true); b.fill(128,44);
+  let t=""; for(const x of b) t+=String.fromCharCode(x); return btoa(t) })();
+function tkStopAudio(){ try{ tkAudio.pause() }catch(e){} if(tkSrc){ const x=tkSrc; tkSrc=null; x.onended=null; try{ x.stop() }catch(e){} } }
+function tkSkip(){ if(TLK.st==="say"){ tkSeq++; tkStopAudio(); TLK.st="idle" } }
 const tkSleep=ms=>new Promise(r=>setTimeout(r,ms));
 const tkHide=()=>TLK.blind?1:+ST.talk.hide, tkSupN=()=>TLK.blind?2:ST.talk.sup;
 const tkSetup=sc=>sc.custom?sc.custom:`The learner plays ${sc.you}. You play ${sc.w}. Setting: ${sc.at}. Purpose of the scene: ${sc.goal}.`;
 const tkMax=sc=>sc.max||8;
 function tkLevel(){ if(ST.talk.lv) return ST.talk.lv; let n=0; for(const r of cefrCalc()){ if(r.p>=.7) n++; else break } return n===0?"A1":n===1?"A2":"B1" }
 function tkUnlock(){
-  try{ tkAudio.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="; tkAudio.play().catch(()=>{}) }catch(e){}
+  try{ tkAudio.src=TK_SIL; tkAudio.play().catch(()=>{}) }catch(e){}
+  try{ const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u) }catch(e){}
   try{ const AC=window.AudioContext||window.webkitAudioContext; if(AC){ tkCtx=tkCtx||new AC(); if(tkCtx.state==="suspended") tkCtx.resume() } }catch(e){}
 }
 function tkStopRec(r){ if(!r) return; clearTimeout(r.auto); cancelAnimationFrame(r.raf); try{r.src&&r.src.disconnect()}catch(e){} try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){} tkAmbient() }
 function tkLeave(){
   TLK.id++;
   if(tkRec){ const r=tkRec; r.send=false; tkRec=null; tkStopRec(r); try{r.mr.stop()}catch(e){} }
-  try{ tkAudio.pause() }catch(e){}
+  tkSeq++; tkStopAudio();
 }
 async function tkSpeak(text,btn,done){
-  lastAct=Date.now(); try{ tkAudio.pause() }catch(e){}
+  lastAct=Date.now(); tkStopAudio(); const mine=++tkSeq;
   document.querySelectorAll(".tk .tk-on").forEach(b=>b.classList.remove("tk-on"));
   if(btn) btn.classList.add("tk-on");
-  let fin=false; const off=()=>{ if(btn) btn.classList.remove("tk-on"); if(!fin){ fin=true; if(done) done() } };
+  let fin=false, wd=0; const off=()=>{ clearTimeout(wd); if(btn) btn.classList.remove("tk-on"); if(!fin){ fin=true; if(done) done() } };
+  const rate=S.rate==="slow"?.8:1; let c=tkCache.get(text);
+  if(!c){
+    try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify({text}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); const ab=await r.arrayBuffer(); c={ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}; tkCache.set(text,c) }
+    catch(e){ if(mine===tkSeq){ try{ speak(text,btn) }catch(x){} setTimeout(off,Math.max(1200,text.length*65)) } else off(); return }
+  }
+  if(mine!==tkSeq){ off(); return }
+  // 1) Web Audio: once the context has been unlocked by a tap it plays without a fresh tap (what iOS blocks for <audio>)
+  if(tkCtx){ try{
+    if(tkCtx.state!=="running") await Promise.race([tkCtx.resume(),tkSleep(700)]);
+    if(tkCtx.state==="running"){
+      const buf=await tkCtx.decodeAudioData(c.ab.slice(0)); if(mine!==tkSeq){ off(); return }
+      const x=tkCtx.createBufferSource(); x.buffer=buf; x.playbackRate.value=rate; x.connect(tkCtx.destination); tkSrc=x;
+      x.onended=()=>{ if(tkSrc===x){ tkSrc=null; off() } };
+      x.start(0); wd=setTimeout(off,buf.duration/rate*1000+2500); return
+    } }catch(e){ tkSrc=null } }
+  // 2) the <audio> element
   try{
-    let u=tkCache.get(text);
-    if(!u){ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify({text}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); u=URL.createObjectURL(await r.blob()); tkCache.set(text,u) }
-    tkAudio.src=u; tkAudio.playbackRate=S.rate==="slow"?.8:1; tkAudio.onended=tkAudio.onerror=off;
-    await tkAudio.play();
-  }catch(e){ try{ speak(text,btn) }catch(x){} setTimeout(off,Math.max(1200,text.length*65)) }
+    tkAudio.src=c.u; tkAudio.playbackRate=rate; tkAudio.onended=tkAudio.onerror=off;
+    await Promise.race([tkAudio.play(),tkSleep(3000).then(()=>{ throw new Error("hang") })]);
+    wd=setTimeout(off,(isFinite(tkAudio.duration)&&tkAudio.duration>0?tkAudio.duration/rate:12)*1000+2500);
+  }catch(e){
+    // blocked: don't wait for sound that will never come. Open the answer bar and point at the speaker.
+    try{ tkAudio.pause() }catch(x){}
+    if(done&&mine===tkSeq){ TLK.note="Your phone blocked the audio. Tap the speaker under their message to hear it."; if(btn) btn.classList.add("tk-nudge") }
+    off();
+  }
 }
 
 // ---------- home
@@ -5135,7 +5163,7 @@ function tkTutHTML(m,i){
 function tkTryHTML(){
   const sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null, st=TLK.st, sup=tkSupN();
   if(!sg||st==="ai"||st==="stt"||st==="end") return "";
-  if(!TLK.sugReady) return `<div class="tk-m tk-me">${tkDots("tk-ph tk-enter")}</div>`;
+  if(!TLK.sugReady) return "";
   const dim=st==="say";
   return `<div class="tk-try${tkEnter(TLK.sugAt)}"><div class="tk-tc"><button type="button" class="tk-th" data-a="tryopen" aria-expanded="${TLK.tryOpen}"><span>Try Saying</span><span class="tk-chev${TLK.tryOpen?"":" tk-shut"}">${tki("chev")}</span></button>
     ${TLK.tryOpen?`<div class="tk-tb"><p class="tk-es" data-a="reveal">${tkBlur(sg.es,sup,TLK.rev)}</p>${TLK.enOn&&sg.en?`<p class="tk-en">${esc(sg.en)}</p>`:""}</div>`:""}</div>
@@ -5223,9 +5251,9 @@ async function tkTurn(){
     const help=tkPost("/talk/next",{...base,history:hist()},40000).then(j=>{
       if(id!==TLK.id) return; am.en=j.reply_en||""; am.enP=false;
       TLK.sug=(j.suggestions||[]).filter(x=>x&&x.es); TLK.goal=j.goal_en||""; (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
-    }).catch(()=>{ am.enP=false }).then(()=>tkSleep(Math.max(0,700-(Date.now()-am.at)))).then(()=>{
-      if(id!==TLK.id) return; if(!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now(); tkDraw("end") } });
-    const next=()=>help.then(()=>{ if(id===TLK.id) tkOpenDock() });
+    }).catch(()=>{ am.enP=false });
+    // the idea for your answer appears only once the partner has finished speaking
+    const next=()=>help.then(()=>{ if(id!==TLK.id) return; if(!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now() } tkOpenDock(); if(TLK.st!=="rec") tkDraw("end") });
     if(S.auto==="on") tkSpeak(A.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900);
   }catch(e){
     if(id!==TLK.id) return;
@@ -5235,6 +5263,7 @@ async function tkTurn(){
   }
 }
 function tkOpenDock(){
+  if(TLK.st==="idle"||TLK.st==="rec"||TLK.st==="stt") return;
   if(TLK.st==="end") { tkComposer(); return }
   if(TLK.sc&&TLK.end){ TLK.st="end"; tkDraw(); return }
   TLK.st="idle"; tkDraw(); if(TLK.micOK&&!TLK.tyOn) tkMicStart();
@@ -5318,7 +5347,7 @@ function tkBlur(es,mode,rev){
 function tkComposer(){
   const a=$("actions"); if(screen!=="tchat") return;
   const st=TLK.st, r=tkRec; let h="";
-  const busy=st==="ai"||st==="stt"||st==="say";
+  const busy=st==="ai"||st==="stt";
   if(TLK.err) h+=`<div class="tk-err"><p>${esc(TLK.err.msg)}</p>${TLK.err.stop?"":`<button type="button" class="grow" data-a="retry">Try again</button>`}</div>`;
   if(st==="end"){ h+=`<p class="tk-goal">That’s the end of the scene. Nicely done.</p><button type="button" class="grow" data-a="results" style="width:100%">See your results</button>` }
   else if(busy&&!TLK.err){ h+="" }
@@ -5332,15 +5361,15 @@ function tkComposer(){
   const dk=st+"|"+(r&&r.voiced)+"|"+TLK.tyOn+"|"+(TLK.err?1:0)+"|"+TLK.msgs.length, fade=dk!==TLK.dk; TLK.dk=dk;
   a.innerHTML=`<div class="tk-comp${fade?" tk-fade":""}">${h}</div>`;
   const c=a.firstElementChild; c.onclick=tkCompClick;
-  c.onsubmit=e=>{ e.preventDefault(); const v=$("tkIn").value.trim(); if(!v||TLK.st!=="idle") return; TLK.sug=[]; TLK.msgs.push({role:"user",es:v,busy:true,at:Date.now()}); tkTurn() };
+  c.onsubmit=e=>{ e.preventDefault(); const v=$("tkIn").value.trim(); tkSkip(); if(!v||TLK.st!=="idle") return; TLK.sug=[]; TLK.msgs.push({role:"user",es:v,busy:true,at:Date.now()}); tkTurn() };
   if(st==="rec"&&r) tkPaintWave(r);
 }
 function tkCompClick(e){
   const b=e.target.closest("[data-a]"); if(!b||b.disabled) return; const a=b.dataset.a;
-  if(a==="mic") tkMicStart();
+  if(a==="mic"){ tkSkip(); tkMicStart() }
   else if(a==="send") tkMicStop(true);
   else if(a==="pause"||a==="cancel") tkMicStop(false);
-  else if(a==="typetoggle"){ if(tkRec) tkMicStop(false); TLK.tyOn=!TLK.tyOn; TLK.note=""; tkComposer(); if(TLK.tyOn&&$("tkIn")) $("tkIn").focus() }
+  else if(a==="typetoggle"){ tkSkip(); if(tkRec) tkMicStop(false); TLK.tyOn=!TLK.tyOn; TLK.note=""; tkComposer(); if(TLK.tyOn&&$("tkIn")) $("tkIn").focus() }
   else if(a==="retry"&&TLK.err){ const er=TLK.err; TLK.err=null; if(er.kind==="stt") tkSend(er.blob,er.mime); else tkTurn() }
   else if(a==="results") tkFinish(false);
 }
