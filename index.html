@@ -830,6 +830,10 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .chip.refl{background:var(--refl-soft);color:var(--refl);box-shadow:inset 0 -2px 0 var(--refl)} .tag.refl{color:var(--refl)} .dot.refl{background:var(--refl)} .refl-t{color:var(--refl)} .tile.r-refl{background:var(--refl-soft);color:var(--refl);border-color:var(--refl)}
 .chip.nr{background:var(--nr-soft);color:var(--nr);box-shadow:inset 0 -2px 0 var(--nr)} .tag.nr{color:var(--nr)} .dot.nr{background:var(--nr)} .nr-t{color:var(--nr)} .tile.r-nr{background:var(--nr-soft);color:var(--nr);border-color:var(--nr)}
 .rules .vgrid{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;line-height:1.35} .rules .vgrid b{white-space:nowrap}
+/* Verb meanings: typed mode */
+.vtype{display:block;width:100%;box-sizing:border-box;font:inherit;font-size:1.35rem;font-weight:600;text-align:center;padding:15px 12px;border-radius:14px;border:1.5px solid var(--line);border-bottom-width:3px;background:var(--card);color:var(--ink);outline:none;margin-top:4px}
+.vtype:focus{border-color:var(--cc)} .vtype.ok{border-color:var(--ok);background:var(--ok-soft)} .vtype.bad{border-color:var(--bad);background:var(--bad-soft)}
+#vmHint{text-align:center;margin-top:8px;letter-spacing:.04em}
 </style>
 
 <div class="splash" id="splash" aria-live="polite">
@@ -895,7 +899,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 22:06</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-14 · 08:35</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4153,7 +4157,7 @@ const VB=[["ser","be","🪪","","who or what someone is","soy|eres|es|somos|sois
 const VBALT={"reír|pret|2":["rió"]};
 // ================= Verb trainer: 300+ verbs, 7 tenses, all offline =================
 ST.verbs=ST.verbs||{}; ST.verbs.m=ST.verbs.m||{}; ST.verbs.log=ST.verbs.log||{};
-ST.verbs.mean=ST.verbs.mean||{}; ST.verbs.mset=Object.assign({range:50,dir:"both"},ST.verbs.mset||{});
+ST.verbs.mean=ST.verbs.mean||{}; ST.verbs.mset=Object.assign({range:50,dir:"both",mode:"pick"},ST.verbs.mset||{});
 ST.verbs.set=Object.assign({range:50,mode:"pick",vos:true,mix:["pres","pret","imp","fut","cond","perf","near"]},ST.verbs.set||{});
 if(ST.verbs.set.range===300) ST.verbs.set.range=VB.length;
 const VBX=VB.map((a,i)=>({i,inf:a[0],e:a[1],ic:a[2],fl:a[3],clar:a[4],f:{pres:a[5].split("|"),pret:a[6].split("|"),imp:a[7].split("|"),fut:a[8].split("|"),cond:a[9].split("|")},pp:a[10],note:a[11]||{},r:a[3].includes("r")}));
@@ -4544,12 +4548,15 @@ function renderVmSetup(){
     <div><p class="label" style="margin-bottom:8px">Which verbs? <span style="text-transform:none;letter-spacing:0;font-weight:500">· the most useful first</span></p>
       <div class="vchips" id="vmRange">${VRANGES.map(r=>`<button type="button" data-r="${r}" aria-pressed="${S2.range===r}">${r===VB.length?"All "+r:"Top "+r}<small>${pct(r)}%</small></button>`).join("")}</div></div>
     <div><p class="label" style="margin-bottom:8px">Which way?</p>
-      <div class="vchips" id="vmDir"><button type="button" data-d="both" aria-pressed="${S2.dir==="both"}">Both ways</button><button type="button" data-d="es" aria-pressed="${S2.dir==="es"}">Spanish → English</button><button type="button" data-d="en" aria-pressed="${S2.dir==="en"}">English → Spanish</button></div></div>`;
+      <div class="vchips" id="vmDir"><button type="button" data-d="both" aria-pressed="${S2.dir==="both"}">Both ways</button><button type="button" data-d="es" aria-pressed="${S2.dir==="es"}">Spanish → English</button><button type="button" data-d="en" aria-pressed="${S2.dir==="en"}">English → Spanish</button></div></div>
+    <div><p class="label" style="margin-bottom:8px">How do you answer?</p>
+      <div class="vchips" id="vmMode"><button type="button" data-m="pick" aria-pressed="${S2.mode!=="type"}">Pick from 4</button><button type="button" data-m="type" aria-pressed="${S2.mode==="type"}">Type it</button></div></div>`;
   $("drill").style.cssText=""; $("drill").scrollTop=0;
   $("actions").innerHTML=`<button type="button" class="ghost" id="vmBr">Browse</button><button type="button" class="grow" id="vmGo">Start quiz</button>`;
   $("vmBr").onclick=()=>renderVList(); $("vmGo").onclick=()=>vmStart();
   document.querySelectorAll("#vmRange button").forEach(b=>b.onclick=()=>{S2.range=+b.dataset.r; vSave(); renderVmSetup()});
   document.querySelectorAll("#vmDir button").forEach(b=>b.onclick=()=>{S2.dir=b.dataset.d; vSave(); renderVmSetup()});
+  document.querySelectorAll("#vmMode button").forEach(b=>b.onclick=()=>{S2.mode=b.dataset.m; vSave(); renderVmSetup()});
 }
 function renderVm(){
   screen="vm"; V.tense="mix"; chrome(); setCourseColour(course); $("fb").hidden=true; V.answered=false;
@@ -4564,18 +4571,50 @@ function renderVm(){
   $("actions").innerHTML=`<button type="button" class="vlite" id="vmSkip">I don’t know</button>`;
   $("vmSkip").onclick=()=>{if(!V.answered) vmAnswer(null)};
   document.querySelectorAll(".vopt").forEach(b=>b.onclick=()=>{if(!V.answered) vmAnswer(b.dataset.o)});
+  if(ST.verbs.mset.mode==="type") vmTypedUI(q,es);
 }
-function vmAnswer(val){
+// ---- typed answers ----
+const vmNorm=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9ñ ]/g," ").replace(/\s+/g," ").trim();
+function vmLev(a,b){const m=a.length,n=b.length; if(Math.abs(m-n)>2) return 9; let p=Array.from({length:n+1},(_,j)=>j); for(let i=1;i<=m;i++){const c=[i]; for(let j=1;j<=n;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c} return p[n]}
+const vmClose=(a,b)=>a===b||(a.length>=6&&vmLev(a,b)<=1)||(a.length>=10&&vmLev(a,b)<=2);
+function vmEnWords(v){ // every English form we accept for this verb, without the leading "to "
+  const out=new Set(), add=t=>{t=vmNorm(String(t).replace(/\(.*?\)/g," ").replace(/^to /,"")); if(t) out.add(t); if(t.startsWith("to ")) out.add(t.slice(3))};
+  String(v.e).split(/[\/,;]| or /).forEach(add); add(v.e);
+  if(v.clar&&v.clar.startsWith("to ")) v.clar.split(/[\/,;·]| or /).forEach(add);
+  return [...out];
+}
+function vmTypedOk(v,dir,txt){
+  let t=vmNorm(txt); if(!t) return false;
+  if(dir==="en"){ const targets=[vmNorm(v.inf)]; if(v.r) targets.push(vmNorm(v.inf.replace(/se$/,""))); return targets.some(x=>vmClose(t,x)) }
+  t=t.replace(/^to /,""); return vmEnWords(v).some(x=>vmClose(t,x))
+}
+function vmTypedUI(q,es){
+  const v=q.v;
+  $("vOpts").outerHTML=`<form id="vmF" autocomplete="off" onsubmit="return false"><input class="vtype" id="vmIn" type="text" lang="${es?"en":"es"}" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${es?"Type it in English":"Type the Spanish verb"}" aria-label="Your answer"></form><p class="ven" id="vmHint" hidden></p>`;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="vmHintB">Hint</button><button type="button" class="ghost" id="vmSkip">I don’t know</button><button type="button" class="grow" id="vmChk" disabled>Check</button>`;
+  const inp=$("vmIn"), chk=$("vmChk");
+  const go=()=>{ if(V.answered) return; const t=inp.value.trim(); if(!t) return; vmAnswer(t,t) };
+  inp.addEventListener("input",()=>{chk.disabled=!inp.value.trim()});
+  $("vmF").addEventListener("submit",go);
+  // the global bottom-bar handler already keeps the keyboard up while the field has focus
+  chk.onclick=go;
+  $("vmSkip").onclick=()=>{if(!V.answered) vmAnswer(null)};
+  $("vmHintB").onclick=()=>{ q.hint=true; const w=es?vmEnWords(v)[0]:v.inf.normalize("NFC"); const show=w.split("").map((c,i)=>i===0||c===" "||c==="-"?c:"_").join(" ").replace(/ {2,}/g,"  "); const h=$("vmHint"); h.hidden=false; h.textContent=show; haptic(8); inp.focus({preventScroll:true}) };
+  try{inp.focus({preventScroll:true})}catch(e){}
+}
+function vmAnswer(val,typedText){
   const q=V.q[V.i], v=q.v; V.answered=true;
-  const ok=val===v.inf;
-  vmSet(v.inf,ok); const L=ST.verbs.log; L[todayKey()]=(L[todayKey()]||0)+1; vSave();
+  const ok=typedText!==undefined?vmTypedOk(v,q.dir,typedText):val===v.inf;
+  vmSet(v.inf,ok&&!q.hint); const L=ST.verbs.log; L[todayKey()]=(L[todayKey()]||0)+1; vSave();
   if(ok) V.score++; else V.wrong.push(q);
   haptic(ok?20:[70,50,70]);
+  if($("vmIn")){ $("vmIn").disabled=true; $("vmIn").classList.add(ok?"ok":"bad") }
   document.querySelectorAll(".vopt").forEach(b=>{b.disabled=true; if(b.dataset.o===v.inf) b.classList.add("ok"); else if(b.dataset.o===val) b.classList.add("bad"); else b.classList.add("dim")});
   chrome();
   const fb=$("fb"); fb.className="sheet top "+(ok?"ok":"bad");
   fb.innerHTML=`<div class="body"><div class="vrow"><div class="verdict">${ok?"¡Correcto!":(val===null?"Answer":"Not quite")}</div>${spkBtn(v.inf)}</div>
     <div style="font-size:1.35rem;margin-top:2px"><b>${esc(v.inf)}</b> <span style="color:var(--muted)">=</span> ${esc(vGloss(v))}</div>
+    ${typedText&&!ok?`<p class="note" style="margin:4px 0 0">You typed: <b>${esc(typedText)}</b></p>`:""}
     <p class="note" style="margin:6px 0 0">Present: ${vPers(v).map(p=>`<span style="color:var(--muted)">${vPro(p,false)}</span> <b>${esc(vf(v,"pres",p))}</b>`).join(" · ")}</p></div>`;
   sizeTopSheet(.5,8); fb.hidden=false; settleTopSheet();
   const last=V.i+1>=V.q.length;
