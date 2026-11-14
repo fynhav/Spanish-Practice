@@ -823,6 +823,10 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .sc-me{align-self:flex-end;background:var(--sn-soft);border:1px solid var(--sn-line);border-top-right-radius:6px}
 .sc-me .spk{right:auto;left:-40px}.sc-me{margin-left:40px}
 .sc-gap{display:inline-block;min-width:4.2em;border-bottom:2px dashed var(--sn);text-align:center}.sc-gap.sc-filled{border-bottom-style:solid;color:var(--sn-d);font-weight:700}
+
+.sc-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.sc-opt.pic .sc-img{border-radius:12px}
+.sc-cr{margin:10px 0 0;text-align:center;font-size:.72rem;color:var(--muted)}
 /* Reflexive verbs course */
 :root{--refl:#A24A6B;--refl-soft:#F4DEE6;--nr:#6C6552;--nr-soft:#ECE7D8}
 .pill.rf,.pill.rt,.pill.rw{background:var(--refl-soft);color:var(--refl)}
@@ -899,7 +903,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-14 · 08:35</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-14 · 09:26</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -5777,7 +5781,20 @@ const scWK=(p,w)=>p.id+":"+w[0];
 const scW=(p,w)=>ST.scn.w[scWK(p,w)];
 const scNorm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim();
 const scShuf=a=>{a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a};
-const scPic=(w,c)=>w[8]?`<img class="sc-img" src="${esc(w[8])}" alt="" loading="lazy">`:si(w[2],c);
+// ---- optional photos: tools/scn_photos.py downloads pictures into img/scn/ and writes img/scn/manifest.json
+const SCPH={}, scSlug=w=>String(w[0]).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const SCBASE=(/github\.io$|^localhost$|^127\./.test(location.hostname)||location.protocol==="file:")?"":"https://fynhav.github.io/spanish-practice/";
+let scPhLoaded=0;
+function scLoadPhotos(){
+  if(scPhLoaded) return; scPhLoaded=1;
+  try{ fetch(SCBASE+"img/scn/manifest.json",{cache:"no-cache"}).then(r=>r.ok?r.json():{}).then(m=>{
+      if(!m||typeof m!=="object") return; Object.assign(SCPH,m);
+      // keep the pictures for offline use: fetch them once in the background (the service worker saves them)
+      if(Object.keys(m).length&&navigator.onLine) setTimeout(()=>Object.values(m).forEach(x=>{try{fetch(SCBASE+"img/scn/"+x.f).catch(()=>{})}catch(e){}}),1500);
+    }).catch(()=>{}) }catch(e){}
+}
+const scPic=(w,c)=>{ const k=SCPH[scSlug(w)], u=w[8]||(k?SCBASE+"img/scn/"+k.f:""), ic=si(w[2],c);
+  return u?`<img class="sc-img" src="${esc(u)}" alt="" loading="lazy" data-f="${esc(ic)}" onerror="this.outerHTML=this.dataset.f">`:ic };
 const SC={pack:null,en:true};
 function scStats(p){
   const ps=scPS(p.id); let seen=0,known=0; p.words.forEach(w=>{const x=scW(p,w); if(x){seen++; if(x.b>=3) known++}});
@@ -5815,6 +5832,7 @@ function scHomeHTML(){
   return `<button type="button" class="sc-card" id="scHome"><span class="sc-ic">${si("plate")}</span><span class="sc-tx"><b>Scenarios</b><small>Words with pictures, phrases and role-plays for real situations${st.seen?` · ${st.known} words known`:""}</small></span><span class="sc-go">›</span></button>`;
 }
 function renderScn(){
+  scLoadPhotos();
   scBase("scn"); SC.pack=null; scChrome();
   const row=p=>{const st=scStats(p); return `<button type="button" class="sc-card" data-p="${p.id}"><span class="sc-ic">${si(p.ic)}</span><span class="sc-tx"><b>${p.t}</b><small>${p.en} · ${p.lv}</small><span class="sc-bar"><i style="width:${Math.round(st.pct*100)}%"></i></span></span><span class="sc-go">›</span></button>`};
   $("drill").innerHTML=`<div class="sc">
@@ -5838,7 +5856,7 @@ function scOpen(id){
      ${step("d","dlg","Dialogue",st.dlg?`Best ${st.dlg} of ${st.dl} gaps`:"Listen, then fill the gaps",st.dlg>=st.dl)}
     </div>
     <div class="sc-card sc-talk"><span class="sc-ic">${si("chat")}</span><span class="sc-tx"><b>Talk it through</b><small>${st.talk?`${st.talk} ${st.talk===1?"session":"sessions"} so far`:"Role-play it with a partner who answers back"}</small><span class="sc-two"><button type="button" class="sc-pill" data-talk="0">Guided</button><button type="button" class="sc-pill" data-talk="1">Blind</button></span></span></div>
-    <div class="vcard sc-note"><p class="label" style="margin:0 0 4px">Good to know</p><p class="sc-nt">${esc(p.note)}</p></div></div>`;
+    <div class="vcard sc-note"><p class="label" style="margin:0 0 4px">Good to know</p><p class="sc-nt">${esc(p.note)}</p></div>${Object.keys(SCPH).length?`<p class="sc-cr">Photos from Pexels</p>`:""}</div>`;
   $("drill").onclick=e=>{
     const b=e.target.closest("[data-k]"), t=e.target.closest("[data-talk]");
     if(t){haptic(8); scTalk(p.id,t.dataset.talk==="1"); return}

@@ -1,4 +1,4 @@
-const CACHE="practica-v81", AUDIO="practica-audio";
+const CACHE="practica-v82", AUDIO="practica-audio";
 const CORE=["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE&&k!==AUDIO).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
@@ -10,6 +10,11 @@ self.addEventListener("fetch",e=>{
   if(req.mode==="navigate"){
     e.respondWith(withTimeout(fetch(req,{cache:"no-store"}),4000).then(res=>{const copy=res.clone();caches.open(CACHE).then(c=>c.put("index.html",copy));return res})
       .catch(()=>caches.match("index.html")));
+    return;
+  }
+  // the Scenarios photo list: always try the network first so new photos show up, then the saved copy
+  if(url.origin===location.origin&&url.pathname.endsWith("/img/scn/manifest.json")){
+    e.respondWith(withTimeout(fetch(req,{cache:"no-store"}),4000).then(res=>{const copy=res.clone();caches.open(CACHE).then(c=>c.put(req,copy));return res}).catch(()=>caches.match(req).then(h=>h||new Response("{}",{headers:{"content-type":"application/json"}}))));
     return;
   }
   // recorded voice clips: kept in their own cache so app updates never throw them away

@@ -1,0 +1,172 @@
+{
+ "la-mesa": {
+  "q": "restaurant table set",
+  "es": "la mesa",
+  "en": "the table"
+ },
+ "la-silla": {
+  "q": "wooden restaurant chair",
+  "es": "la silla",
+  "en": "the chair"
+ },
+ "el-camarero": {
+  "q": "waiter serving restaurant",
+  "es": "el camarero",
+  "en": "the waiter"
+ },
+ "la-carta": {
+  "q": "restaurant menu",
+  "es": "la carta",
+  "en": "the menu"
+ },
+ "la-reserva": {
+  "q": "restaurant reserved table sign",
+  "es": "la reserva",
+  "en": "the reservation"
+ },
+ "la-cuenta": {
+  "q": "restaurant bill receipt",
+  "es": "la cuenta",
+  "en": "the bill"
+ },
+ "la-propina": {
+  "q": "tip money restaurant table",
+  "es": "la propina",
+  "en": "the tip"
+ },
+ "el-plato": {
+  "q": "dinner plate dish",
+  "es": "el plato",
+  "en": "the plate; the dish"
+ },
+ "el-vaso": {
+  "q": "glass of water tumbler",
+  "es": "el vaso",
+  "en": "the glass (tumbler)"
+ },
+ "la-copa": {
+  "q": "wine glass",
+  "es": "la copa",
+  "en": "the (wine) glass"
+ },
+ "el-tenedor": {
+  "q": "fork cutlery",
+  "es": "el tenedor",
+  "en": "the fork"
+ },
+ "el-cuchillo": {
+  "q": "table knife cutlery",
+  "es": "el cuchillo",
+  "en": "the knife"
+ },
+ "la-cuchara": {
+  "q": "spoon cutlery",
+  "es": "la cuchara",
+  "en": "the spoon"
+ },
+ "la-servilleta": {
+  "q": "napkin table",
+  "es": "la servilleta",
+  "en": "the napkin"
+ },
+ "el-agua": {
+  "q": "glass of water",
+  "es": "el agua",
+  "en": "the water"
+ },
+ "la-cerveza": {
+  "q": "beer glass",
+  "es": "la cerveza",
+  "en": "the beer"
+ },
+ "el-vino": {
+  "q": "red wine glass",
+  "es": "el vino",
+  "en": "the wine"
+ },
+ "el-cafe": {
+  "q": "cup of coffee",
+  "es": "el café",
+  "en": "the coffee"
+ },
+ "el-zumo": {
+  "q": "orange juice glass",
+  "es": "el zumo",
+  "en": "the juice"
+ },
+ "el-pan": {
+  "q": "bread basket",
+  "es": "el pan",
+  "en": "the bread"
+ },
+ "la-ensalada": {
+  "q": "fresh salad bowl",
+  "es": "la ensalada",
+  "en": "the salad"
+ },
+ "la-sopa": {
+  "q": "soup bowl",
+  "es": "la sopa",
+  "en": "the soup"
+ },
+ "la-carne": {
+  "q": "steak meat plate",
+  "es": "la carne",
+  "en": "the meat"
+ },
+ "el-pollo": {
+  "q": "roast chicken",
+  "es": "el pollo",
+  "en": "the chicken"
+ },
+ "el-pescado": {
+  "q": "grilled fish plate",
+  "es": "el pescado",
+  "en": "the fish (as food)"
+ },
+ "el-arroz": {
+  "q": "rice dish",
+  "es": "el arroz",
+  "en": "the rice"
+ },
+ "las-patatas": {
+  "q": "french fries",
+  "es": "las patatas",
+  "en": "the potatoes; the fries"
+ },
+ "las-verduras": {
+  "q": "fresh vegetables",
+  "es": "las verduras",
+  "en": "the vegetables"
+ },
+ "el-queso": {
+  "q": "cheese board",
+  "es": "el queso",
+  "en": "the cheese"
+ },
+ "el-huevo": {
+  "q": "fried egg",
+  "es": "el huevo",
+  "en": "the egg"
+ },
+ "el-postre": {
+  "q": "dessert plate",
+  "es": "el postre",
+  "en": "the dessert"
+ },
+ "el-helado": {
+  "q": "ice cream cone",
+  "es": "el helado",
+  "en": "the ice cream"
+ },
+ "picante": {
+  "q": "spicy red chili peppers",
+  "es": "picante",
+  "en": "spicy"
+ },
+ "vegetariano": {
+  "q": "vegetarian food bowl",
+  "es": "vegetariano",
+  "en": "vegetarian"
+ }
+}
