@@ -740,6 +740,14 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 @keyframes tknudge{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 .tk-live{color:var(--muted)}.tk-live svg{width:19px;height:19px;display:block;margin:auto}
 .tk-live.on{background:#D6ECEF!important;border-color:#3A8190!important;color:#1F5E6A!important}
+.tk-rep{display:flex;flex-direction:column;gap:6px;align-items:stretch;text-align:center;padding:4px 2px}
+.tk-rl{margin:0;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tk-rt{margin:0;font-family:var(--f-display);font-size:1.25rem;line-height:1.25;color:var(--ink)}
+.tk-rs{margin:0;min-height:2.4em;font-size:.9rem;color:var(--muted)}.tk-rh{color:var(--bad)}
+.tk-rep-ok .tk-rs{color:var(--ok);font-weight:600}.tk-rep-ok .tk-rt{color:var(--ok)}
+.tk-rep-again .tk-rs{color:var(--bad)}
+.tk-rep .tk-skip{width:auto;min-width:56px;border-radius:22px;padding:0 14px;font-size:.84rem;color:var(--muted)}
+.tk-rl-on{animation:vcp 1s ease-in-out infinite}
 /* Scenarios */
 .sc,.sc-card,.sc-chip{--sn:#B0562A;--sn-d:#8F431F;--sn-soft:#F7E3D5;--sn-line:#E6C9B4}
 .sc{display:flex;flex-direction:column;gap:12px}
@@ -880,7 +888,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 20:36</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-13 · 20:46</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -5024,7 +5032,7 @@ function tkUnlock(){
 }
 function tkStopRec(r){ if(!r) return; clearTimeout(r.auto); cancelAnimationFrame(r.raf); try{r.src&&r.src.disconnect()}catch(e){} try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){} tkAmbient() }
 function tkLeave(){
-  TLK.id++;
+  TLK.id++; try{ if(typeof vcRec!=="undefined"&&vcRec) vcStop(false) }catch(e){}
   if(tkRec){ const r=tkRec; r.send=false; tkRec=null; tkStopRec(r); try{r.mr.stop()}catch(e){} }
   tkSeq++; tkStopAudio();
 }
@@ -5037,6 +5045,25 @@ function tkPrefetch(text,voice){
 function tkLiveDraw(){ const b=$("tkLive"); if(!b) return; const on=!!ST.talk.live; b.setAttribute("aria-pressed",String(on)); b.classList.toggle("on",on); b.innerHTML=tki("live"); b.setAttribute("aria-label","Live feedback "+(on?"on":"off")) }
 $("tkLive").onclick=()=>{ ST.talk.live=!ST.talk.live; saveLocal(); tkLiveDraw(); vcToast(ST.talk.live?"Live feedback on. After each answer you’ll hear how to say it.":"Live feedback off.",2800) };
 const tkNz=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim();
+// After the spoken correction the learner says it back. Listening starts by itself; Skip is always there.
+function tkRepeat(target,id,after){
+  if(id!==TLK.id) return;
+  const R=TLK.rep={target,tries:0,state:"listen",heard:"",id}; let ended=false;
+  const finish=(delay)=>{ if(ended) return; ended=true; setTimeout(()=>{ if(id!==TLK.id||TLK.rep!==R) return; TLK.rep=null; TLK.st="say"; tkComposer(); after() },delay) };
+  R.finish=finish;
+  const T=tkNz(target).split(" ").filter(Boolean), need=T.length<=3?1:.75;
+  R.go=()=>{
+    if(id!==TLK.id||TLK.rep!==R||ended) return; R.state="listen"; R.heard=""; tkComposer();
+    vcStart($("tkRepMic"),txt=>{
+      if(id!==TLK.id||TLK.rep!==R||ended) return; R.tries++; R.heard=txt;
+      const H=new Set(tkNz(txt).split(" ")), hit=T.length?T.filter(t=>H.has(t)).length/T.length:1;
+      if(hit>=need){ R.state="ok"; haptic(14); const u=TLK.msgs.filter(m=>m.role==="user").pop(); if(u) u.rep=true; tkComposer(); finish(1100) }
+      else if(R.tries>=2){ R.state="giveup"; haptic(8); tkComposer(); finish(1800) }
+      else { R.state="again"; haptic(22); tkComposer(); tkSpeak(R.target,null,()=>setTimeout(R.go,250),TK_FB_VOICE) }
+    },()=>{ if(id!==TLK.id||TLK.rep!==R||ended) return; if(R.state==="listen"){ R.state="idle"; tkComposer() } });
+  };
+  TLK.st="rep"; tkComposer(); setTimeout(R.go,250);
+}
 async function tkSpeak(text,btn,done,voice){
   lastAct=Date.now(); tkStopAudio(); const mine=++tkSeq;
   document.querySelectorAll(".tk .tk-on").forEach(b=>b.classList.remove("tk-on"));
@@ -5237,8 +5264,11 @@ async function tkAsk(i,q){
     if(ent.n>=w){ ent.n=null; clearInterval(iv); if(el) el.textContent=ent.a; else tkDraw() }
     else if(el) el.textContent=words.slice(0,ent.n).join(" ")+" …"; else clearInterval(iv) },45);
 }
-async function tkPost(path,body,ms){
-  const r=await rfetch(path,{method:"POST",body:JSON.stringify(body),ms:ms||30000});
+async function tkPost(path,body,ms,again){
+  let r;
+  try{ r=await rfetch(path,{method:"POST",body:JSON.stringify(body),ms:ms||30000}) }
+  catch(e){ if(again) throw e; await new Promise(k=>setTimeout(k,700)); return tkPost(path,body,ms,true) }
+  if(r.status>=500&&!again){ await new Promise(k=>setTimeout(k,700)); return tkPost(path,body,ms,true) }
   if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
   if(r.status===401) throw Object.assign(new Error("auth"),{auth:true});
   if(!r.ok) throw new Error(path+" "+r.status);
@@ -5278,7 +5308,7 @@ async function tkTurn(){
         if(id!==TLK.id) return; const g=lastU.grade;
         if(g&&g.verdict!=="great"&&g.corrected&&tkNz(g.corrected)!==tkNz(lastU.es)){
           TLK.note="Listen: this is how to say it."; tkComposer();
-          tkSpeak(g.corrected,null,()=>{ if(id!==TLK.id) return; if(TLK.note==="Listen: this is how to say it.") TLK.note=""; tkComposer(); setTimeout(speakReply,350) },TK_FB_VOICE);
+          tkSpeak(g.corrected,null,()=>{ if(id!==TLK.id) return; if(TLK.note==="Listen: this is how to say it.") TLK.note=""; tkComposer(); tkRepeat(g.corrected,id,speakReply) },TK_FB_VOICE);
         } else speakReply() });
     } else speakReply();
   }catch(e){
@@ -5376,6 +5406,9 @@ function tkComposer(){
   const busy=st==="ai"||st==="stt";
   if(TLK.err) h+=`<div class="tk-err"><p>${esc(TLK.err.msg)}</p>${TLK.err.stop?"":`<button type="button" class="grow" data-a="retry">Try again</button>`}</div>`;
   if(st==="end"){ h+=`<p class="tk-goal">That’s the end of the scene. Nicely done.</p><button type="button" class="grow" data-a="results" style="width:100%">See your results</button>` }
+  else if(st==="rep"&&TLK.rep){ const R=TLK.rep, msg=R.state==="listen"?"Listening… say it now":R.state==="ok"?"That’s it. Well done.":R.state==="again"?"Not quite. Listen again and try once more.":R.state==="giveup"?"Good effort. Let’s carry on.":"Tap the mic and say it";
+    h+=`<div class="tk-rep tk-rep-${R.state}"><p class="tk-rl">Now you say it</p><p class="tk-rt">${esc(R.target)}</p><p class="tk-rs">${esc(msg)}${R.heard&&R.state!=="ok"?`<br><span class="tk-rh">Heard: ${esc(R.heard)}</span>`:""}</p>
+    <div class="tk-mrow"><button type="button" class="tk-circ" data-a="rephear" aria-label="Hear it again">${tki("play")}</button><button type="button" class="tk-main${R.state==="listen"?" tk-rl-on":""}" id="tkRepMic" data-a="repmic" aria-label="Say it">${tki("mic")}</button><button type="button" class="tk-circ tk-skip" data-a="repskip" aria-label="Skip">Skip</button></div></div>` }
   else if(busy&&!TLK.err){ h+="" }
   else if(!TLK.err||(TLK.err.kind==="stt"&&!TLK.err.stop)){
     const hint=TLK.note?`<p class="tk-goal warn">${esc(TLK.note)}</p>`:TLK.goal&&!TLK.blind?`<p class="tk-goal">${esc(TLK.goal)}</p>`:"";
@@ -5393,6 +5426,9 @@ function tkComposer(){
 function tkCompClick(e){
   const b=e.target.closest("[data-a]"); if(!b||b.disabled) return; const a=b.dataset.a;
   if(a==="mic"){ tkSkip(); tkMicStart() }
+  else if(a==="repmic"&&TLK.rep){ if(vcRec) vcStop(true); else TLK.rep.go() }
+  else if(a==="rephear"&&TLK.rep){ if(vcRec) vcStop(false); tkSpeak(TLK.rep.target,null,()=>{ if(TLK.rep&&TLK.rep.state!=="ok") setTimeout(()=>TLK.rep&&TLK.rep.go(),200) },TK_FB_VOICE) }
+  else if(a==="repskip"&&TLK.rep){ if(vcRec) vcStop(false); TLK.rep.finish(0) }
   else if(a==="send") tkMicStop(true);
   else if(a==="pause"||a==="cancel") tkMicStop(false);
   else if(a==="typetoggle"){ tkSkip(); if(tkRec) tkMicStop(false); TLK.tyOn=!TLK.tyOn; TLK.note=""; tkComposer(); if(TLK.tyOn&&$("tkIn")) $("tkIn").focus() }
@@ -5440,24 +5476,24 @@ function vcToast(msg,ms){ let t=$("vcToast"); if(!t){ t=document.createElement("
 function vcStop(send){ const r=vcRec; if(!r) return; r.send=send; try{ r.mr.stop() }catch(e){ vcRelease(r) } }
 function vcRelease(r){ if(!r) return; clearInterval(r.iv); clearTimeout(r.max); try{r.src&&r.src.disconnect()}catch(e){} try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){} if(vcRec===r) vcRec=null; tkAmbient(); document.querySelectorAll(".vc-mic").forEach(b=>b.classList.remove("on")) }
 // start listening; onText(text) is called with the transcript. Tapping again while listening sends what was heard so far.
-async function vcStart(btn,onText){
+async function vcStart(btn,onText,fail){
   if(vcRec){ vcStop(true); return }
-  if(!RL.code){ vcToast("Add your sync code in Settings to answer by voice.",3600); return }
-  if(!navigator.mediaDevices||!window.MediaRecorder){ vcToast("Voice answers aren’t supported here."); return }
+  if(!RL.code){ vcToast("Add your sync code in Settings to answer by voice.",3600); fail&&fail(); return }
+  if(!navigator.mediaDevices||!window.MediaRecorder){ vcToast("Voice answers aren’t supported here."); fail&&fail(); return }
   const scr=screen; let stream;
   try{ if(navigator.audioSession) navigator.audioSession.type="play-and-record" }catch(e){}
   try{ stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}) }
-  catch(e){ tkAmbient(); vcToast("The microphone isn’t available. Allow it in your phone’s settings."); return }
+  catch(e){ tkAmbient(); vcToast("The microphone isn’t available. Allow it in your phone’s settings."); fail&&fail(); return }
   if(screen!==scr||vcRec){ stream.getTracks().forEach(t=>t.stop()); tkAmbient(); return }
   try{ speechSynthesis.cancel() }catch(e){} try{ recRun++; if(recEl) recEl.pause() }catch(e){}
   const mt=["audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"].find(t=>MediaRecorder.isTypeSupported(t))||"";
-  let mr; try{ mr=new MediaRecorder(stream,mt?{mimeType:mt}:undefined) }catch(e){ stream.getTracks().forEach(t=>t.stop()); tkAmbient(); vcToast("Recording isn’t supported here."); return }
+  let mr; try{ mr=new MediaRecorder(stream,mt?{mimeType:mt}:undefined) }catch(e){ stream.getTracks().forEach(t=>t.stop()); tkAmbient(); vcToast("Recording isn’t supported here."); fail&&fail(); return }
   const chunks=[], r={mr,stream,send:true,t0:Date.now(),mt:mr.mimeType||mt||"audio/mp4",voiced:false,quiet:0,flat:0};
   mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data) };
   mr.onstop=async()=>{
-    const send=r.send; vcRelease(r); if(!send||screen!==scr) return;
+    const send=r.send; vcRelease(r); if(!send||screen!==scr){ if(!send&&screen===scr) fail&&fail(); return }
     const blob=new Blob(chunks,{type:r.mt});
-    if(Date.now()-r.t0<600||blob.size<1500){ vcToast("Too short. Tap the mic and try again."); return }
+    if(Date.now()-r.t0<600||blob.size<1500){ vcToast("Too short. Tap the mic and try again."); fail&&fail(); return }
     vcToast("Listening to your answer…",0); btn&&btn.classList.add("busy");
     try{
       const x=await rfetch("/talk/stt",{method:"POST",body:blob,headers:{"content-type":r.mt},ms:25000});
@@ -5465,9 +5501,9 @@ async function vcStart(btn,onText){
       if(!x.ok) throw new Error("stt "+x.status);
       const text=String((await x.json()).text||"").replace(/[.,;:!?¡¿"“”]/g," ").replace(/\s+/g," ").trim();
       btn&&btn.classList.remove("busy"); if(screen!==scr) return;
-      if(!text){ vcToast("I didn’t catch that. Try again."); return }
+      if(!text){ vcToast("I didn’t catch that. Try again."); fail&&fail(); return }
       vcToast("",1); $("vcToast")&&$("vcToast").classList.remove("on"); onText(text);
-    }catch(e){ btn&&btn.classList.remove("busy"); if(screen===scr) vcToast(e.limit?"You’ve used today’s voice allowance. It resets tomorrow.":"Couldn’t hear that. Try again, or type your answer.",3600) }
+    }catch(e){ btn&&btn.classList.remove("busy"); if(screen===scr){ vcToast(e.limit?"You’ve used today’s voice allowance. It resets tomorrow.":"Couldn’t hear that. Try again, or type your answer.",3600); fail&&fail() } }
   };
   vcRec=r; btn&&btn.classList.add("on"); mr.start(250); haptic(8);
   // stop by itself: after the answer ends in silence, or give up if nothing is said
