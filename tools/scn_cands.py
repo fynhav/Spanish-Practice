@@ -13,27 +13,27 @@ Q = {
  "la-mesa": ["restaurant table", "dining table wooden"], "la-silla": ["wooden chair", "chair furniture"],
  "el-camarero": ["waiter restaurant", "waiter serving"], "la-carta": ["restaurant menu", "menu held restaurant"],
  "la-reserva": ["reserved sign table", "reservado table sign"], "la-cuenta": ["restaurant bill receipt", "paying bill restaurant"],
- "la-propina": ["tip jar", "restaurant tip coins bill"], "el-plato": ["dinner plate", "plate of food"],
+ "la-propina": ["tip jar", "restaurant tip coins bill"], "el-plato": ["empty white plate", "dinner plate table setting"],
  "el-vaso": ["drinking glass tumbler", "glass of water"], "la-copa": ["wine glass", "empty wine glass"],
- "el-tenedor": ["fork cutlery", "fork"], "el-cuchillo": ["table knife", "knife cutlery"],
+ "el-tenedor": ["dinner fork", "fork isolated"], "el-cuchillo": ["table knife", "knife cutlery"],
  "la-cuchara": ["spoon", "tablespoon cutlery"], "la-servilleta": ["napkin folded", "paper napkin"],
  "el-agua": ["glass of water", "water pouring glass"], "la-cerveza": ["glass of beer", "beer glass pint"],
  "el-vino": ["glass of red wine", "wine glass red"], "el-cafe": ["cup of coffee", "coffee cup saucer"],
- "el-zumo": ["glass orange juice", "orange juice"], "el-pan": ["bread loaf", "bread basket"],
- "la-ensalada": ["green salad bowl", "salad"], "la-sopa": ["soup bowl", "bowl of soup"],
+ "el-zumo": ["glass orange juice", "orange juice"], "el-pan": ["bread loaf bakery", "sliced bread"],
+ "la-ensalada": ["green salad bowl", "salad"], "la-sopa": ["bowl of soup", "vegetable soup"],
  "la-carne": ["steak plate", "grilled meat"], "el-pollo": ["roast chicken", "grilled chicken"],
  "el-pescado": ["grilled fish plate", "fish dish"], "el-arroz": ["rice dish", "bowl of rice"],
- "las-patatas": ["potatoes", "french fries"], "las-verduras": ["vegetables", "fresh vegetables market"],
- "el-queso": ["cheese", "cheese board"], "el-huevo": ["fried egg", "egg"],
+ "las-patatas": ["potatoes", "french fries"], "las-verduras": ["assorted vegetables", "vegetables market stall"],
+ "el-queso": ["cheese wheel", "cheese slices"], "el-huevo": ["fried egg", "egg"],
  "el-postre": ["dessert", "dessert cake plate"], "el-helado": ["ice cream cone", "ice cream"],
- "picante": ["red chili peppers", "hot chili"], "vegetariano": ["vegetarian food", "vegetable dish plate"]}
+ "picante": ["red chili pepper", "chilli peppers pods"], "vegetariano": ["vegetarian food", "vegetable dish plate"]}
 def get(url):
-    for k in range(3):
+    for k in range(5):
         try:
             return urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "practica-diaria/1.0 (language app; github.com/fynhav/spanish-practice)"}), timeout=40).read()
         except Exception as e:
-            if k == 2: raise
-            time.sleep(3)
+            if k == 4: raise
+            time.sleep(25 if "429" in str(e) else 3)
 def search(q):
     u = "https://commons.wikimedia.org/w/api.php?" + urllib.parse.urlencode({"action": "query", "format": "json", "generator": "search", "gsrnamespace": 6,
         "gsrsearch": q + " filetype:bitmap", "gsrlimit": 14, "prop": "imageinfo", "iiprop": "url|mime|size|extmetadata", "iiurlwidth": 340,
@@ -59,10 +59,14 @@ if "--pick" in sys.argv:
         print("picked", slug, i, c["t"]); time.sleep(0.5)
     json.dump(man, open(mp, "w", encoding="utf8"), ensure_ascii=False, indent=1)
 else:
-    os.makedirs(CAND, exist_ok=True); allc = {}
+    os.makedirs(CAND, exist_ok=True)
+    only = sys.argv[sys.argv.index("--only") + 1].split() if "--only" in sys.argv else None
+    cp = os.path.join(ROOT, "tools", "cands.json"); allc = json.load(open(cp, encoding="utf8")) if only and os.path.exists(cp) else {}
     for slug, qs in Q.items():
+        if only and slug not in only: continue
         seen, lst = set(), []
         for q in qs:
+            time.sleep(1.5)
             try:
                 for c in search(q):
                     if c["t"] not in seen and not re.search(r"\.(svg|tif)|logo|icon|diagram|map|poster|painting|drawing", c["t"], re.I): seen.add(c["t"]); lst.append(c)

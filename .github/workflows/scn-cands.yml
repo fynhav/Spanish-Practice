@@ -8,6 +8,10 @@ on:
         description: "cands or pick"
         required: true
         default: "cands"
+      only:
+        description: "cands only: words to redo, e.g. el-pan picante"
+        required: false
+        default: ""
 permissions:
   contents: write
 jobs:
@@ -18,7 +22,7 @@ jobs:
       - name: Candidates
         if: github.event.inputs.mode == 'cands'
         run: |
-          python3 tools/scn_cands.py
+          if [ -n "${{ github.event.inputs.only }}" ]; then python3 tools/scn_cands.py --only "${{ github.event.inputs.only }}"; else python3 tools/scn_cands.py; fi
           git config user.name "photos-bot"; git config user.email "photos-bot@users.noreply.github.com"
           git add tools/cands.json && git commit -m "Photo candidates list" && git pull --rebase && git push
           cp -r cand /tmp/cand
