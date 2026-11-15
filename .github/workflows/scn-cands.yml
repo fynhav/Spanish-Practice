@@ -1,0 +1,31 @@
+name: Scenario photo candidates
+# mode "cands": gather candidate thumbnails from Wikimedia Commons (pushed to the photo-cands branch)
+# mode "pick":  download the photos chosen in tools/scn_picks.json into img/scn/
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "cands or pick"
+        required: true
+        default: "cands"
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Candidates
+        if: github.event.inputs.mode == 'cands'
+        run: |
+          python3 tools/scn_cands.py
+          git config user.name "photos-bot"; git config user.email "photos-bot@users.noreply.github.com"
+          git add tools/cands.json && git commit -m "Photo candidates list" && git pull --rebase && git push
+          cp -r cand /tmp/cand
+          git checkout --orphan photo-cands && git rm -rf -q . && cp -r /tmp/cand/* . && git add -A && git commit -q -m "candidates" && git push -f origin photo-cands
+      - name: Pick
+        if: github.event.inputs.mode == 'pick'
+        run: |
+          python3 tools/scn_cands.py --pick
+          git config user.name "photos-bot"; git config user.email "photos-bot@users.noreply.github.com"
+          git add img && git commit -m "Scenarios photos from Wikimedia Commons" && git pull --rebase && git push
