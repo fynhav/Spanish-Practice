@@ -42,13 +42,31 @@ for slug, info in queries.items():
         elif SRC == "pixabay":
             res = json.loads(get("https://pixabay.com/api/?key=%s&q=%s&image_type=photo&per_page=3&safesearch=true" % (KEY, q), {"User-Agent": "practica-diaria"}))
             hits = [(p["webformatURL"].replace("_640", "_340"), p.get("user", ""), p.get("pageURL", "")) for p in res.get("hits") or []]
-        else:  # openverse, public domain / CC0 only so no per-photo credit is needed
-            res = json.loads(get("https://api.openverse.org/v1/images/?q=%s&license=cc0,pdm&page_size=3&aspect_ratio=square" % q, {"User-Agent": "practica-diaria"}))
-            hits = [(p.get("thumbnail") or p["url"], p.get("creator") or "", p.get("foreign_landing_url") or "") for p in res.get("results") or []]
+        else:  # openverse: public domain / CC0 first, then CC-BY / BY-SA (credit is shown in the app), then a shorter search
+            hits = []
+            words = info["q"].split()
+            tries = [(info["q"], "cc0,pdm"), (info["q"], "cc0,pdm,by,by-sa"), (" ".join(words[:2]), "cc0,pdm,by,by-sa"), (info["es"].split()[-1], "cc0,pdm,by,by-sa")]
+            for qq, lic in tries:
+                try:
+                    res = json.loads(get("https://api.openverse.org/v1/images/?q=%s&license=%s&page_size=6&aspect_ratio=square" % (urllib.parse.quote_plus(qq), lic), {"User-Agent": "practica-diaria"}))
+                except Exception as e:
+                    if "429" in str(e): raise
+                    continue
+                hits = [(p.get("thumbnail") or p["url"], p.get("creator") or "", p.get("foreign_landing_url") or "") for p in res.get("results") or []]
+                if hits: break
+                time.sleep(0.4)
         if not hits:
             print("  no result:", slug, "-", info["q"]); fail += 1; continue
-        src, by, page = hits[0]
-        img = get(src, {"User-Agent": "practica-diaria"})
+        img = None
+        for src, by, page in hits:   # first hit whose picture actually downloads
+            try:
+                img = get(src, {"User-Agent": "practica-diaria"})
+                if len(img) > 2000: break
+            except Exception as e:
+                if "429" in str(e): raise
+                img = None
+        if not img:
+            print("  failed: no picture could be downloaded for", slug); fail += 1; continue
         fn = slug + ".jpg"
         open(os.path.join(OUT, fn), "wb").write(img)
         manifest[slug] = {"f": fn, "by": by, "u": page, "s": {"pixabay": "Pixabay", "pexels": "Pexels"}.get(SRC, "Openverse")}
