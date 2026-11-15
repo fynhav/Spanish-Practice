@@ -903,7 +903,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 18:31</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 18:32</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1255,13 +1255,12 @@ const ptAccGer=w=>w.replace(/([iy])endo$/,"$1éndo").replace(/ando$/,"ándo");
 const tokTxt=t=>t.parts?t.parts.map(x=>x[0]).join(""):t[0];
 const ptWeighted=(items,r)=>{const tot=items.reduce((a,x)=>a+x.w,0); let x=r()*tot; for(const it of items){ if(x<=it.w) return it; x-=it.w } return items[items.length-1]};
 const PPX_INTRO={
-  15:"New today: pronouns in the past. Finished events (ayer, anoche, el sábado pasado) take the pretérito. The pronoun still goes right before the verb: Ayer le mandé la foto. With both pronouns, le/les becomes se: Ayer se la mandé.",
-  16:"New today: pronouns with the imperfecto. Habits and background (antes, todos los días, a menudo) take the imperfecto. The pronoun goes before the verb as always: Antes le mandaba una foto cada día.",
-  17:"Choose the tense. A finished event (ayer, anoche, la semana pasada) takes the pretérito: le mandé. A habit or background (antes, todos los días, los domingos) takes the imperfecto: le mandaba. The pronouns do not change.",
-  18:"Review: the past with pronouns. Read the time phrase, pick pretérito or imperfecto, then add the pronoun before the verb. Some present-tense sentences are mixed in."};
+  12:"New today: pronouns with the imperfecto. Habits and background (antes, todos los días, a menudo) take the imperfecto. The pronoun goes before the verb as always: Antes le mandaba una foto cada día.",
+  13:"Choose the tense. A finished event (ayer, anoche, la semana pasada) takes the pretérito: le mandé. A habit or background (antes, todos los días, los domingos) takes the imperfecto: le mandaba. The pronouns do not change.",
+  14:"Review: the past with pronouns. Read the time phrase, pick pretérito or imperfecto, then add the pronoun before the verb. Some present-tense sentences are mixed in."};
 function ptPlan(day,n,r){
-  if(day>=15&&day<=18){
-    const h=Math.floor(n/2), out=day===15?Array(n).fill("pret"):day===16?Array(n).fill("imp"):day===17?[...Array(h).fill("pret"),...Array(n-h).fill("imp")]
+  if(day>=12&&day<=14){
+    const h=Math.floor(n/2), out=day===12?Array(n).fill("imp"):day===13?[...Array(h).fill("pret"),...Array(n-h).fill("imp")]
       :[...Array(Math.round(n*.4)).fill("pret"),...Array(Math.round(n*.4)).fill("imp")]; while(out.length<n) out.push("pres");
     return shuf(out,r);
   }
@@ -1397,10 +1396,10 @@ function genPron(kind,count,seed){
       for(let k=0;k<60;k++){
         if(!q.length) q=shuf(pairs.slice(),r);
         const pr=q.pop(), t=(PT_NO[pr[0].inf]||[]).includes(t0)?"pres":t0;
-        if(d>=15&&d<=18&&t!==t0) continue;   // keep the past-tense days free of fallbacks
+        if(d>=12&&d<=14&&t!==t0) continue;   // keep the past-tense days free of fallbacks
         const it=t==="pres"?makePron(kind,pr,r):makePronT(kind,pr,t,r,d), key=JSON.stringify(it.full)+t;
         if(seen.has(key)) continue;
-        seen.add(key); it.tn=it.tn||"pres"; if(d>=15&&d<=18&&!firsts.has("x"+d)){it.intro=PPX_INTRO[d]; firsts.add("x"+d)} if(!(d>=15&&d<=18)&&t===PT_FOCUS(d)&&d===PT_INTRO[t]&&t!=="pres"&&!firsts.has(t)){it.intro=PT_INTRO_TXT[t]; firsts.add(t)}
+        seen.add(key); it.tn=it.tn||"pres"; if(d>=12&&d<=14&&!firsts.has("x"+d)){it.intro=PPX_INTRO[d]; firsts.add("x"+d)} if(!(d>=12&&d<=14)&&t===PT_FOCUS(d)&&d===PT_INTRO[t]&&t!=="pres"&&!firsts.has(t)){it.intro=PT_INTRO_TXT[t]; firsts.add(t)}
         out.push(it); break;
       }
     }
@@ -1608,7 +1607,7 @@ function parseHand([s,inf,ans,alt,tense,why,alsoOk=[]]){
 
 // ================= courses + 30-day pools =================
 const COURSES={
-  pron:{name:"Object pronouns",short:"Pronouns",sub:"lo · la · le · les · se",cc:"do",days:18,parts:[
+  pron:{name:"Object pronouns",short:"Pronouns",sub:"lo · la · le · les · se",cc:"do",days:14,parts:[
     {key:"do",n:10,name:"Direct objects",pill:"Part 1 · Direct",rule:`Replace <b class="do-t">what</b> is acted on with <b class="do-t">lo · la · los · las</b>. Match the noun’s gender and number.`,ex:"Compro las flores → Las compro"},
     {key:"io",n:10,name:"Indirect objects",pill:"Part 2 · Indirect",rule:`Replace <b class="io-t">to whom</b> with <b class="io-t">le</b> (one person) or <b class="io-t">les</b> (several). No gender. Keep the other noun.`,ex:"Escribo un mensaje a Carlos → Le escribo un mensaje"},
     {key:"both",n:5,typing:true,name:"Both together",pill:"Part 3 · Both together",rule:`Use both: <b class="io-t">indirect</b> first, then <b class="do-t">direct</b>. <b class="io-t">le/les</b> turns into <b class="io-t">se</b> before lo/la/los/las.`,ex:"Juan da el libro a María → Juan se lo da"}]},
