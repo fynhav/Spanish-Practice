@@ -1,10 +1,4 @@
 {
- "la-mesa": {
-  "f": "la-mesa.jpg",
-  "by": "Buwaneka Saranga",
-  "u": "https://www.flickr.com/photos/67584745@N07/13622010684",
-  "s": "Openverse"
- },
  "la-silla": {
   "f": "la-silla.jpg",
   "by": "Ioana Muresan",
@@ -19,8 +13,8 @@
  },
  "la-carta": {
   "f": "la-carta.jpg",
-  "by": "bigQizlee",
-  "u": "https://www.flickr.com/photos/82115604@N05/53497303621",
+  "by": "",
+  "u": "https://www.rawpixel.com/image/6730172/vector-frame-vintage-public-domain",
   "s": "Openverse"
  },
  "el-plato": {
@@ -53,12 +47,6 @@
   "u": "https://www.flickr.com/photos/41284017@N08/28677604910",
   "s": "Openverse"
  },
- "el-queso": {
-  "f": "el-queso.jpg",
-  "by": "Peter Belch",
-  "u": "https://stocksnap.io/photo/pizza-cheese-L1S7QIJIAT",
-  "s": "Openverse"
- },
  "el-huevo": {
   "f": "el-huevo.jpg",
   "by": "",
@@ -77,24 +65,6 @@
   "u": "https://www.rawpixel.com/image/6287178/png-public-domain-green",
   "s": "Openverse"
  },
- "la-reserva": {
-  "f": "la-reserva.jpg",
-  "by": "lwolfartist",
-  "u": "https://www.flickr.com/photos/151817352@N04/54295884551",
-  "s": "Openverse"
- },
- "la-cuenta": {
-  "f": "la-cuenta.jpg",
-  "by": "ana maría 8",
-  "u": "https://www.flickr.com/photos/203640637@N02/54859495635",
-  "s": "Openverse"
- },
- "la-propina": {
-  "f": "la-propina.jpg",
-  "by": "H.L.I.T.",
-  "u": "https://www.flickr.com/photos/29311691@N05/5822290249",
-  "s": "Openverse"
- },
  "el-vaso": {
   "f": "el-vaso.jpg",
   "by": "museado",
@@ -109,26 +79,20 @@
  },
  "el-tenedor": {
   "f": "el-tenedor.jpg",
-  "by": "Ranger Robb",
-  "u": "https://www.flickr.com/photos/39422575@N02/52295186829",
+  "by": "Giuseppe Milo (www.pixael.com)",
+  "u": "https://www.flickr.com/photos/87690240@N03/12293933184",
   "s": "Openverse"
  },
  "el-cuchillo": {
   "f": "el-cuchillo.jpg",
-  "by": "osorhormichael",
-  "u": "https://www.flickr.com/photos/189078236@N07/52574322219",
+  "by": "Giuseppe Milo (www.pixael.com)",
+  "u": "https://www.flickr.com/photos/87690240@N03/12293933184",
   "s": "Openverse"
  },
  "la-cuchara": {
   "f": "la-cuchara.jpg",
   "by": "Believe Creative",
   "u": "https://www.flickr.com/photos/22832936@N07/2392198147",
-  "s": "Openverse"
- },
- "la-servilleta": {
-  "f": "la-servilleta.jpg",
-  "by": "Emily Abrego",
-  "u": "https://www.inaturalist.org/photos/340203478",
   "s": "Openverse"
  },
  "el-agua": {
@@ -169,8 +133,8 @@
  },
  "el-pollo": {
   "f": "el-pollo.jpg",
-  "by": "Lachlan Hardy",
-  "u": "https://www.flickr.com/photos/98983159@N00/19236225695",
+  "by": "RBerteig",
+  "u": "https://www.flickr.com/photos/51035786238@N01/543657278",
   "s": "Openverse"
  },
  "el-pescado": {
@@ -185,22 +149,10 @@
   "u": "https://wordpress.org/photos/photo/93265bf709/",
   "s": "Openverse"
  },
- "las-patatas": {
-  "f": "las-patatas.jpg",
-  "by": "Kim Siever",
-  "u": "https://www.flickr.com/photos/57873306@N00/51359593143",
-  "s": "Openverse"
- },
  "el-postre": {
   "f": "el-postre.jpg",
   "by": "GlueGunGlory",
   "u": "https://www.flickr.com/photos/96841189@N06/31140475892",
-  "s": "Openverse"
- },
- "vegetariano": {
-  "f": "vegetariano.jpg",
-  "by": "Fort Drum & 10th Mountain Division (LI)",
-  "u": "https://www.flickr.com/photos/62309569@N03/51336984338",
   "s": "Openverse"
  }
 }
