@@ -903,7 +903,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 18:32</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 18:35</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -1052,6 +1052,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
           <tr><td>poder</td><td>managed to</td><td>was able to</td></tr>
           <tr><td>tener</td><td>got, received</td><td>had</td></tr></table></div>
         <div class="order"><b>Interrupted action:</b> the ongoing action is <span class="imp-t">imperfecto</span>, the event that cuts in is <span class="pret-t">pretérito</span>. <i>Mientras leía, sonó el teléfono.</i></div>
+        <div class="order"><b>With pronouns (days 12–14):</b> some sentences also have <i>me, te, le, nos, les, lo, la</i> or <i>se lo</i>. The pronoun sits right before the verb and does not change the tense: <i>Ayer <b class="io-t">le</b> escribí</i> (finished) and <i>Antes <b class="io-t">le</b> escribía</i> (habit). Pick the tense from the time clue as usual.</div>
       </div>
     </div>
   </div>
@@ -2436,6 +2437,56 @@ const POOL={
     const want=d%2?3:2, day=[];
     for(let k=0;k<5;k++){const src=(k<want?P.length:I.length)?(k<want?P:I):(P.length?P:I); day.push(src.shift())}
     POOL.past.mix.push(...shuf(day.filter(Boolean),r));
+  }
+})();
+(()=>{ // pronoun sentences for the last three days of the Past tense course
+  const PP_PRET=`{Ayer} (yo) le _ un mensaje a mi jefe.|escribir|0
+{Anoche} mi madre nos _ la cena a todos.|preparar|2
+{El sábado pasado} Daniel le _ flores a su madre.|regalar|2
+{Ayer} (tú) me _ las llaves, ¿verdad?|devolver|1
+{La semana pasada} (nosotros) les _ las fotos a los abuelos.|enviar|3
+{Hace dos días} (yo) la _ en el supermercado.|ver|0
+{Anoche} mis amigos me _ una sorpresa.|dar|4
+{El verano pasado} (nosotros) los _ a la playa.|llevar|3
+{Ayer} (tú) les _ la verdad a tus padres.|decir|1
+{Una vez} mi profesora me _ un consejo muy bueno.|dar|2|p|Una vez points to a single occasion that is over, so this is a completed event.
+{Ayer por la tarde} (yo) lo _ en la biblioteca.|encontrar|0
+{Anoche} Carlos nos _ una historia increíble.|contar|2
+{Ayer} (yo) compré las entradas y se las _ a mi hermana.|dar|0
+{Ayer} (tú) me _ algo muy raro.|preguntar|1
+{Esta mañana} el camarero nos _ el café muy caliente.|servir|2|p|Esta mañana is a finished stretch of time, so this is a completed event.`;
+  const PP_IMP=`{Antes}, (yo) le _ una carta a mi abuela cada mes.|escribir|0
+{Todos los domingos} mi madre nos _ la comida.|preparar|2
+{Siempre} (tú) me _ dinero para el autobús.|dar|1
+{A menudo} (nosotros) les _ regalos a los vecinos.|llevar|3
+{Todos los días} (yo) la _ en la parada del autobús.|ver|0
+{Normalmente} Ana me _ cómo había ido el día.|contar|2
+{Cada verano} mis tíos nos _ a su casa de la playa.|invitar|4|i|Cada verano marks a habit, something repeated, so it takes the imperfecto.
+{Antes} (tú) le _ siempre la verdad a tu hermano.|decir|1
+{De vez en cuando} (nosotros) los _ en el centro.|encontrar|3|i|De vez en cuando marks a habit, something repeated, so it takes the imperfecto.
+{Los fines de semana} mi abuela nos _ galletas.|hacer|2|i|Los fines de semana marks a habit, something repeated, so it takes the imperfecto.
+{Todos los días} el profesor les _ las tareas a los alumnos.|explicar|2
+{Siempre} (yo) te _ las llaves antes de salir.|dejar|0
+{Antes} mis padres me _ un helado cada viernes.|comprar|4
+{Cuando era niño}, mi padre me _ un cuento cada noche.|leer|2|i|Cuando era niño describes how things used to be, so it takes the imperfecto.`;
+  const PP_MIX=`{Mientras} (yo) le _ la cena, sonó el teléfono.|preparar|0|i|Mientras sets up an action in progress. The phone call is the event that interrupted it.
+{Anoche} (yo) le _ un mensaje a Carlos.|mandar|0|p|Anoche is a finished night, so one completed action.
+{Cuando era pequeña}, mi abuela me _ cuentos todas las noches.|contar|2|i|Cuando era pequeña and todas las noches: how things used to be.
+{De repente} Marta me _ la mano.|dar|2|p|De repente = a sudden, one-off event.
+{Mientras} (tú) nos _ el café, hablábamos de planes.|servir|1|i|Mientras: you were in the middle of it, so it is background.
+{Ayer} el jefe nos _ la noticia en la reunión.|decir|2|p|Ayer is a finished day, so one completed action.
+{Siempre} (nosotros) les _ la verdad a nuestros padres.|decir|3|i|Siempre marks a habit.
+{Aquel día} (yo) la _ por primera vez en la calle.|ver|0|p|Aquel día = one specific occasion.
+{Todas las mañanas} (tú) me _ el desayuno a la cama.|traer|1|i|Todas las mañanas marks a habit.
+{El viernes} (nosotros) los _ en la estación.|encontrar|3|p|El viernes = one specific occasion.`;
+  const L={pret:shuf(bankItems(PP_PRET,"pret",rng(71)),rng(72)), imp:shuf(bankItems(PP_IMP,"imp",rng(73)),rng(74)), mix:bankItems(PP_MIX,"pret",rng(75))};
+  const NP={pret:10,imp:10,mix:5}, CNT={12:{pret:3,imp:3,mix:1},13:{pret:4,imp:4,mix:2},14:{pret:5,imp:5,mix:3}};
+  for(const d of [12,13,14]) for(const k of ["pret","imp","mix"]){
+    const n=NP[k], cnt=CNT[d][k], base=(d-1)*n;
+    for(let i=0;i<cnt;i++){
+      const pos=base+Math.floor((i+.5)*n/cnt), it=L[k].shift(); if(!it) continue;
+      it.pron=true; POOL.past[k][pos]=it;
+    }
   }
 })();
 const ADV_EN=[["I’m going to give the book to María.","I’m going to give it to her."],["I want to buy the flowers.","I want to buy them."],["I have to call Carlos.","I have to call him."],["We’re going to send the photos to the grandparents.","We’re going to send them to them."],["I need to explain the problem to the teacher.","I need to explain it to him."],["You can bring the bill.","You can bring it."],["Ana wants to give a dog to the kids.","Ana wants to give it to them."],["I’m reading the newspaper.","I’m reading it."],["We’re preparing dinner.","We’re preparing it."],["I’m going to tell my parents the truth.","I’m going to say it to them."],["You have to return the keys to Carlos.","You have to return them to him."],["I’m writing an email to the boss.","I’m writing it to him."],["We’re going to watch the film.","We’re going to watch it."],["You’re looking for the keys.","You’re looking for them."]];
