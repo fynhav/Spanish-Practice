@@ -485,6 +485,9 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .wr-front{padding:8px 0 4px}.wr-front .ven{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
 .wr-reg{font-size:.72rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:1px 7px}
 .wr-back{text-align:center;display:flex;flex-direction:column;gap:12px;padding:6px 2px 0}
+.wr-cnt{display:inline-flex;gap:12px;font-weight:700;font-size:1rem}.wr-cnt b{padding-bottom:1px;border-bottom:2px solid transparent}.wr-cnt .n{color:#2F5FA8}.wr-cnt .l{color:var(--bad)}.wr-cnt .r{color:var(--ok)}.wr-cnt b.on{border-bottom-color:currentColor}
+.wr-after{flex:1.5 1 0}.wr-front{padding:8px 0 14px}.wr-back{border-top:1.5px solid var(--line);margin:0 4px;padding-top:18px}
+.wr-g button{flex-direction:column}.wr-g button small{font-size:.8rem;margin-bottom:1px}
 .wr-mean{font-family:var(--f-display);font-size:1.45rem;line-height:1.25;color:var(--cc)}
 .wr-ex{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center;text-align:left}
 .wr-ex .es{font-size:1.1rem;font-weight:600}.wr-ex small{grid-column:1/-1;color:var(--muted);font-size:.92rem}
@@ -903,7 +906,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 18:35</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 18:40</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -4859,11 +4862,15 @@ function wrNext(){
   if(!it.kind){const c=ST.words.c[it.k]; it.kind=ST.words.set.mode==="mix"&&c&&c.st===2&&c.r>=2&&Math.random()<.5?"choose":"flip"}
   it.kind==="choose"?wrChoose(it):wrFlip(it);
 }
-const wrMeta=(tag)=>`<div class="meta"><span class="pill vp" style="background:var(--cc-soft);color:var(--cc)">${tag}</span><span class="label" style="margin-left:auto">${WR.q.length} left</span></div><div class="qpush" aria-hidden="true"></div>`;
+const wrCls=it=>{if(!it) return ""; if(it.nw) return "n"; const c=ST.words.c[it.k]; return c&&(c.st===1||c.st===3)?"l":"r"};
+const wrCnt=()=>{const n={n:0,l:0,r:0}; WR.q.forEach(it=>n[wrCls(it)]++); const cur=wrCls(WR.q[0]);
+  return `<span class="wr-cnt">${["n","l","r"].map(k=>`<b class="${k}${cur===k?" on":""}">${n[k]}</b>`).join("")}</span>`};
+const wrShort=t=>t.replace(" min","m").replace(" h","h").replace(" d","d").replace(" mo","mo").replace(" y","y");
+const wrMeta=(tag)=>`<div class="meta"><span class="pill vp" style="background:var(--cc-soft);color:var(--cc)">${tag}</span><span style="margin-left:auto">${wrCnt()}</span></div><div class="qpush" aria-hidden="true"></div>`;
 function wrIntro(it){
   const k=it.k, w=WORDS[k-1];
   $("drill").innerHTML=`${wrMeta("NEW WORD")}<div class="va wr-front"><div class="vinf wrw">${esc(w[0])}</div><div class="ven">${esc(wrPos(k))}${wrRegTag(w)}${spkBtn(w[0],"sm")}</div></div>
-    <div class="wr-back"><div class="wr-mean">${esc(w[2])}</div>${wrExHTML(w)}</div>`;
+    <div class="wr-back"><div class="wr-mean">${esc(w[2])}</div>${wrExHTML(w)}</div><div class="qpush wr-after" aria-hidden="true"></div>`;
   $("actions").innerHTML=`<button type="button" class="grow" id="wrGot">Got it</button>`;
   $("wrGot").onclick=()=>{it.seen=true; WR.q.shift(); WR.q.splice(Math.min(WR.q.length,3),0,it); haptic(8); wrNext()};
   if(S.auto==="on") speak(w[0]);
@@ -4871,15 +4878,15 @@ function wrIntro(it){
 function wrFlip(it){
   const k=it.k, w=WORDS[k-1];
   $("drill").innerHTML=`${wrMeta("RECALL")}<div class="va wr-front"><div class="vinf wrw">${esc(w[0])}</div><div class="ven">${esc(wrPos(k))}${wrRegTag(w)}${spkBtn(w[0],"sm")}</div></div>
-    <div class="wr-back" id="wrBack" hidden><div class="wr-mean">${esc(w[2])}</div>${wrExHTML(w)}</div>`;
+    <div class="wr-back" id="wrBack" style="visibility:hidden"><div class="wr-mean">${esc(w[2])}</div>${wrExHTML(w)}</div><div class="qpush wr-after" aria-hidden="true"></div>`;
   $("actions").innerHTML=`<button type="button" class="grow" id="wrShow">Show answer</button>`;
   $("wrShow").onclick=()=>wrReveal(it);
   if(S.auto==="on") speak(w[0]);
 }
 function wrReveal(it){
   const k=it.k, w=WORDS[k-1], now=Date.now(), pv=wrPreview(ST.words.c[k],now); haptic(8);
-  $("wrBack").hidden=false;
-  $("actions").innerHTML=`<div class="wr-g">${["Again","Hard","Good","Easy"].map((n,i)=>`<button type="button" class="g${i+1}" data-g="${i+1}">${n}<small>${wrLbl(pv[i],now)}</small></button>`).join("")}</div>`;
+  $("wrBack").style.visibility="visible";
+  $("actions").innerHTML=`<div class="wr-g">${["Again","Hard","Good","Easy"].map((n,i)=>`<button type="button" class="g${i+1}" data-g="${i+1}"><small>${wrShort(wrLbl(pv[i],now))}</small>${n}</button>`).join("")}</div>`;
   document.querySelectorAll(".wr-g button").forEach(b=>b.onclick=()=>wrGrade(+b.dataset.g));
   $("drill").scrollTop=0; if(S.auto==="on") speak(w[3]);
 }
