@@ -1,11 +1,11 @@
 {
  "la-mesa": {
-  "q": "restaurant table set",
+  "q": "empty wooden table",
   "es": "la mesa",
   "en": "the table"
  },
  "la-silla": {
-  "q": "wooden restaurant chair",
+  "q": "wooden chair",
   "es": "la silla",
   "en": "the chair"
  },
@@ -15,22 +15,22 @@
   "en": "the waiter"
  },
  "la-carta": {
-  "q": "restaurant menu",
+  "q": "restaurant menu card",
   "es": "la carta",
   "en": "the menu"
  },
  "la-reserva": {
-  "q": "restaurant reserved table sign",
+  "q": "reserved sign restaurant table",
   "es": "la reserva",
   "en": "the reservation"
  },
  "la-cuenta": {
-  "q": "restaurant bill receipt",
+  "q": "restaurant receipt bill",
   "es": "la cuenta",
   "en": "the bill"
  },
  "la-propina": {
-  "q": "tip money restaurant table",
+  "q": "tip jar cash",
   "es": "la propina",
   "en": "the tip"
  },
@@ -40,7 +40,7 @@
   "en": "the plate; the dish"
  },
  "el-vaso": {
-  "q": "glass of water tumbler",
+  "q": "drinking glass of water",
   "es": "el vaso",
   "en": "the glass (tumbler)"
  },
@@ -50,12 +50,12 @@
   "en": "the (wine) glass"
  },
  "el-tenedor": {
-  "q": "fork cutlery",
+  "q": "fork",
   "es": "el tenedor",
   "en": "the fork"
  },
  "el-cuchillo": {
-  "q": "table knife cutlery",
+  "q": "kitchen knife",
   "es": "el cuchillo",
   "en": "the knife"
  },
@@ -65,7 +65,7 @@
   "en": "the spoon"
  },
  "la-servilleta": {
-  "q": "napkin table",
+  "q": "paper napkin",
   "es": "la servilleta",
   "en": "the napkin"
  },
@@ -95,7 +95,7 @@
   "en": "the juice"
  },
  "el-pan": {
-  "q": "bread basket",
+  "q": "loaf of bread",
   "es": "el pan",
   "en": "the bread"
  },
@@ -130,7 +130,7 @@
   "en": "the rice"
  },
  "las-patatas": {
-  "q": "french fries",
+  "q": "potatoes",
   "es": "las patatas",
   "en": "the potatoes; the fries"
  },
@@ -140,7 +140,7 @@
   "en": "the vegetables"
  },
  "el-queso": {
-  "q": "cheese board",
+  "q": "cheese",
   "es": "el queso",
   "en": "the cheese"
  },
@@ -165,7 +165,7 @@
   "en": "spicy"
  },
  "vegetariano": {
-  "q": "vegetarian food bowl",
+  "q": "vegetable salad plate",
   "es": "vegetariano",
   "en": "vegetarian"
  }

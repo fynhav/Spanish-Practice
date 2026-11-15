@@ -3,6 +3,11 @@ name: Scenario photos
 # and commits them to img/scn/. Runs once when this file or the search list changes, or by hand: Actions > Scenario photos > Run workflow.
 on:
   workflow_dispatch:
+    inputs:
+      redo:
+        description: "Words to fetch again, e.g. la-mesa la-silla (edit tools/scn_queries.json first)"
+        required: false
+        default: ""
   push:
     paths:
       - ".github/workflows/scn-photos.yml"
@@ -17,9 +22,10 @@ jobs:
       - name: Download photos (retries if the source rate-limits)
         env:
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+          REDO: ${{ github.event.inputs.redo }}
         run: |
           for i in 1 2 3 4 5 6; do
-            python3 tools/scn_photos.py | tee out.txt
+            if [ -n "$REDO" ]; then python3 tools/scn_photos.py --redo $REDO | tee out.txt; else python3 tools/scn_photos.py | tee out.txt; fi
             grep -q "rate limit" out.txt || break
             sleep 240
           done

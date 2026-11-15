@@ -48,7 +48,7 @@ for slug, info in queries.items():
             tries = [(info["q"], "cc0,pdm"), (info["q"], "cc0,pdm,by,by-sa"), (" ".join(words[:2]), "cc0,pdm,by,by-sa"), (info["es"].split()[-1], "cc0,pdm,by,by-sa")]
             for qq, lic in tries:
                 try:
-                    res = json.loads(get("https://api.openverse.org/v1/images/?q=%s&license=%s&page_size=6&aspect_ratio=square" % (urllib.parse.quote_plus(qq), lic), {"User-Agent": "practica-diaria"}))
+                    res = json.loads(get("https://api.openverse.org/v1/images/?q=%s&license=%s&page_size=6&aspect_ratio=square&category=photograph" % (urllib.parse.quote_plus(qq), lic), {"User-Agent": "practica-diaria"}))
                 except Exception as e:
                     if "429" in str(e): raise
                     continue
