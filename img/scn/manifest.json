@@ -1,158 +1,240 @@
 {
  "la-silla": {
   "f": "la-silla.jpg",
-  "by": "Ioana Muresan",
-  "u": "https://wordpress.org/photos/photo/99862e2dd7/",
-  "s": "Openverse"
+  "by": "James Dobson, photographer employed by National Trust",
+  "u": "https://commons.wikimedia.org/wiki/File:Hughenden_DisraeliSedanChair_January2024_NT_CCBYSA_open.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "el-camarero": {
   "f": "el-camarero.jpg",
-  "by": "Mussi Katz",
-  "u": "https://www.flickr.com/photos/52775988@N00/51674101938",
-  "s": "Openverse"
+  "by": "Simiaxmhwua 00",
+  "u": "https://commons.wikimedia.org/wiki/File:HK_CWB_%E9%8A%85%E9%91%BC%E7%81%A3_Causeway_Bay_%E8%A8%98%E5%88%A9%E4%BD%90%E6%B2%BB%E8%A1%97_Great_George_Street_%E7%BF%A1%E7%BF%A0%E6%98%8E%E7%8F%A0%E5%BB%A3%E5%A0%B4_JP_Plaza_mall_shop_%E4%B8%8A%E6%B5%B7%E5%A7%A5%E5%A7%A5_Shanghai_Lao_Lao_Restaurant_waiter_uniform_November_2021_SS2_001.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "la-carta": {
   "f": "la-carta.jpg",
-  "by": "",
-  "u": "https://www.rawpixel.com/image/6730172/vector-frame-vintage-public-domain",
-  "s": "Openverse"
+  "by": "Andy Li",
+  "u": "https://commons.wikimedia.org/wiki/File:Menu_of_Sawadee_Thai_Restaurant_(p4)_2024-10-05.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC0"
  },
  "el-plato": {
   "f": "el-plato.jpg",
-  "by": "Rohit Maharjan",
-  "u": "https://wordpress.org/photos/photo/55165c341f/",
-  "s": "Openverse"
+  "by": "Stock Catalog",
+  "u": "https://commons.wikimedia.org/wiki/File:Empty_table_setting_plate_fork_knife_(42585288225).jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 2.0"
  },
  "la-cerveza": {
   "f": "la-cerveza.jpg",
-  "by": "",
-  "u": "https://www.rawpixel.com/image/6588621/vector-sticker-public-domain-illustrations",
-  "s": "Openverse"
+  "by": "User:misterkong",
+  "u": "https://commons.wikimedia.org/wiki/File:IPA_in_a_pint_glass.jpeg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 3.0"
  },
  "el-zumo": {
   "f": "el-zumo.jpg",
-  "by": "Julia D'Alkmin",
-  "u": "https://stocksnap.io/photo/drink-beverage-7SKKID2EPP",
-  "s": "Openverse"
+  "by": "Agency of the United States Department of Agriculture Edited Version by: Arad",
+  "u": "https://commons.wikimedia.org/wiki/File:Orange_juice_1_edit1.jpg",
+  "s": "Wikimedia Commons",
+  "l": "Public domain"
  },
  "la-sopa": {
   "f": "la-sopa.jpg",
-  "by": "",
-  "u": "https://www.rawpixel.com/image/6479842/image-public-domain-blue-green",
-  "s": "Openverse"
+  "by": "Mobius6",
+  "u": "https://commons.wikimedia.org/wiki/File:Nongshim_Yukejang_Bowl_Noodle_Soup_20201111_002.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "las-verduras": {
   "f": "las-verduras.jpg",
-  "by": "USDAgov",
-  "u": "https://www.flickr.com/photos/41284017@N08/28677604910",
-  "s": "Openverse"
+  "by": "Ella Olsson from Stockholm, Sweden",
+  "u": "https://commons.wikimedia.org/wiki/File:Fresh_vegetables_from_a_local_farm_(44924370242).jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 2.0"
  },
  "el-huevo": {
   "f": "el-huevo.jpg",
-  "by": "",
-  "u": "https://www.rawpixel.com/image/6552446/image-public-domain-illustrations-white",
-  "s": "Openverse"
+  "by": "Horacio Cambeiro",
+  "u": "https://commons.wikimedia.org/wiki/File:Fried_egg_cooking_in_a_pan.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 3.0"
  },
  "el-helado": {
   "f": "el-helado.jpg",
-  "by": "PatrickRich",
-  "u": "https://www.flickr.com/photos/91689877@N03/36409577510",
-  "s": "Openverse"
+  "by": "Amanda Slater",
+  "u": "https://commons.wikimedia.org/wiki/File:Citta_di_Palazzolo_sull%27Oglio_-_Ice_cream_cone.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 2.0"
  },
  "picante": {
   "f": "picante.jpg",
-  "by": "",
-  "u": "https://www.rawpixel.com/image/6287178/png-public-domain-green",
-  "s": "Openverse"
+  "by": "Vyacheslav Argenberg",
+  "u": "https://commons.wikimedia.org/wiki/File:Shan_Hills,_Myanmar,_Red_chili_pepper_plant.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 4.0"
  },
  "el-vaso": {
   "f": "el-vaso.jpg",
-  "by": "museado",
-  "u": "https://www.flickr.com/photos/200781279@N05/53902476377",
-  "s": "Openverse"
+  "by": "Kurt Kaiser",
+  "u": "https://commons.wikimedia.org/wiki/File:Glass_of_water_ouside.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC0"
  },
  "la-copa": {
   "f": "la-copa.jpg",
-  "by": "jess2284",
-  "u": "https://www.flickr.com/photos/49744078@N00/217248934",
-  "s": "Openverse"
+  "by": "New England Glass Company",
+  "u": "https://commons.wikimedia.org/wiki/File:Wine_Glass_MET_180800.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC0"
  },
  "el-tenedor": {
   "f": "el-tenedor.jpg",
-  "by": "Giuseppe Milo (www.pixael.com)",
-  "u": "https://www.flickr.com/photos/87690240@N03/12293933184",
-  "s": "Openverse"
+  "by": "",
+  "u": "https://commons.wikimedia.org/wiki/File:Assorted_forks.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 3.0 us"
  },
  "el-cuchillo": {
   "f": "el-cuchillo.jpg",
-  "by": "Giuseppe Milo (www.pixael.com)",
-  "u": "https://www.flickr.com/photos/87690240@N03/12293933184",
-  "s": "Openverse"
+  "by": "Smirkybec",
+  "u": "https://commons.wikimedia.org/wiki/File:Italian_table_knife.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "la-cuchara": {
   "f": "la-cuchara.jpg",
-  "by": "Believe Creative",
-  "u": "https://www.flickr.com/photos/22832936@N07/2392198147",
-  "s": "Openverse"
+  "by": "Akwugo",
+  "u": "https://commons.wikimedia.org/wiki/File:Ngaji.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "el-agua": {
   "f": "el-agua.jpg",
-  "by": "",
-  "u": "https://www.rawpixel.com/image/6042373/photo-image-public-domain-blue-bubbles",
-  "s": "Openverse"
+  "by": "Derek Jensen (Tysto)",
+  "u": "https://commons.wikimedia.org/wiki/File:Glass-of-water.jpg",
+  "s": "Wikimedia Commons",
+  "l": "Public domain"
  },
  "el-vino": {
   "f": "el-vino.jpg",
-  "by": "Didriks",
-  "u": "https://www.flickr.com/photos/49889671@N03/19390244048",
-  "s": "Openverse"
+  "by": "Evan Swigart from Chicago, USA",
+  "u": "https://commons.wikimedia.org/wiki/File:Glass_of_Red_Wine_with_a_bottle_of_Red_Wine_-_Evan_Swigart.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 2.0"
  },
  "el-cafe": {
   "f": "el-cafe.jpg",
-  "by": "walmarc04",
-  "u": "https://www.flickr.com/photos/30924550@N04/53474282105",
-  "s": "Openverse"
+  "by": "Julius Schorzman",
+  "u": "https://commons.wikimedia.org/wiki/File:A_small_cup_of_coffee.JPG",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 2.0"
  },
  "el-pan": {
   "f": "el-pan.jpg",
-  "by": "Kim Siever",
-  "u": "https://www.flickr.com/photos/57873306@N00/52211560627",
-  "s": "Openverse"
+  "by": "FranHogan",
+  "u": "https://commons.wikimedia.org/wiki/File:Fresh_made_bread_05.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "la-ensalada": {
   "f": "la-ensalada.jpg",
-  "by": "bark",
-  "u": "https://www.flickr.com/photos/49503168860@N01/5752422901",
-  "s": "Openverse"
+  "by": "Horacio Cambeiro",
+  "u": "https://commons.wikimedia.org/wiki/File:Fresh_salad_with_arugula,_cabbage_and_tomato_in_a_glass_bowl.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 3.0"
  },
  "la-carne": {
   "f": "la-carne.jpg",
-  "by": "prunderground",
-  "u": "https://www.flickr.com/photos/46636594@N04/7546920904",
-  "s": "Openverse"
+  "by": "Ceeseven",
+  "u": "https://commons.wikimedia.org/wiki/File:Beef_Steak_on_Sizzling_Plate.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "el-pollo": {
   "f": "el-pollo.jpg",
-  "by": "RBerteig",
-  "u": "https://www.flickr.com/photos/51035786238@N01/543657278",
-  "s": "Openverse"
+  "by": "Evan Swigart from Chicago, USA",
+  "u": "https://commons.wikimedia.org/wiki/File:Max%27s_Roasted_Chicken_-_Evan_Swigart.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 2.0"
  },
  "el-pescado": {
   "f": "el-pescado.jpg",
-  "by": "Didriks",
-  "u": "https://www.flickr.com/photos/49889671@N03/5958082059",
-  "s": "Openverse"
+  "by": "Christin568",
+  "u": "https://commons.wikimedia.org/wiki/File:Grilled_Fish_with_Wild_Greens.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  },
  "el-arroz": {
   "f": "el-arroz.jpg",
-  "by": "Harshit Tripathi",
-  "u": "https://wordpress.org/photos/photo/93265bf709/",
-  "s": "Openverse"
+  "by": "Judgefloro",
+  "u": "https://commons.wikimedia.org/wiki/File:0880Del_Monte_Sardine_Chicken_rice_(Filipino_dish)_03.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC0"
  },
  "el-postre": {
   "f": "el-postre.jpg",
-  "by": "GlueGunGlory",
-  "u": "https://www.flickr.com/photos/96841189@N06/31140475892",
-  "s": "Openverse"
+  "by": "Rebeccananonof",
+  "u": "https://commons.wikimedia.org/wiki/File:Dessert_fruit_and_cake.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC0"
+ },
+ "la-mesa": {
+  "f": "la-mesa.jpg",
+  "by": "Basile Morin",
+  "u": "https://commons.wikimedia.org/wiki/File:Restaurant_table_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
+ },
+ "la-reserva": {
+  "f": "la-reserva.jpg",
+  "by": "",
+  "u": "https://commons.wikimedia.org/wiki/File:Sign,_reserved_(AM_1994.112-1).jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 4.0"
+ },
+ "la-cuenta": {
+  "f": "la-cuenta.jpg",
+  "by": "Benreis",
+  "u": "https://commons.wikimedia.org/wiki/File:Pay_the_bill.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 3.0"
+ },
+ "la-propina": {
+  "f": "la-propina.jpg",
+  "by": "Ser Amantio di Nicolao",
+  "u": "https://commons.wikimedia.org/wiki/File:Tip_jar_at_Sherwood_Gourmet_Deli.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
+ },
+ "la-servilleta": {
+  "f": "la-servilleta.jpg",
+  "by": "Tewy",
+  "u": "https://commons.wikimedia.org/wiki/File:Folded_napkin_01.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY 2.5"
+ },
+ "las-patatas": {
+  "f": "las-patatas.jpg",
+  "by": "Bff",
+  "u": "https://commons.wikimedia.org/wiki/File:Solanum_tuberosum_Red_Scarlett20170523_7825.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
+ },
+ "vegetariano": {
+  "f": "vegetariano.jpg",
+  "by": "Petar Milošević",
+  "u": "https://commons.wikimedia.org/wiki/File:Vegetarian_Pizza.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
+ },
+ "el-queso": {
+  "f": "el-queso.jpg",
+  "by": "Frank Schulenburg",
+  "u": "https://commons.wikimedia.org/wiki/File:Cowgirl_Creamery_Point_Reyes_-_Red_Hawk_cheese.jpg",
+  "s": "Wikimedia Commons",
+  "l": "CC BY-SA 4.0"
  }
 }
