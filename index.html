@@ -906,7 +906,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 19:02</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-16 · 10:02</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -3673,14 +3673,23 @@ function storyWords(txt){
 }
 // one answer box below the story: the paragraph is for reading, the box never loses focus
 let storyState=null;
-function gapLabel(g){return g.type==="verb"?g.inf:`= ${g.hint}`}
+const PERSON_OV={"p2:0":"yo","p2:1":"yo","p3:1":"yo","p5:0":"yo","p5:1":"yo","p5:3":"yo","p5:5":"yo","p6:7":"yo","p7:1":"yo","p7:2":"yo","p10:1":"yo","p10:2":"yo","p10:3":"yo","p10:4":"yo","p14:2":"yo","p14:3":"yo","p7:6":"nosotros","p1:1":"","p1:2":"","p6:1":"","p6:2":"","p13:2":""};
+const PERSON_IRR={fui:"yo",fuiste:"tú",fue:"él/ella",fuimos:"nosotros",fueron:"ellos",di:"yo",diste:"tú",dio:"él/ella",dimos:"nosotros",dieron:"ellos",vi:"yo",viste:"tú",vio:"él/ella",vimos:"nosotros",vieron:"ellos",hice:"yo",hiciste:"tú",hizo:"él/ella",hicimos:"nosotros",hicieron:"ellos",dije:"yo",dijo:"él/ella",dijimos:"nosotros",dijeron:"ellos",tuve:"yo",tuvo:"él/ella",tuvimos:"nosotros",tuvieron:"ellos",estuve:"yo",estuvo:"él/ella",estuvimos:"nosotros",estuvieron:"ellos",pude:"yo",pudo:"él/ella",pudimos:"nosotros",pudieron:"ellos",puse:"yo",puso:"él/ella",pusimos:"nosotros",pusieron:"ellos",quise:"yo",quiso:"él/ella",quisimos:"nosotros",quisieron:"ellos",supe:"yo",supo:"él/ella",vine:"yo",vino:"él/ella",vinimos:"nosotros",vinieron:"ellos",traje:"yo",trajo:"él/ella",trajimos:"nosotros",trajeron:"ellos",anduve:"yo",anduvo:"él/ella",detuvo:"él/ella",era:"él/ella",iba:"él/ella",eras:"tú","éramos":"nosotros","íbamos":"nosotros",eran:"ellos",iban:"ellos"};
+function gapPerson(stId,i,g){
+  const ov=PERSON_OV[stId+":"+i]; if(ov!==undefined) return ov;
+  const w=g.answers[0].toLowerCase().trim().split(" ").pop(); if(PERSON_IRR[w]) return PERSON_IRR[w];
+  if(/(é|í)$/.test(w)&&g.tense==="pret") return "yo"; if(/(aste|iste)$/.test(w)) return "tú"; if(/(ó|ió)$/.test(w)) return "él/ella";
+  if(/(amos|imos|ábamos|íamos)$/.test(w)) return "nosotros"; if(/(aron|ieron|yeron|aban|ían)$/.test(w)) return "ellos"; if(/(abas|ías)$/.test(w)) return "tú";
+  return "él/ella"; // -aba / -ía with the subject named in the text
+}
+function gapLabel(g){return g.type==="verb"?g.inf+(g.person?" · "+g.person:""):`= ${g.hint}`}
 function gapIsOk(k){const S=storyState, v=(S.vals[k]||"").trim(); return !!v&&S.gaps[k].answers.some(a=>norm(a)===norm(v))}
 function saveStoryDraft(){const S=storyState, d={}; S.vals.forEach((v,i)=>{if(v)d[i]=v}); d.a=S.att; d.r=S.revealed; ST.storyDraft[S.id]=d; saveLocal()}
 function renderStory(id){
   const st=STORIES.find(x=>x.id===id); if(!st) return renderStoryList();
   storyId=id; storyKind=st.kind; storyChecked=false; screen="story"; $("fb").hidden=true; chrome();
   $("title").textContent=st.title;
-  const {segs,gaps}=parseStory(st), d=ST.storyDraft[id]||{};
+  const {segs,gaps}=parseStory(st), d=ST.storyDraft[id]||{}; if(st.kind==="past") gaps.forEach((g,i)=>{if(g.type==="verb") g.person=gapPerson(st.id,i,g)});
   storyState={id,st,segs,gaps,vals:gaps.map((_,i)=>d[i]||""),att:d.a||{},revealed:d.r||{},cur:0};
   storyState.cur=Math.max(0,gaps.findIndex((_,k)=>!gapIsOk(k)));
   $("drill").innerHTML=`
@@ -3699,6 +3708,11 @@ function renderStory(id){
   const keep=(id,fn)=>{const b=$(id); b.addEventListener("pointerdown",e=>e.preventDefault()); b.addEventListener("click",fn)};
   keep("cGo",storySubmit); keep("cSkip",()=>storyMove(1,true)); keep("cShow",storyReveal);
   $("storyText").addEventListener("pointerdown",e=>{const g=e.target.closest(".gp"); if(g&&!storyChecked){e.preventDefault(); storyGo(+g.dataset.i)}});
+  // iOS raises the keyboard only for focus() called from a click, not from pointerdown, and tapping a box that already has focus does nothing; so if no keyboard is up, focus again on the click
+  const kbUp=()=>window.visualViewport?(innerHeight-visualViewport.height>120):true;
+  const reKb=()=>{ if(storyChecked||kbUp()) return; const a=$("ans"); a.blur(); a.focus({preventScroll:true}); focusEnd(a) };
+  $("storyText").addEventListener("click",e=>{ if(e.target.closest(".gp")) reKb() });
+  ans.addEventListener("click",reKb);
   storyUpdate(true);
 }
 function storyGo(k){const S=storyState; S.cur=k; $("ans").value=gapIsOk(k)?"":(S.vals[k]||""); $("cMsg").textContent=""; $("cMsg").className="cmsg"; storyUpdate(); focusEnd($("ans"))}
