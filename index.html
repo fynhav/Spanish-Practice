@@ -278,6 +278,7 @@ th{font-weight:600;color:var(--muted);font-size:.72rem}
 .ecard{font-size:1.12rem;line-height:2.05;padding:12px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);opacity:.32;transition:opacity .35s ease,box-shadow .35s ease}
 .ecard.cur{opacity:1;box-shadow:0 6px 22px rgba(42,38,32,.09);border-color:var(--pret)}
 .ecard.done{opacity:.6}
+#storyText.one .ss:not(.on){display:none}#storyText.one .ss.on{animation:efade .3s ease}#storyText.one{padding-top:3vh}
 .feed.one{padding-top:5vh}.feed.one .ecard:not(.cur){display:none}.feed.one .ecard.cur{animation:efade .3s ease}@keyframes efade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .ecard .t{cursor:pointer;border-radius:5px}
 .ecard .t.tapped{background:var(--line)}
@@ -907,7 +908,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-16 · 10:39</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-16 · 10:42</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -3700,7 +3701,7 @@ function renderStory(id){
   $("drill").innerHTML=`
     <div class="meta"><span class="pill ${st.kind==="past"?"pret":st.kind==="a1"?"pres":"both"}">${st.kind==="past"?"Past tense":st.kind==="b1"?"B1 tenses":st.kind==="a1"?"Present tense":"Pronouns"}</span><span class="sub" style="margin:0">${esc(st.en)} · ${gaps.length} gaps</span><span style="margin-left:auto">${spkBtn(segs.map(sg=>typeof sg==="string"?sg:(gaps[sg.i].answers[0]||"")).join(" "))}</span></div>
     <p class="hint" style="margin:0">${st.kind==="a1"?"Type each verb in the present tense. The infinitive is in brackets, and the person comes from the story.":st.kind==="past"?"Type each verb in the pretérito or imperfecto.":st.kind==="b1"?"Type each verb in the tense or mood the sentence needs. The infinitive is in brackets, and the person comes from the story.":"Type the object pronoun(s). The note says what each gap replaces."} Tap a gap to jump to it, or any word for its meaning.</p>
-    <p class="story" id="storyText">${segs.map(sg=>typeof sg==="string"?storyWords(sg):`<span class="gp" data-i="${sg.i}"></span><span class="ginf">(${esc(gapLabel(sg))})</span>`).join("")}</p>`;
+    <p class="story one" id="storyText">${segs.map(sg=>typeof sg==="string"?storyWords(sg):`<span class="gp" data-i="${sg.i}"></span><span class="ginf">(${esc(gapLabel(sg))})</span>`).join("")}</p>`;
   $("drill").insertAdjacentHTML("beforeend",transHTML(id));
   $("actions").innerHTML=`<div class="composer">
       <div class="cmeta"><span id="cLabel"></span><span class="cbtns"><button type="button" id="cShow">Show answer</button><button type="button" id="cSkip">Skip ›</button></span></div>
@@ -3718,12 +3719,23 @@ function renderStory(id){
   const reKb=()=>{ if(storyChecked||kbUp()) return; const a=$("ans"); a.blur(); a.focus({preventScroll:true}); focusEnd(a) };
   $("storyText").addEventListener("click",e=>{ if(e.target.closest(".gp")) reKb() });
   ans.addEventListener("click",reKb);
+  storyCards();
   storyUpdate(true);
+}
+function storyCards(){
+  const root=$("storyText"), groups=[]; let cur=[];
+  [...root.childNodes].forEach(n=>{cur.push(n); if(n.nodeType===1&&n.classList.contains("t")&&/[.!?]["”»)]*$/.test(n.textContent.trim())){groups.push(cur);cur=[]}});
+  if(cur.length) groups.push(cur);
+  const cards=[]; let pend=[];
+  groups.forEach(g=>{ const gaps=g.filter(n=>n.nodeType===1&&n.classList.contains("gp")).map(n=>+n.dataset.i); pend=pend.concat(g); if(gaps.length){cards.push({nodes:pend,gaps}); pend=[]} });
+  if(pend.length&&cards.length) cards[cards.length-1].nodes=cards[cards.length-1].nodes.concat(pend);
+  cards.forEach(c=>{const el=document.createElement("span"); el.className="ss"; root.insertBefore(el,c.nodes[0]); c.nodes.forEach(n=>el.appendChild(n)); c.el=el});
+  root._cards=cards;
 }
 function storyGo(k){const S=storyState; S.cur=k; $("ans").value=gapIsOk(k)?"":(S.vals[k]||""); $("cMsg").textContent=""; $("cMsg").className="cmsg"; storyUpdate(); focusEnd($("ans"))}
 function focusEnd(el){el.focus({preventScroll:true}); try{const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=getSelection(); s.removeAllRanges(); s.addRange(r)}catch(e){}}
 function storyUpdate(first){
-  const S=storyState;
+  const S=storyState; { const cs=$("storyText")._cards; if(cs) cs.forEach(c=>c.el.classList.toggle("on",c.gaps.includes(S.cur))) }
   document.querySelectorAll("#storyText .gp").forEach(el=>{
     const k=+el.dataset.i, v=S.vals[k], ok=gapIsOk(k);
     el.className="gp"+(k===S.cur&&!storyChecked?" cur":"")+(ok?(S.att[k]===false?" fixed":" ok"):(v?" bad":""));
@@ -3771,6 +3783,7 @@ function storyFinish(){
   storyChecked=true; checkStoryResults(S);
 }
 function checkStoryResults(S){
+  $("storyText").classList.remove("one");
   const st=S.st, n=S.gaps.length; let score=0; const wrong=[];
   document.querySelectorAll("#storyText .gp").forEach(el=>{
     const k=+el.dataset.i, g=S.gaps[k], ok=gapIsOk(k);
