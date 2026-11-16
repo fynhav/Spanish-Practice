@@ -829,7 +829,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 
 .sc-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
 .sc-opt.pic .sc-img{border-radius:12px}
-.sc-cr{margin:10px 0 0;text-align:center;font-size:.72rem;color:var(--muted)}
+.sc-cr{margin:10px 0 0;font-size:.72rem;color:var(--muted)}.sc-cr summary{text-align:center;cursor:pointer;list-style:none}.sc-cr summary::-webkit-details-marker{display:none}.sc-cr ul{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;line-height:1.35}.sc-cr a{color:var(--sn-d,inherit)}
 /* Reflexive verbs course */
 :root{--refl:#A24A6B;--refl-soft:#F4DEE6;--nr:#6C6552;--nr-soft:#ECE7D8}
 .pill.rf,.pill.rt,.pill.rw{background:var(--refl-soft);color:var(--refl)}
@@ -906,7 +906,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 18:45</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-15 · 19:02</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -5875,6 +5875,9 @@ function scLoadPhotos(){
       if(Object.keys(m).length&&navigator.onLine) setTimeout(()=>Object.values(m).forEach(x=>{try{fetch(SCBASE+"img/scn/"+x.f).catch(()=>{})}catch(e){}}),1500);
     }).catch(()=>{}) }catch(e){}
 }
+const scCredits=p=>{ const rows=p.words.map(w=>[w,SCPH[scSlug(w)]]).filter(x=>x[1]); if(!rows.length) return "";
+  const src=[...new Set(rows.map(x=>x[1].s||"Pexels"))].join(" and ");
+  return `<details class="sc-cr"><summary>Photos from ${esc(src)} · credits</summary><ul>${rows.map(([w,m])=>`<li><b>${esc(w[0])}</b> ${m.u?`<a href="${esc(m.u)}" target="_blank" rel="noopener">photo</a>`:"photo"}${m.by?" by "+esc(m.by):""}${m.l?" · "+esc(m.l):""}</li>`).join("")}</ul></details>` };
 const scPic=(w,c)=>{ const k=SCPH[scSlug(w)], u=w[8]||(k?SCBASE+"img/scn/"+k.f:""), ic=si(w[2],c);
   return u?`<img class="sc-img" src="${esc(u)}" alt="" loading="lazy" data-f="${esc(ic)}" onerror="this.outerHTML=this.dataset.f">`:ic };
 const SC={pack:null,en:true};
@@ -5939,7 +5942,7 @@ function scOpen(id){
      ${step("d","dlg","Dialogue",st.dlg?`Best ${st.dlg} of ${st.dl} gaps`:"Listen, then fill the gaps",st.dlg>=st.dl)}
     </div>
     <div class="sc-card sc-talk"><span class="sc-ic">${si("chat")}</span><span class="sc-tx"><b>Talk it through</b><small>${st.talk?`${st.talk} ${st.talk===1?"session":"sessions"} so far`:"Role-play it with a partner who answers back"}</small><span class="sc-two"><button type="button" class="sc-pill" data-talk="0">Guided</button><button type="button" class="sc-pill" data-talk="1">Blind</button></span></span></div>
-    <div class="vcard sc-note"><p class="label" style="margin:0 0 4px">Good to know</p><p class="sc-nt">${esc(p.note)}</p></div>${Object.keys(SCPH).length?`<p class="sc-cr">Photos from ${esc([...new Set(Object.values(SCPH).map(x=>x.s||"Pexels"))].join(" and "))}</p>`:""}</div>`;
+    <div class="vcard sc-note"><p class="label" style="margin:0 0 4px">Good to know</p><p class="sc-nt">${esc(p.note)}</p></div>${scCredits(p)}</div>`;
   $("drill").onclick=e=>{
     const b=e.target.closest("[data-k]"), t=e.target.closest("[data-talk]");
     if(t){haptic(8); scTalk(p.id,t.dataset.talk==="1"); return}
