@@ -23,7 +23,7 @@ Q = {
  "la-ensalada": ["green salad bowl", "salad"], "la-sopa": ["bowl of soup", "vegetable soup"],
  "la-carne": ["steak plate", "grilled meat"], "el-pollo": ["roast chicken", "grilled chicken"],
  "el-pescado": ["grilled fish plate", "fish dish"], "el-arroz": ["rice dish", "bowl of rice"],
- "las-patatas": ["potatoes", "french fries"], "las-verduras": ["assorted vegetables", "vegetables market stall"],
+ "las-patatas": ["potatoes", "french fries"], "las-verduras": ["mixed fresh vegetables", "vegetables basket carrots tomatoes"],
  "el-queso": ["cheese wheel", "cheese slices"], "el-huevo": ["fried egg", "egg"],
  "el-postre": ["dessert", "dessert cake plate"], "el-helado": ["ice cream cone", "ice cream"],
  "picante": ["red chili pepper", "chilli peppers pods"], "vegetariano": ["vegetarian food", "vegetable dish plate"]}
