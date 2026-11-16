@@ -25,5 +25,12 @@
  "el-huevo": 2,
  "el-postre": 1,
  "el-helado": 7,
- "vegetariano": 0
+ "vegetariano": 0,
+ "el-plato": 3,
+ "la-sopa": 5,
+ "las-verduras": 7,
+ "el-queso": 1,
+ "el-tenedor": 1,
+ "el-pan": 3,
+ "picante": 7
 }
