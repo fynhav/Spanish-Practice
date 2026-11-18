@@ -599,6 +599,15 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .m-nf i{background:var(--plup)} .m-nt i{background:var(--plup)} .m-nw i{background:var(--plup)}
 .pill.cf,.pill.ct,.pill.cw{background:var(--cn-soft);color:var(--cn)}
 .m-cf i{background:var(--cn)} .m-ct i{background:var(--cn)} .m-cw i{background:var(--cn)}
+:root{--tm:#2E6F6B;--tm-soft:#DCEDEB;--dm:#B0651F;--dm-soft:#F6E4CF;--dmm:#2F5FA8;--dmm-soft:#DCE6F5;--dmf:#A24A6B;--dmf-soft:#F4DEE6}
+.pill.dm1,.pill.dm2,.pill.dm3{background:var(--dm-soft);color:var(--dm)}.m-dm1 i,.m-dm2 i,.m-dm3 i{background:var(--dm)}
+.chip.dm{background:var(--dm-soft);color:var(--dm);box-shadow:inset 0 -2px 0 var(--dm)}.tag.dm{color:var(--dm)}.dot.dm{background:var(--dm)}.dm-t{color:var(--dm)}.tile.r-dm{background:var(--dm-soft);color:var(--dm);border-color:var(--dm)}
+.chip.tm{background:var(--tm-soft);color:var(--tm);box-shadow:inset 0 -2px 0 var(--tm)}.tag.tm{color:var(--tm)}.tm-t{color:var(--tm)}.tmnote{display:block;margin-top:2px;font-size:.92rem;color:var(--muted)}
+.dm-m{color:var(--dmm);font-weight:700}.dm-f{color:var(--dmf);font-weight:700}
+.dmdia{width:100%;height:auto;display:block;background:var(--card);border:1px solid var(--line);border-radius:14px}.dmdia text{font-family:inherit}
+.dmdia .dt{font-size:12.5px;font-weight:600;fill:var(--ink)}.dmdia .ds{font-size:10.5px;fill:var(--muted)}.dmdia .db{font-size:15px;font-weight:700}.dmdia .dh{font-size:11px;font-weight:700;letter-spacing:.06em;fill:var(--muted)}
+.dmdia .ms{fill:#2F5FA8}.dmdia .fs{fill:#A24A6B}.dmdia .em{font-size:24px}
+.intro .dmdia{flex:none}
 .chip.fut{background:var(--fut-soft);color:var(--fut);box-shadow:inset 0 -2px 0 var(--fut)} .tag.fut{color:var(--fut)} .dot.fut{background:var(--fut)} .fut-t{color:var(--fut)} .tile.r-fut{background:var(--fut-soft);color:var(--fut);border-color:var(--fut)}
 .chip.cond{background:var(--cond-soft);color:var(--cond);box-shadow:inset 0 -2px 0 var(--cond)} .tag.cond{color:var(--cond)} .dot.cond{background:var(--cond)} .cond-t{color:var(--cond)} .tile.r-cond{background:var(--cond-soft);color:var(--cond);border-color:var(--cond)}
 .chip.plup{background:var(--plup-soft);color:var(--plup);box-shadow:inset 0 -2px 0 var(--plup)} .tag.plup{color:var(--plup)} .dot.plup{background:var(--plup)} .plup-t{color:var(--plup)} .tile.r-plup{background:var(--plup-soft);color:var(--plup);border-color:var(--plup)}
@@ -908,7 +917,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-18 · 11:10</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-18 · 11:32</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -976,6 +985,14 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <div><h3><span class="dot cn"></span>Contrast and cause</h3><p><i>pero</i> = but. <i>sino</i> = but rather, after a negative (<i>No quiero té, sino café</i>). <i>aunque</i> = although. <i>porque / ya que / como</i> = because. <i>así que / por eso</i> = so.</p></div>
         <div><h3><span class="dot cn"></span>Por and para</h3><p><i>por</i>: cause, through, duration, exchange, means (<i>por teléfono, gracias por</i>). <i>para</i>: purpose, deadline, destination, recipient (<i>para ti, para aprobar</i>).</p></div>
         <div><h3><span class="dot cn"></span>Relatives</h3><p><i>que</i> (people or things), <i>quien</i> (people, after a preposition), <i>donde</i> (place), <i>lo que</i> (what), <i>cuyo</i> (whose, agrees with the thing owned).</p></div>
+      </div>
+      <div id="rulesDem" class="rules" hidden>
+        <h3 class="sec">This, that, that over there</h3>
+        <div id="demRuleDia"></div>
+        <div><h3><span class="dot dm"></span>Three distances</h3><p><b>este</b> = this, near me (<i>aquí</i>). <b>ese</b> = that, near you (<i>ahí</i>). <b>aquel</b> = that over there, far from both of us (<i>allí</i>).</p></div>
+        <div><h3><span class="dot dm"></span>Four forms each</h3><p>The word copies the noun: <span class="dm-m">masculine</span> or <span class="dm-f">feminine</span>, singular or plural. <i>este libro, esta casa, estos libros, estas casas</i>. Same for <i>ese</i> and <i>aquel</i>.</p></div>
+        <div><h3><span class="dot dm"></span>Gender of the noun</h3><p>Usually <b>-o</b> = masculine and <b>-a</b> = feminine. Always feminine: <b>-ción, -dad, -tad</b>. Exceptions to learn: <i>el día, el mapa, el problema, la mano, la foto</i>. <b>-e</b> nouns vary: <i>el coche, la noche</i>. <i>Agua</i> is feminine: <i>esta agua</i>.</p></div>
+        <div><h3><span class="dot dm"></span>Without a noun</h3><p>You can drop the noun: <i>¿Cuál quieres? Este.</i> For an idea or something unnamed use <b>esto / eso / aquello</b>: <i>¿Qué es esto?</i></p></div>
       </div>
       <div id="rulesRefl" class="rules" hidden>
         <h3 class="sec">Reflexive verbs</h3>
@@ -1390,7 +1407,7 @@ function makePronT(kind,[forms,o],tense,r,day){
     :two?"The pronoun can go before the first verb or attach to the infinitive/-ndo form. Either is accepted."
     :tense==="perf"?"Put the pronoun before haber (he, has, ha, hemos, han).":"";
   const tl=neg?"Negative command":PT_LABEL[tense]||"";
-  return {kind:"pron",full,short,display,accept:acceptRaw.map(norm),acceptRaw,extra,tiles:shuf(words,r).map(x=>x),note:tnote,tn:tense,tl,tip,...pronEN2(kind,forms,o,rc,p,subj,tense,neg,aux&&aux.id,cueEN)};
+  return {kind:"pron",cueN:cue?cue.split(" ").length:0,full,short,display,accept:acceptRaw.map(norm),acceptRaw,extra,tiles:shuf(words,r).map(x=>x),note:tnote,tn:tense,tl,tip,...pronEN2(kind,forms,o,rc,p,subj,tense,neg,aux&&aux.id,cueEN)};
 }
 function genPron(kind,count,seed){
   const r=rng(seed), n=kind==="both"?5:10, pairs=[];
@@ -1621,6 +1638,10 @@ const COURSES={
     {key:"pret",n:10,name:"Pretérito",pill:"Part 1 · Pretérito",rule:`Finished actions at a specific time take the <b class="pret-t">pretérito</b>: <b class="pret-t">ayer, anoche, el sábado pasado, una vez</b>.`,ex:"Ayer (yo) ___ (comer) paella → comí"},
     {key:"imp",n:10,name:"Imperfecto",pill:"Part 2 · Imperfecto",rule:`Habits, repeated actions and background take the <b class="imp-t">imperfecto</b>: <b class="imp-t">siempre, todos los días, antes, normalmente</b>.`,ex:"Siempre (yo) ___ (comer) paella → comía"},
     {key:"mix",n:5,typing:true,name:"Choose the tense",pill:"Part 3 · Mixed",rule:`Decide which tense fits, then type the form. Look for the time phrase, or for an action that gets interrupted.`,ex:"Mientras (yo) ___ (leer), sonó el teléfono → leía"}]},
+  dem:{name:"This, that, that over there",short:"This & that",sub:"este · ese · aquel",cc:"dm",days:3,parts:[
+    {key:"dm1",n:8,name:"Match the noun",pill:"Part 1 · Match",rule:`The word copies the noun’s <b>gender</b> and <b>number</b>: <span class="dm-m">masculine</span> <i>libro</i> → <b>este</b>, <span class="dm-f">feminine</span> <i>casa</i> → <b>esta</b>. Plural: <b>estos</b>, <b>estas</b>.`,ex:"Aquí, ___ casa me gusta → esta"},
+    {key:"dm2",n:8,name:"Clues and tricky nouns",pill:"Part 2 · Clues",rule:`Clue words show the distance: <b>aquí</b> = near me (<b>este</b>), <b>ahí</b> = near you (<b>ese</b>), <b>allí</b> = far from both (<b>aquel</b>). Tricky nouns keep their own gender: <i>este problema, esta mano</i>.`,ex:"Allí, ___ coche es grande → aquel"},
+    {key:"dm3",n:4,typing:true,name:"Write it",pill:"Part 3 · Write it",rule:`Type the right word. Check the noun’s gender and number first, then the clue word.`,ex:"¿Ves ___ casas allí? → aquellas"}]},
   subj:{name:"Subjunctive and commands",short:"Subjunctive",sub:"quiero que · no hables",cc:"subj",days:20,parts:[
     {key:"sf",n:8,name:"The forms",pill:"Part 1 · Forms",rule:`After a trigger like <i>quiero que</i>, the verb switches to the <b class="subj-t">present subjunctive</b>: take the <i>yo</i> form, drop <i>-o</i> and add the opposite vowel (<i>-ar → e</i>, <i>-er/-ir → a</i>).`,ex:"Quiero que (tú) ___ (hablar) más despacio → hables"},
     {key:"st",n:8,name:"Subjunctive or indicative",pill:"Part 2 · Which mood",rule:`Wishes, feelings, doubt and things that have not happened yet take the <b class="subj-t">subjunctive</b>. Facts, beliefs and certainty take the <b class="ind-t">indicative</b>.`,ex:"Creo que (tú) ___ (tener) razón → tienes"},
@@ -1642,7 +1663,7 @@ const COURSES={
     {key:"rt",n:4,name:"Reflexive or not?",pill:"Part 2 · Which one",rule:`If the action goes to <b class="refl-t">yourself</b>, use the pronoun (<i>me despierto</i>). If it goes to <b class="nr-t">someone or something else</b>, drop it (<i>despierto a mi hijo</i>).`,ex:"(yo) ___ (despertar) a mi hijo → despierto"},
     {key:"rw",n:2,typing:true,name:"Write it",pill:"Part 3 · Write it",rule:`Longer sentences in the present, the pretérito and <i>ir a</i>. The pronoun goes before the verb, or joins the infinitive: <i>voy a levantarme</i>.`,ex:"Ayer (yo) ___ (levantarse) tarde → me levanté"}]}
 };
-const GEN_READY={fut:1,narr:1,conn:1,refl:1};
+const GEN_READY={fut:1,narr:1,conn:1,refl:1,dem:1};
 Object.keys(GEN_READY).forEach(k=>{if(!GEN_READY[k]) delete COURSES[k]});
 const daysOf=c=>COURSES[c].days||DAYS;
 const dN=c=>Object.keys(ST[c].done).filter(d=>+d>=1&&+d<=daysOf(c)).length;
@@ -2434,6 +2455,108 @@ const POOL={
   subj:{sf:SUBJ_DATA.filter(r=>r[8]===1).map(subjItem),st:SUBJ_DATA.filter(r=>r[8]===2).map(subjItem),sw:SUBJ_DATA.filter(r=>r[8]===3).map(subjItem)},
   past:{pret:shuf(bankItems(BANK_PRET,"pret",rng(41)),rng(404)),imp:shuf(bankItems(BANK_IMP,"imp",rng(42)),rng(505)),mix:[]}
 };
+const DEM_N=[ // es, gender, plural, en, en plural, note (tricky gender), no plural
+ ["libro","m","libros","book","books"],["coche","m","coches","car","cars","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>el coche, el billete, el nombre</i> but <i>la noche, la calle, la llave</i>."],["vaso","m","vasos","glass","glasses"],["plato","m","platos","plate","plates"],["perro","m","perros","dog","dogs"],["zapato","m","zapatos","shoe","shoes"],["cuaderno","m","cuadernos","notebook","notebooks"],["billete","m","billetes","ticket","tickets","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>el coche, el billete, el nombre</i> but <i>la noche, la calle, la llave</i>."],["teléfono","m","teléfonos","phone","phones"],["árbol","m","árboles","tree","trees"],["nombre","m","nombres","name","names","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>el coche, el billete, el nombre</i> but <i>la noche, la calle, la llave</i>."],["café","m","cafés","coffee","coffees"],
+ ["casa","f","casas","house","houses"],["mesa","f","mesas","table","tables"],["silla","f","sillas","chair","chairs"],["puerta","f","puertas","door","doors"],["ventana","f","ventanas","window","windows"],["camisa","f","camisas","shirt","shirts"],["botella","f","botellas","bottle","bottles"],["bolsa","f","bolsas","bag","bags"],["tienda","f","tiendas","shop","shops"],["playa","f","playas","beach","beaches"],["carta","f","cartas","letter","letters"],["lámpara","f","lámparas","lamp","lamps"],
+ ["día","m","días","day","days","<b>Día</b> ends in <b>-a</b> but is <b>masculine</b>: <i>el día, este día</i>. So do <i>mapa, problema, idioma, tema, sistema, programa</i> (mostly words from Greek)."],["mapa","m","mapas","map","maps","<b>Mapa</b> ends in <b>-a</b> but is <b>masculine</b>: <i>el mapa, este mapa</i>. So do <i>día, problema, idioma, tema, sistema, programa</i>."],["problema","m","problemas","problem","problems","<b>Problema</b> ends in <b>-a</b> but is <b>masculine</b>: <i>el problema, este problema</i>. So do <i>día, mapa, idioma, tema, sistema, programa</i>."],["idioma","m","idiomas","language","languages","<b>Idioma</b> ends in <b>-a</b> but is <b>masculine</b>: <i>el idioma, este idioma</i>. So do <i>día, mapa, problema, tema, sistema, programa</i>."],["tema","m","temas","topic","topics","<b>Tema</b> ends in <b>-a</b> but is <b>masculine</b>: <i>el tema, este tema</i>. So do <i>día, mapa, problema, idioma, sistema, programa</i>."],["sistema","m","sistemas","system","systems","<b>Sistema</b> ends in <b>-a</b> but is <b>masculine</b>: <i>el sistema, este sistema</i>. So do <i>día, mapa, problema, idioma, tema, programa</i>."],["programa","m","programas","program","programs","<b>Programa</b> ends in <b>-a</b> but is <b>masculine</b>: <i>el programa, este programa</i>. So do <i>día, mapa, problema, idioma, tema, sistema</i>."],["sofá","m","sofás","sofa","sofas","<b>Sofá</b> is <b>masculine</b> (<i>el sofá</i>). Nouns ending in a stressed vowel are not covered by the -o/-a rule."],["lápiz","m","lápices","pencil","pencils","<b>Lápiz</b> is <b>masculine</b> (<i>el lápiz</i>). Its plural changes z → c: <i>lápices</i>."],
+ ["mano","f","manos","hand","hands","<b>Mano</b> ends in <b>-o</b> but is <b>feminine</b>: <i>la mano, esta mano</i>. So do <i>la foto, la moto</i> (short for fotografía, motocicleta)."],["foto","f","fotos","photo","photos","<b>Foto</b> ends in <b>-o</b> but is <b>feminine</b>: <i>la foto, esta foto</i>. So do <i>la mano, la moto</i>."],["moto","f","motos","motorbike","motorbikes","<b>Moto</b> ends in <b>-o</b> but is <b>feminine</b>: <i>la moto, esta moto</i>. So do <i>la mano, la foto</i>."],["agua","f","aguas","water","waters","<b>Agua</b> is <b>feminine</b>. It takes <i>el</i> in the singular (<i>el agua</i>) only for the sound, but the demonstrative stays feminine: <i>esta agua</i>.",1],["noche","f","noches","night","nights","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>la noche, la calle, la llave</i> but <i>el coche, el billete</i>."],["calle","f","calles","street","streets","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>la calle, la llave, la noche</i> but <i>el coche, el billete</i>."],["llave","f","llaves","key","keys","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>la llave, la calle, la noche</i> but <i>el coche, el billete</i>."],["clase","f","clases","class","classes","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>la clase, la llave</i> but <i>el coche, el nombre</i>."],["leche","f","leches","milk","milks","Nouns ending in <b>-e</b> can be either gender, so learn each one: <i>la leche, la llave</i> but <i>el coche, el nombre</i>.",1],["flor","f","flores","flower","flowers","<b>Flor</b> is <b>feminine</b> (<i>la flor</i>). Nouns ending in <b>-r</b> are usually masculine, so this one is an exception to learn."],["luz","f","luces","light","lights","Nouns ending in <b>-z</b> are mostly <b>feminine</b>: <i>la luz, la voz, la vez</i>. The plural changes z → c: <i>luces</i>."],["canción","f","canciones","song","songs","Nouns ending in <b>-ción</b> are always <b>feminine</b>: <i>la canción, la estación</i>."],["ciudad","f","ciudades","city","cities","Nouns ending in <b>-dad</b> are always <b>feminine</b>: <i>la ciudad, la verdad</i>."],["estación","f","estaciones","station","stations","Nouns ending in <b>-ción</b> are always <b>feminine</b>: <i>la estación, la canción</i>."]];
+const DEM_F={ // distance → forms by gender + number
+ near:{ms:"este",fs:"esta",mp:"estos",fp:"estas"}, there:{ms:"ese",fs:"esa",mp:"esos",fp:"esas"}, far:{ms:"aquel",fs:"aquella",mp:"aquellos",fp:"aquellas"}};
+const DEM_D={near:["near <b>me</b>","aquí"],there:["near <b>you</b> (or a little further away)","ahí"],far:["far from <b>both of us</b>","allí"]};
+const DEM_FR={ // es [singular, plural] with @ for the noun · en [singular, plural] with {D} {N}
+ near:[
+  [["{Aquí}, _ @ me gusta mucho.","{Aquí}, _ @ me gustan mucho."],["Here, I really like {D} {N}.","Here, I really like {D} {N}."],1],
+  [["{Mira}, _ @ es muy interesante.","{Mira}, _ @ son muy interesantes."],["Look, {D} {N} is very interesting.","Look, {D} {N} are very interesting."],1],
+  [["{Aquí en la tienda}, _ @ cuesta poco.","{Aquí en la tienda}, _ @ cuestan poco."],["Here in the shop, {D} {N} costs very little.","Here in the shop, {D} {N} cost very little."]],
+  [["¿Cuánto cuesta _ @ {de aquí}?","¿Cuánto cuestan _ @ {de aquí}?"],["How much does {D} {N} here cost?","How much do {D} {N} here cost?"]],
+  [["{Aquí}, _ @ es muy importante.","{Aquí}, _ @ son muy importantes."],["Here, {D} {N} is very important.","Here, {D} {N} are very important."],1]],
+ there:[
+  [["{Ahí, cerca de ti}, _ @ es muy importante.","{Ahí, cerca de ti}, _ @ son muy importantes."],["There, near you, {D} {N} is very important.","There, near you, {D} {N} are very important."],1],
+  [["¿Me pasas _ @ {que tienes ahí}?","¿Me pasas _ @ {que tienes ahí}?"],["Can you pass me {D} {N} you have there?","Can you pass me {D} {N} you have there?"]],
+  [["¿De quién es _ @ {que está ahí}?","¿De quién son _ @ {que están ahí}?"],["Whose is {D} {N} there?","Whose are {D} {N} there?"]],
+  [["{Ahí a tu lado}, _ @ me gusta mucho.","{Ahí a tu lado}, _ @ me gustan mucho."],["There beside you, I really like {D} {N}.","There beside you, I really like {D} {N}."],1],
+  [["¿Cuánto cuesta _ @ {que tienes ahí}?","¿Cuánto cuestan _ @ {que tienes ahí}?"],["How much does {D} {N} you have there cost?","How much do {D} {N} you have there cost?"]]],
+ far:[
+  [["{Allí, al fondo}, _ @ es muy importante.","{Allí, al fondo}, _ @ son muy importantes."],["Over there at the back, {D} {N} is very important.","Over there at the back, {D} {N} are very important."],1],
+  [["¿Ves _ @ {que está allí}?","¿Ves _ @ {que están allí}?"],["Do you see {D} {N} over there?","Do you see {D} {N} over there?"]],
+  [["{Allá lejos}, _ @ me gusta mucho.","{Allá lejos}, _ @ me gustan mucho."],["Far away, I really like {D} {N}.","Far away, I really like {D} {N}."],1],
+  [["{Mira allí}: _ @ es muy interesante.","{Mira allí}: _ @ son muy interesantes."],["Look over there: {D} {N} is very interesting.","Look over there: {D} {N} are very interesting."],1],
+  [["¿De quién es _ @ {de allá}?","¿De quién son _ @ {de allá}?"],["Whose is {D} {N} over there?","Whose are {D} {N} over there?"]]]};
+const DEM_EN={near:["this","these"],there:["that","those"],far:["that","those"]};
+function genDem(){
+  const r=rng(777), ABS=new Set(["día","problema","idioma","tema","sistema","programa","ciudad","calle","playa","estación","noche","canción","luz","clase"]), nn=DEM_N.map(([es,g,pl,en,enPl,nt,np])=>({es,g,pl,en,enPl,nt:nt||"",np:!!np,ab:ABS.has(es)}));
+  const reg=nn.filter(n=>!n.nt||/-e<\/b> can be either/.test(n.nt)&&0), tri=nn.filter(n=>n.nt);
+  const out={dm1:[],dm2:[],dm3:[]}, DS=["near","there","far"];
+  const mk=(n,num,dist,fi,kind,alsoD)=>{
+    const g=n.g, og=g==="m"?"f":"m", pl=num==="p", on=pl?"s":"p", FL=DEM_FR[dist].filter(f=>!n.ab||f[2]), fr=FL[fi%FL.length];
+    const ans=DEM_F[dist][g+num], alt0=DEM_F[dist][og+num];
+    let alt=alt0, x;
+    if(kind==="dist"){const o=alsoD.filter(d=>d!==dist); alt=DEM_F[o[0]][g+num]; x=[DEM_F[dist][og+num],DEM_F[o[0]][og+num]]; if(o[1]) x=[DEM_F[o[1]][g+num],DEM_F[dist][og+num]]}
+    else x=[DEM_F[dist][g+on],DEM_F[dist][og+on]];
+    const sent=fr[0][pl?1:0].replace("@",pl?n.pl:n.es), en=fr[1][pl?1:0].replace("{D}",DEM_EN[dist][pl?1:0]).replace("{N}",pl?n.enPl:n.en);
+    const it=parseHand([sent,"",ans,alt,"dm",""]);
+    it.sj=1; it.mood="dm"; it.altTag="dm"; it.en=en; it.tileWords=[ans,alt,...x]; it.dm={n:pl?n.pl:n.es,sg:n.es,g,num,dist,alt,kind,nt:n.nt};
+    return it};
+  for(let d=0;d<3;d++){
+    const used=new Set(), avail=DS.slice(0,d+1);
+    const take=(list,g)=>{const c=list.filter(n=>!used.has(n.es)&&(!g||n.g===g)); const n=c[Math.floor(r()*c.length)]||list.filter(n=>!g||n.g===g)[0]; used.add(n.es); return n};
+    const pickNum=(n,want)=>n.np?"s":want;
+    // part 1: only this day's distance, balanced over ms/fs/mp/fp
+    const combos=shuf(["ms","fs","mp","fp","ms","fs","mp","fp"],r);
+    for(let i=0;i<8;i++){const g=combos[i][0], num=combos[i][1], n=take(reg,g); out.dm1.push(mk(n,pickNum(n,num),DS[d],i+d,"gender"))}
+    // part 2: tricky nouns; day 1 near only, then the clue decides between distances
+    const t2=shuf(tri.slice(),r), pc=shuf(["ms","fs","mp","fp","ms","fs","mp","fp"],r);
+    for(let i=0;i<8;i++){const n=take(t2,null), dist=avail[(i+d)%avail.length]; out.dm2.push(mk(n,pickNum(n,pc[i][1]==="p"?"p":"s"),dist,i+2*d+1,avail.length>1?"dist":"gender",avail))}
+    // part 3: typed, mixed
+    const all=shuf(nn.slice(),r);
+    for(let i=0;i<4;i++){const n=take(all,null), dist=avail[(i+1+d)%avail.length]; out.dm3.push(mk(n,pickNum(n,i%2?"p":"s"),dist,i+3*d,"gender",avail))}
+  }
+  return out;
+}
+function whyDem(it){
+  const m=it.dm, G=m.g==="m"?"masculine":"feminine", gc=m.g==="m"?"dm-m":"dm-f", N=m.num==="p"?"plural":"singular";
+  const l1=`<div><span class="dot dm"></span><span><b>${esc(m.n)}</b> is <span class="${gc}">${G}</span> ${N} → <b class="dm-t">${esc(it.ans)}</b>.${m.nt&&m.num?` ${m.nt}`:""}</span></div>`;
+  const l2=`<div><span class="dot"></span><span>${m.kind==="dist"?`Clue <b>${DEM_D[m.dist][1]}</b>: ${DEM_D[m.dist][0]}. <i>${esc(m.alt)}</i> would point somewhere else.`:`This one points ${DEM_D[m.dist][0]}. <i>${esc(m.alt)}</i> is the ${G==="masculine"?"feminine":"masculine"} form.`}</span></div>`;
+  return l1+l2;
+}
+// ---- diagrams
+const demText=(x,y,t,c="dt",a="middle")=>`<text x="${x}" y="${y}" text-anchor="${a}" class="${c}">${t}</text>`;
+const demPerson=(x,y,col,lab)=>`<circle cx="${x}" cy="${y}" r="9" fill="${col}"/><path d="M${x-14} ${y+32} q0 -21 14 -21 q14 0 14 21z" fill="${col}"/>${demText(x,y+46,lab,"ds")}`;
+const demRing=(cx,cy,rx,ry,col)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${col}" fill-opacity=".13" stroke="${col}" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+const demObj=(x,y,emo,form,en)=>`<text x="${x}" y="${y}" text-anchor="middle" class="em">${emo}</text>${demText(x,y+17,form,"dt")}${en?demText(x,y+30,en,"ds"):""}`;
+function demGrid(dist,y0,ex){ // 2 x 2 table of the four forms for one distance
+  const F=DEM_F[dist], X=88, W=130, rows=[["m","masculine","ms"],["f","feminine","fs"]];
+  let s=demText(X+W/2,y0+14,"SINGULAR","dh")+demText(X+W*1.5+8,y0+14,"PLURAL","dh");
+  rows.forEach(([g,lab,cl],i)=>{const y=y0+24+i*58;
+    s+=`<rect x="10" y="${y}" width="340" height="52" rx="10" fill="var(--${g==="m"?"dmm":"dmf"}-soft)"/>`+demText(20,y+31,lab,"dt","start").replace('class="dt"',`class="dt ${cl}"`);
+    [["s",X+W/2,ex[g][0]],["p",X+W*1.5+8,ex[g][1]]].forEach(([nm,cx,e])=>{s+=demText(cx,y+23,F[g+nm],"db "+cl)+demText(cx,y+41,e,"ds")})});
+  return s}
+function demTable(y0){ // all twelve forms
+  const rows=[["near","aquí"],["there","ahí"],["far","allí"]], cols=[["ms","masc."],["fs","fem."],["mp","masc. pl."],["fp","fem. pl."]];
+  let s=cols.map(([k,l],i)=>demText(112+i*62,y0+14,l.toUpperCase(),"dh")).join("");
+  rows.forEach(([d,w],i)=>{const y=y0+22+i*40; s+=`<rect x="10" y="${y}" width="340" height="34" rx="9" fill="var(--dm-soft)" fill-opacity="${.55+i*.15}"/>`+demText(20,y+22,w,"dt","start")+cols.map(([k],j)=>demText(112+j*62,y+22,DEM_F[d][k],"dt "+(k[0]==="m"?"ms":"fs"))).join("")});
+  return s}
+function demDia(day,pi){
+  const O="#B0651F", T="#2E6F6B", B="#5A5A8A", E={near:{m:["este libro","esta casa"],f:["",""]}};
+  const exN={m:["este libro","estos libros"],f:["esta casa","estas casas"]}, exT={m:["ese coche","esos coches"],f:["esa mesa","esas mesas"]}, exF={m:["aquel árbol","aquellos árboles"],f:["aquella casa","aquellas casas"]};
+  const svg=(h,b,l)=>`<svg class="dmdia" viewBox="0 0 360 ${h}" role="img" aria-label="${l}">${b}</svg>`;
+  if(day===3&&pi>0) return svg(170,demTable(6),"All twelve forms");
+  if(pi>0) return svg(172,demGrid(day===1?"near":"there",4,day===1?exN:exT),day===1?"este, esta, estos, estas":"ese, esa, esos, esas");
+  if(day===1){
+    const sc=demRing(170,58,158,50,O)+demPerson(46,30,O,"yo")+demObj(150,52,"📖","este libro","this book")+demObj(232,52,"🏠","esta casa","this house")+demText(190,24,"aquí","db").replace('class="db"','class="db" fill="'+O+'"');
+    return svg(300,sc+demGrid("near",122,exN)+demText(180,292,"-o → masculine · -a → feminine (día, mapa, mano are exceptions)","ds"),"This: este, esta, estos, estas, for things near me");
+  }
+  if(day===2){
+    const sc=demRing(100,58,92,50,O)+demRing(262,58,92,50,T)+demPerson(30,30,O,"yo")+demPerson(330,30,T,"tú")+demObj(105,52,"📖","este libro","near me")+demObj(255,52,"📖","ese libro","near you")+demText(100,25,"aquí","db").replace('class="db"','class="db" fill="'+O+'"')+demText(262,25,"ahí","db").replace('class="db"','class="db" fill="'+T+'"');
+    return svg(300,sc+demGrid("there",122,exT)+demText(180,292,"ese = near you, or a little further away from me","ds"),"That: ese, esa, esos, esas, for things near you");
+  }
+  const sc=`<rect x="8" y="10" width="112" height="96" rx="12" fill="${O}" fill-opacity=".14"/><rect x="124" y="10" width="112" height="96" rx="12" fill="${T}" fill-opacity=".14"/><rect x="240" y="10" width="112" height="96" rx="12" fill="${B}" fill-opacity=".14"/>`+
+    demPerson(24,22,O,"yo").replace(/<text[^>]*>yo<\/text>/,"")+demObj(76,48,"📖","este libro","near me")+demObj(180,48,"📖","ese libro","near you")+demObj(296,48,"🏠","aquella casa","far away")+
+    demText(64,26,"AQUÍ","dh")+demText(180,26,"AHÍ","dh")+demText(296,26,"ALLÍ","dh")+
+    `<path d="M20 98 H340" stroke="var(--muted)" stroke-width="1.5"/><path d="M340 98 l-7 -4 v8z" fill="var(--muted)"/>`+demText(180,120,"increasing distance from me →","ds");
+  return svg(318,sc+demGrid("far",136,exF)+demText(180,308,"aquel has no -s: aquel · aquella · aquellos · aquellas","ds"),"That over there: aquel, aquella, aquellos, aquellas, for things far from both of us");
+}
+POOL.dem=genDem();
 (()=>{ // mixed past: realistic sentences where the clue alone decides the tense, five a day (2–3 of each tense)
   const r=rng(606), key=it=>JSON.stringify(it.tokens), used=new Set([...POOL.past.pret,...POOL.past.imp].map(key));
   const all=shuf([...HAND.map(parseHand),...bankItems(BANK_MIX,"pret",rng(43))],r).filter(it=>{const k=key(it); if(used.has(k)) return false; used.add(k); return true});
@@ -2524,7 +2647,7 @@ bindSeg("segMode","mode"); bindSeg("segView","view"); bindSeg("segVibe","vibe");
 function openOv(which){
   $("ovTitle").textContent=which==="rules"?"Rules":"Settings";
   $("rulesPart").hidden=which!=="rules"; $("settingsPart").hidden=which==="rules";
-  $("rulesPron").hidden=!!course&&course!=="pron"; $("rulesPast").hidden=!!course&&course!=="past"; $("rulesSubj").hidden=course!=="subj"; $("rulesFut").hidden=course!=="fut"; $("rulesNarr").hidden=course!=="narr"; $("rulesConn").hidden=course!=="conn"; $("rulesRefl").hidden=course!=="refl";
+  $("rulesPron").hidden=!!course&&course!=="pron"; $("rulesPast").hidden=!!course&&course!=="past"; $("rulesSubj").hidden=course!=="subj"; $("rulesFut").hidden=course!=="fut"; $("rulesNarr").hidden=course!=="narr"; $("rulesConn").hidden=course!=="conn"; $("rulesRefl").hidden=course!=="refl"; $("rulesDem").hidden=course!=="dem"; if(course==="dem") $("demRuleDia").innerHTML=demDia(3,0);
   $("ov").hidden=false; if(which!=="rules"&&typeof railUI==="function") railUI(); $("ov").querySelector(".panel").scrollTop=0; $("closeOv").focus();
 }
 $("openRules").onclick=()=>openOv("rules");
@@ -3171,7 +3294,7 @@ function renderIntro(pi){
   screen="intro"; $("fb").hidden=true; chrome();
   const p=parts()[pi];
   $("drill").innerHTML=`<div class="intro"><span class="pill ${p.key}" style="align-self:flex-start">${p.pill} · ${p.n} sentences</span>
-    <h2>${p.name}</h2><div class="rule">${p.rule}<div class="ex" style="margin-top:8px"><i>${esc(p.ex)}</i></div></div></div>`;
+    <h2>${p.name}</h2>${course==="dem"?demDia(day,pi):""}<div class="rule">${p.rule}<div class="ex" style="margin-top:8px"><i>${esc(p.ex)}</i></div></div></div>`;
   $("actions").innerHTML=`<button type="button" class="grow" id="goBtn">Start part ${pi+1}</button>`;
   $("goBtn").onclick=()=>renderQ(false);
   $("goBtn").focus({preventScroll:true});
@@ -3184,8 +3307,9 @@ const cur=()=>drillOn?{item:drill.item,part:-1}:queue[pos];
 const inputMode=()=>drillOn?S.dmode:(parts()[cur().part].typing&&cur().item.kind==="past"?"type":S.mode);
 const comboOf=st=>Math.min(3,1+0.5*Math.floor(st/5));
 const G={m:"masc.",f:"fem."}, N={s:"sing.",p:"plural"};
-function renderFull(words,mode){
-  return `<div class="sentence">${words.map(w=>{
+function renderFull(words,mode,cueN=0){
+  return `<div class="sentence">${words.map((w,wi)=>{
+    if(cueN&&typeof w==="string"&&wi<cueN) return wi===0?`<div class="w"><span class="t chip tm">${words.slice(0,cueN).map(esc).join(" ")}</span><span class="tag tm">Time · not written</span></div>`:"";
     if(typeof w==="string") return `<div class="w"><span class="t">${esc(w)}</span></div>`;
     if(mode==="blind"||mode==="blindpics"){
       return (mode==="blindpics"&&w.pre?`<div class="w pw"><span class="t">${esc(w.pre)}</span></div>`:"")+
@@ -3231,6 +3355,7 @@ function renderPast(item,mode,hl,slot){
   }).join("")}</div>`;
 }
 function hintText(item){
+  if(item.dm) return `Is <b>${esc(item.dm.sg)}</b> masculine or feminine? Then check whether it is singular or plural, and look at <b>${esc(item.trig)}</b>.`;
   if(item.kind==="past"){
     let s=`Look at <b>${esc(item.trig)}</b>.`;
     if(item.p!=null) s+=` The subject is <b>${P[item.p]}</b>.`;
@@ -3272,12 +3397,12 @@ function renderQ(restore){
   const inSlot=isPast&&m==="tiles";
   // in the endless drill nothing in the question says which type it is: no category label, no colours, no direct/indirect tags
   const blind=drillOn, pics=S.view==="pics";
-  const q=isPast?renderPast(item,"q",!blind&&info.key!=="mix"&&!GEN_NOHL.has(info.key),inSlot):renderFull(item.full,blind?(pics?"blindpics":"blind"):(pics?"pics":"tags"));
+  const q=isPast?renderPast(item,"q",!blind&&info.key!=="mix"&&!GEN_NOHL.has(info.key),inSlot):renderFull(item.full,blind?(pics?"blindpics":"blind"):(pics?"pics":"tags"),blind?0:(item.cueN||0));
   const nObj=isPast?0:item.full.filter(w=>typeof w!=="string").length;
   const PPROMPT={do:"Replace the <b class=\"do-t\">direct object</b> with a pronoun:",io:"Replace <b>only</b> the <b class=\"io-t\">indirect object</b> (highlighted) with a pronoun:",both:"Replace <b>both</b> highlighted objects with pronouns:"};
   const ppn=nObj>1?"Replace <b>both</b> highlighted phrases with pronouns:":"Replace <b>only</b> the highlighted words with a pronoun:";
   const sjP=item.sj?genPrompt(item,info):null;
-  const prompt=(sjP?sjP:isPast?(blind||info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(blind||info.key==="two"?ppn:(PPROMPT[info.key]||ppn)))+` <span class="tapnote">Tap any word for its meaning.</span>`;
+  const prompt=(sjP?sjP:isPast?(blind||info.key==="mix"?`Which past form of <b>${esc(item.inf)}</b> fits?`:`Put <b>${esc(item.inf)}</b> in the ${info.key==="pret"?"pretérito":"imperfecto"}:`):(blind||info.key==="two"?ppn:(PPROMPT[info.key]||ppn)))+` <span class="tapnote">Tap any word for its meaning.</span>`+(!blind&&item.cueN?` <span class="tmnote">The <b class="tm-t">time words</b> stay as they are. Don’t write them again.</span>`:"");
   $("drill").innerHTML=`
     <div class="meta">${blind?"<span style=\"flex:1\"></span>":`<span class="pill ${info.pillCls}">${esc(info.pill)}</span>`}${item.tl?`<span class="tnchip"${blind?' style="margin-left:0"':""}>${esc(item.tl)}</span>`:""}${info.counter}${spkBtn(itemSayQ(item),"")}</div>
     <div class="qpush" aria-hidden="true"></div>
@@ -3286,7 +3411,7 @@ function renderQ(restore){
     ${item.intro&&!blind?`<p class="tnew">${esc(item.intro)}</p>`:""}
     ${m==="tiles"
       ?`${inSlot?"":`<div class="answer empty" id="answer" data-ph="Drag or tap words here" aria-label="Your answer"></div>`}<div class="bank" id="bank"></div>`
-      :`<form id="f" autocomplete="off" onsubmit="return false"><div id="ans" ${FIELD_ATTRS} enterkeyhint="done" data-ph="${isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></div></form>`}
+      :`<form id="f" autocomplete="off" onsubmit="return false"><div id="ans" ${FIELD_ATTRS} enterkeyhint="done" data-ph="${item.dm?"Type the word":isPast?"Type the verb":"Type the short sentence"}" aria-label="Your answer"></div></form>`}
     <p class="hint" id="hint" hidden>${hintText(item)}</p>`;
   $("actions").innerHTML=`<button class="ghost" type="button" id="hintBtn">Hint</button><button class="ghost" type="button" id="skip">Answer</button>${vcBtnHTML()}<button type="button" class="grow" id="checkBtn" ${m==="tiles"?"disabled":""}>Check</button>`;
   vcBind(t=>{ if(!answered) check(t,true) });
@@ -3394,6 +3519,7 @@ function whyPron(item){
   }).join("");
 }
 function whySubj(it){
+  if(it.mood==="dm") return whyDem(it);
   const T=TAGS[it.mood]||[it.mood,it.mood], A=TAGS[it.altTag]||[it.altTag,it.altTag], c=T[1];
   if(it.mood==="refl"||it.mood==="nr"){ const c=it.mood, T=TAGS[c], bare=it.ans.replace(/^(me|te|se|nos) /,""), isR=c==="refl";
     const l2=isR?`<b>${esc(it.inf)}</b> → <b class="refl-t">${esc(it.ans)}</b>. Without the pronoun, <i>${esc(it.alt)}</i>, the action would not turn back on the subject.`:`<b>${esc(it.inf)}</b> → <b class="nr-t">${esc(it.ans)}</b>. With the pronoun it would be <i>${esc(it.alt)}</i>, which means doing it to yourself.`;
@@ -3404,6 +3530,7 @@ function whySubj(it){
 const GEN_HL=new Set(["sf","ff","nf","cf","rf"]), GEN_NOHL=new Set(["st","sw","ft","fw","nt","nw","ct","cw","rt","rw"]);
 function genPrompt(item,info){const k=info.key||"";
   if(item.mood==="cn") return "Which word fits the sentence?";
+  if(item.mood==="dm") return k==="dm1"?"Match the word to the noun:":k==="dm2"?"Read the clue word. Which one fits?":"Type the right word:";
   if(k[0]==="r"&&COURSES.refl&&COURSES.refl.parts.some(p=>p.key===k)) return k==="rf"?`Add the reflexive pronoun. Give the present of <b>${esc(item.inf)}</b>:`:k==="rt"?`Reflexive or not? Give the right form of <b>${esc(item.inf)}</b>:`:`Write <b>${esc(item.inf)}</b> in the form that fits, with its pronoun:`;
   if(k[0]==="f"||k[0]==="n") return k[1]==="f"?`Put <b>${esc(item.inf)}</b> in the ${(TAGS[item.mood]||[item.mood])[0]}:`:`Which tense? Give the right form of <b>${esc(item.inf)}</b>:`;
   return item.mood==="cmd"?`Give the negative command of <b>${esc(item.inf)}</b>:`:k==="sf"?`Put <b>${esc(item.inf)}</b> in the present subjunctive:`:`Subjunctive or indicative? Give the right form of <b>${esc(item.inf)}</b>:`}
@@ -5154,7 +5281,7 @@ function xpSeed(){
 }
 // ---- CEFR: which level each part of the app sits at, and how much of each level you have done
 const CEFR=["A1","A2","B1"];
-const COURSE_LV={pron:"A2",past:"A2",refl:"A2",subj:"B1",fut:"B1",narr:"B1",conn:"B1"};
+const COURSE_LV={pron:"A2",past:"A2",dem:"A2",refl:"A2",subj:"B1",fut:"B1",narr:"B1",conn:"B1"};
 const VT_LV={pres:"A1",near:"A1",pret:"A2",imp:"A2",perf:"A2",fut:"B1",cond:"B1",plup:"B1",subj:"B1"};
 const lvChip=(l,t)=>`<span class="lv"${t?` title="${t}"`:""}>${l}</span>`;
 function cefrCalc(){
