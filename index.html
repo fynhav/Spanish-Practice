@@ -573,7 +573,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .lm-r:last-child{border-bottom:0}
 .lm-r .d{width:8px;height:8px;border-radius:50%;flex:none;background:var(--cc)}
 .lm-r .t{flex:1;min-width:0}.lm-r .t b{display:block;font-size:.95rem;font-weight:600}.lm-r .t small{font-size:.76rem;color:var(--muted)}
-.lm-r .g{font-size:.82rem;font-weight:700;color:var(--cc)}.lm-r .g.dn{color:var(--ok,#4F7A4A)}
+.lm-r .g{font-size:.82rem;font-weight:700;color:var(--cc)}.lm-r.fin{opacity:.5}.lm-r.fin .d{width:15px;height:15px;background:#4F7A4A;display:inline-flex;align-items:center;justify-content:center}.lm-r.fin .d::after{content:"✓";color:#fff;font-size:.62rem;font-weight:700;line-height:1}.lm-r.fin .g{color:#4F7A4A}.course.fin{opacity:.6}.course.fin .segs i.on{background:#4F7A4A}
 .lm-r.soon{color:var(--muted)}.lm-r.soon .d{background:#B7A2C9}.lm-r.soon .g{font-weight:500;color:var(--muted);font-size:.75rem}
 .wd-card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--both);border-radius:16px;padding:12px 14px;width:100%;text-align:left;color:var(--ink);font:inherit}
 .wd-top{display:flex;justify-content:space-between;align-items:baseline}.wd-top b{font-family:var(--f-display);font-weight:400;font-size:1.15rem}
@@ -917,7 +917,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
         <span class="sub">When you type, a row of á é í ó ú ñ ¿ ¡ keys appears above the buttons. For the full Spanish keyboard on iPhone: Settings → General → Keyboard → Keyboards → Add New Keyboard → Español, then switch with the 🌐 key. You can also hold a vowel to pick its accent.</span></div>
       <div class="setting"><span class="label">Cloud backup</span><div id="railBox" class="setting" style="gap:8px"></div></div>
       <p class="syncline" style="margin-top:4px"></p>
-      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-19 · 12:35</p>
+      <p class="sub" style="font-size:.75rem;margin:0">Version 2026-11-19 · 12:46</p>
     </div>
     <div id="rulesPart" style="display:flex;flex-direction:column;gap:18px">
       <div id="rulesPron" class="rules">
@@ -3152,7 +3152,7 @@ function courseCardsHTML(lvl){
     const status=s?`<span class="now">In progress · Day ${s.day}, ${s.pos}/${TOTAL(c)}</span>`
       :doneN>=daysOf(c)?`<span class="now">Complete ✓</span>`
       :tdone?`<span class="now">Done today ✓</span> · next: Day ${nd}`:`<span class="now">Day ${nd} ready</span>`;
-    return `<button type="button" class="course" data-c="${c}" style="--cc:var(--${C.cc});--cc-soft:var(--${C.cc}-soft)">
+    return `<button type="button" class="course${doneN>=daysOf(c)&&!s?" fin":""}" data-c="${c}" style="--cc:var(--${C.cc});--cc-soft:var(--${C.cc}-soft)">
       <span><span class="cn">${C.name}${lvChip(COURSE_LV[c])}</span><br><span class="cs">${C.sub}</span></span><span class="chev" aria-hidden="true">›</span>
       <span class="cs">${status} · ${doneN}/${daysOf(c)} days</span>
       <span class="segs">${[...Array(daysOf(c))].map((_,i)=>`<i class="${ST[c].done[i+1]?"on":""}"></i>`).join("")}</span></button>`;
@@ -3164,7 +3164,7 @@ const soonRows=()=>B1_SOON.filter(n=>!Object.values(COURSES).some(C=>C.name===n)
 function lmHTML(){
   const R=cefrCalc(); let cur=R.findIndex(r=>r.p<.7); if(cur<0) cur=R.length-1;
   return R.map((r,i)=>{const st=r.p>=.7?"done":i===cur?"cur":"next", pc=Math.round(r.p*100);
-    const rows=r.items.map(x=>`<button type="button" class="lm-r" data-go="${x.go}" style="--cc:var(--${x.cc})"><span class="d"></span><span class="t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small></span><span class="g">${x.go.startsWith("c:")?(dN(x.go.slice(2))>=daysOf(x.go.slice(2))?"Complete ✓":`Day ${nextDay(x.go.slice(2))} ›`):x.go==="stories"?"Next ›":x.go==="words"?"Review ›":"Practise ›"}</span></button>`).join("");
+    const rows=r.items.map(x=>`<button type="button" class="lm-r${x.go.startsWith("c:")&&dN(x.go.slice(2))>=daysOf(x.go.slice(2))?" fin":""}" data-go="${x.go}" style="--cc:var(--${x.cc})"><span class="d"></span><span class="t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small></span><span class="g">${x.go.startsWith("c:")?(dN(x.go.slice(2))>=daysOf(x.go.slice(2))?"Complete ✓":`Day ${nextDay(x.go.slice(2))} ›`):x.go==="stories"?"Next ›":x.go==="words"?"Review ›":"Practise ›"}</span></button>`).join("");
     return `<div class="lm ${st}"><div class="lm-h"><span class="lm-l">${r.L}</span><div>${st==="done"?"Complete":st==="cur"?`In progress · ${pc}%`:`Next · ${pc}%`}<span class="lm-bar"><i style="width:${pc}%"></i></span></div>${st==="done"?'<span class="ck" aria-hidden="true">✓</span>':""}</div><div class="lm-b">${rows}${r.L==="B1"?soonRows():""}</div></div>`}).join("");
 }
 function lmBind(){
@@ -3222,6 +3222,7 @@ function renderAll(){
     ${sec("You",row("aLv","both","Level and XP",`Level ${xpInfo(xpTotal()).L} · ${xpInfo(xpTotal()).title}`)+row("aDy","io","Days practised",`${streak(homeHas)}-day streak`)+row("aSe","mix","Settings","sound, speed, sync")+row("aHe","mix","Help","how it works"))}
     <p class="syncline"></p>`;
   $("actions").innerHTML="";
+  Object.keys(COURSES).forEach(c=>{ if(dN(c)>=daysOf(c)&&$("ac-"+c)) $("ac-"+c).classList.add("fin") });
   $("aWr").onclick=renderWrSet; $("aVb").onclick=renderVHome; $("aSt").onclick=()=>renderStoryList(); $("aDr").onclick=renderDrillSetup;
   Object.keys(COURSES).forEach(c=>$("ac-"+c).onclick=()=>{justDone=null;renderCourse(c)});
   $("aWl").onclick=()=>{renderWrList()}; $("aWk").onclick=()=>{try{WR.list.f="known"}catch(e){} renderWrList()};
