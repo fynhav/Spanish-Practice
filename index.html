@@ -5485,17 +5485,47 @@ function tkRepeat(target,id,after){
     vcStart($("tkRepMic"),txt=>{
       if(!live()) return; R.tries++; R.heard=txt;
       const H=new Set(tkNz(txt).split(" ")), hit=T.length?T.filter(t=>H.has(t)).length/T.length:1;
-      if(hit>=need){ haptic(14); const u=TLK.msgs.filter(m=>m.role==="user").pop(); if(u) u.rep=true; draw("ok"); finish(1100) }
-      else if(R.tries>=3){ haptic(8); draw("giveup"); finish(1800) }
-      else { haptic(22); draw("again"); const g=++R.gen; tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,350) },TK_FB_VOICE) }
+      if(hit>=need){ haptic(14); const u=TLK.msgs.filter(m=>m.role==="user").pop(); if(u) u.rep=true; draw("ok"); finish(650) }
+      else if(R.tries>=3){ haptic(8); draw("giveup"); finish(1300) }
+      else { haptic(22); draw("again"); const g=++R.gen; tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,200) },TK_FB_VOICE) }
     },()=>{ if(live()&&(R.state==="listen"||R.state==="think")) draw("idle") },{auto:true,words:T.length,onThink:()=>{ if(live()) draw("think") }})
       .then(started=>{ if(!started&&live()&&!vcRec&&!vcStarting&&!vcThinking&&R.state==="listen") draw("idle") });
   };
   // the three buttons under the sentence
   R.tap=()=>{ if(!live()) return; if(vcRec){ if(Date.now()-vcRec.t0>700){ vcRec.manual=true; vcStop(true) } return } if(vcStarting||vcThinking) return; R.gen++; clear(); tkSeq++; tkStopAudio(); R.go() };
-  R.hear=()=>{ if(!live()) return; clear(); const g=++R.gen; if(vcRec) vcStop(false); draw("hear"); tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,350) },TK_FB_VOICE) };
+  R.hear=()=>{ if(!live()) return; clear(); const g=++R.gen; if(vcRec) vcStop(false); draw("hear"); tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,200) },TK_FB_VOICE) };
   R.skip=()=>{ if(!live()) return; R.gen++; tkSeq++; tkStopAudio(); finish(0) };
-  TLK.st="rep"; tkComposer(); later(R.go,350);
+  TLK.st="rep"; tkComposer(); later(R.go,200);
+}
+const tkEndMs=()=>{ const v=ST.talk&&ST.talk.end; return v==null?1400:+v };   // how long you must be quiet (ms) before your answer is sent by itself (0 = only when you tap)
+let tkWarmAt=0; function tkWarm(){ if(Date.now()-tkWarmAt<12000||!RL.code) return; tkWarmAt=Date.now(); try{ rfetch("/talk/ping",{ms:6000}).catch(()=>{}) }catch(e){} }
+// sentence chunks (same rule as the server): the first chunk can start playing while the rest is still being made
+function tkSplit(t){ const s=(String(t).replace(/\s+/g," ").trim().match(/[^.!?…]+(?:[.!?…]+|$)/g)||[]).map(x=>x.trim()).filter(Boolean), out=[], w=x=>x.split(" ").length;
+  for(const x of s){ if(out.length&&(w(out[out.length-1])<3||out.length>=3)) out[out.length-1]+=" "+x; else out.push(x) }
+  if(out.length>1&&w(out[out.length-1])<3){ const l=out.pop(); out[out.length-1]+=" "+l }
+  return out.length?out:[String(t)] }
+function tkSpeakLine(text,parts,btn,done,voice){
+  const P=(parts&&parts.length)?parts:tkSplit(text); let i=0, seq=0;
+  const step=()=>{ if(i>=P.length){ if(done) done(); return } i++; tkSpeak(P[i-1],btn,()=>{ if(seq&&tkSeq!==seq) return; step() },voice); seq=tkSeq };
+  step();
+}
+function tkB64(b){ const s=atob(b), n=s.length, u=new Uint8Array(n); for(let i=0;i<n;i++) u[i]=s.charCodeAt(i); return u.buffer }
+// read a newline-delimited JSON stream
+async function tkNd(path,body,onLine,ms){
+  const r=await rfetch(path,{method:"POST",body:JSON.stringify(body),ms:ms||30000});
+  if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
+  if(r.status===401) throw Object.assign(new Error("auth"),{auth:true});
+  if(!r.ok) throw new Error(path+" "+r.status);
+  if(!r.body||!r.body.getReader){ (await r.text()).split("\n").forEach(l=>{ if(l.trim()) onLine(JSON.parse(l)) }); return }
+  const rd=r.body.getReader(), dec=new TextDecoder(); let buf="";
+  for(;;){ const {done,value}=await rd.read(); if(done) break; buf+=dec.decode(value,{stream:true}); let i; while((i=buf.indexOf("\n"))>=0){ const l=buf.slice(0,i); buf=buf.slice(i+1); if(l.trim()) onLine(JSON.parse(l)) } }
+  if(buf.trim()) onLine(JSON.parse(buf));
+}
+// audio that is still on its way: tkSpeak waits for it, then finds it in the cache
+function tkExpect(texts,voice){
+  const D={}, fin=k=>{ const d=D[k]; if(!d) return; delete D[k]; clearTimeout(d.t); tkPend.delete(k); d.r() };
+  texts.forEach(t=>{ const k=tkK(t,voice); if(tkCache.has(k)||tkPend.has(k)) return; let r; const pr=new Promise(x=>r=x); D[k]={r,t:setTimeout(()=>fin(k),15000)}; tkPend.set(k,pr) });
+  return { put:(t,b64)=>{ const k=tkK(t,voice); if(b64&&!tkCache.has(k)){ try{ const ab=tkB64(b64); tkCache.set(k,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} } fin(k) }, end:()=>Object.keys(D).forEach(fin) };
 }
 async function tkSpeak(text,btn,done,voice){
   lastAct=Date.now(); tkStopAudio(); const mine=++tkSeq;
@@ -5545,6 +5575,7 @@ function renderTalk(){
       <div class="tk-row"><span>Your level</span>${seg("tkLv",[["","Auto · "+lv],["A1","A1"],["A2","A2"],["B1","B1"]],T.lv)}</div>
       <div class="tk-row"><span>Ideas for what to say</span>${seg("tkSup",[[0,"Full"],[1,"Half hidden"],[2,"Hidden"]],T.sup)}</div>
       <div class="tk-row"><span>Partner’s text</span>${seg("tkHide",[[0,"Shown"],[1,"Hidden"]],T.hide)}</div>
+      <div class="tk-row"><span>Send my answer after I stop talking</span>${seg("tkEnd",[[1000,"Quick"],[1400,"Normal"],[2200,"Patient"],[0,"Tap only"]],T.end==null?1400:T.end)}</div>
     </div>
     <button type="button" class="tk-card tk-blind" id="tkBlind"><span class="tk-ic" aria-hidden="true">${tki("eyeoff")}</span><span class="tk-tx"><b>Blind session</b><small>No text, no ideas. A surprise scene with the odd curveball question.</small></span><span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>
     ${["A1","A2","B1"].map(group).join("")}
@@ -5553,7 +5584,7 @@ function renderTalk(){
       <button type="button" class="grow" id="tkCustGo" style="width:100%;margin-top:8px">Start this scene</button></div>
     <p class="syncline"></p></div>`;
   $("actions").innerHTML="";
-  [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
+  [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"],["tkEnd","end"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
   $("drill").querySelectorAll(".tk-card").forEach(b=>b.onclick=()=>{ if(!tkReady()) return; renderTalkPre(TALK_SC.find(s=>s.id===b.dataset.sc)) });
   $("tkScn").onclick=renderScn; $("tkBlind").onclick=()=>{ if(!tkReady()) return; const pool=TALK_SC.filter(x=>x.lv===lv), last=TLK.lastBlind; const c=pool.filter(x=>x.id!==last), sc=(c.length?c:pool)[Math.floor(Math.random()*(c.length?c.length:pool.length))]; TLK.lastBlind=sc.id; tkStart(sc,{blind:true}) };
   $("tkCustGo").onclick=()=>{ const v=$("tkCust").value.trim(); if(v.length<8){$("tkCust").focus(); return} if(!tkReady()) return;
@@ -5591,7 +5622,7 @@ function renderTalkPre(sc,edit){
 
 // ---------- conversation
 function tkStart(sc,opts){
-  tkUnlock(); tkLeave();
+  tkUnlock(); tkLeave(); tkWarm();
   Object.assign(TLK,{blind:!!(opts&&opts.blind),peeks:0,offs:0,tm:[],sc,lv:tkLevel(),msgs:[],sug:[],tryI:0,goal:"",words:{},err:null,note:"",tyOn:false,enOn:tkLevel()!=="B1",rev:false,res:null,t0:Date.now(),st:"ai",sugReady:false,tryOpen:true,end:false});
   renderTalkChat(); tkTurn();
 }
@@ -5667,7 +5698,7 @@ function tkScroll(mode){
 }
 function tkLogClick(e){
   const b=e.target.closest("[data-a]"); if(!b||b.disabled) return; const a=b.dataset.a, i=+b.dataset.i, m=TLK.msgs[i], sg=TLK.sug.length?TLK.sug[TLK.tryI%TLK.sug.length]:null;
-  if(a==="say") tkSpeak(b.dataset.t||(m&&m.es),b);
+  if(a==="say") tkSpeakLine(b.dataset.t||(m&&m.es),!b.dataset.t&&m&&m.parts,b);
   else if(a==="tryopen"){ TLK.tryOpen=!TLK.tryOpen; tkDraw() }
   else if(a==="sugsay"&&sg) tkSpeak(sg.es,b);
   else if(a==="sugtr"){ TLK.enOn=!TLK.enOn; tkDraw() }
@@ -5710,33 +5741,53 @@ async function tkPost(path,body,ms,again){
 // One turn, built for speed: the partner's line comes from a small fast call and is spoken as soon as it arrives;
 // the grade of your last line runs in parallel, and the translation + ideas load while the audio plays.
 async function tkTurn(){
-  const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; TLK.sug=[]; TLK.sugReady=false; tkDraw(TLK.msgs.length?"end":"top"); lastAct=Date.now();
+  const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; TLK.sug=[]; TLK.sugReady=false; tkDraw(TLK.msgs.length?"end":"top"); lastAct=Date.now(); tkWarm();
   const sc=TLK.sc, base={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),blind:!!TLK.blind};
   const hist=()=>TLK.msgs.filter(m=>m.es&&!m.pend).map(m=>({role:m.role,es:m.es}));
   const lastU=TLK.msgs[TLK.msgs.length-1], hasU=!!(lastU&&lastU.role==="user"), t0=Date.now();
+  const auto=S.auto==="on", liveOn=!!(hasU&&ST.talk.live&&auto);
   try{
-    const gp=hasU?tkPost("/talk/grade",{...base,history:hist()},40000).then(g=>{
-      if(id!==TLK.id) return;
-      lastU.busy=false; lastU.grade=g.grade&&g.grade.verdict?g.grade:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now();
-      tkDraw(); haptic(lastU.grade.verdict==="great"?12:6);
-      if(ST.talk.live&&lastU.grade.verdict!=="great"&&lastU.grade.corrected) tkPrefetch(lastU.grade.corrected,TK_FB_VOICE);
-    }).catch(()=>{ if(id!==TLK.id) return; lastU.busy=false; lastU.grade=lastU.grade||{verdict:"ok",corrected:"",note_en:""}; tkDraw() }):null;
-    const A=await tkPost("/talk/reply",{...base,history:hist()},30000); if(id!==TLK.id) return;
+    // 1) the grade of your last line runs in parallel; with live feedback the spoken correction comes in the same request
+    let gx=null, gDone; const gp=hasU?new Promise(r=>gDone=r):null;
+    const applyGrade=g=>{ if(id!==TLK.id) return; lastU.busy=false; lastU.grade=g&&g.verdict?g:{verdict:"ok",corrected:"",note_en:""}; lastU.pop=Date.now(); lastU.fixAt=Date.now(); tkDraw(); haptic(lastU.grade.verdict==="great"?12:6) };
+    if(hasU) (async()=>{ let got=false;
+      try{ await tkNd("/talk/grade",{...base,history:hist(),stream:true,tts:liveOn,voice:TK_FB_VOICE},l=>{
+        if(l.k==="grade"){ got=true; applyGrade(l.grade); const g=lastU.grade; if(liveOn&&g.verdict!=="great"&&g.corrected&&id===TLK.id) gx=tkExpect([g.corrected],TK_FB_VOICE); gDone() }
+        else if(l.k==="au"){ if(gx) gx.put(l.t,l.b) }
+        else if(l.k==="err"&&!got) throw new Error(l.msg) },40000); if(!got) throw new Error("no grade") }
+      catch(e){ if(!got){ try{ const g=await tkPost("/talk/grade",{...base,history:hist()},40000); applyGrade(g.grade); if(liveOn&&lastU.grade.verdict!=="great"&&lastU.grade.corrected) tkPrefetch(lastU.grade.corrected,TK_FB_VOICE) }
+        catch(e2){ if(id===TLK.id){ lastU.busy=false; lastU.grade=lastU.grade||{verdict:"ok",corrected:"",note_en:""}; tkDraw() } } } }
+      finally{ if(gx) gx.end(); gDone() } })();
+    // 2) the partner's line and its voice come as one stream: text after the first sentence is written, audio as each sentence is made
+    let esR,esJ,metaR; const esP=new Promise((a,b)=>{ esR=a; esJ=b }), metaP=new Promise(r=>metaR=r); let meta={end:false,off:false,off_en:""}, rx=null;
+    tkNd("/talk/turn",{...base,history:hist(),tts:auto},l=>{
+      if(l.k==="es"){ rx=tkExpect(l.parts||[l.es]); esR(l) }
+      else if(l.k==="au"){ if(rx) rx.put(l.t,l.b) }
+      else if(l.k==="meta"){ meta=l; metaR(l) }
+      else if(l.k==="err") esJ(new Error(l.msg)) },35000)
+      .then(()=>{ if(rx) rx.end(); metaR(meta); esJ(new Error("no line")) }).catch(e=>{ if(rx) rx.end(); metaR(meta); esJ(e) });
+    let L;
+    try{ L=await esP }
+    catch(e){ if(e&&(e.limit||e.auth)) throw e;
+      const A=await tkPost("/talk/reply",{...base,history:hist()},30000); L={es:A.reply.es,parts:null}; meta={end:A.end,off:A.off,off_en:A.off_en}; metaR(meta) }
+    if(id!==TLK.id) return;
     TLK.tm.push(Date.now()-t0);
-    if(hasU&&A.off){ lastU.off=A.off_en||"That didn’t answer what they asked."; lastU.offAt=Date.now(); TLK.offs++; haptic(18) }
-    const am={role:"ai",es:A.reply.es,en:"",enP:true,hid:tkHide(),tr:TLK.enOn,at:Date.now()}; TLK.msgs.push(am);
-    TLK.sug=[]; TLK.tryI=0; TLK.rev=false; TLK.tryOpen=!TLK.blind; TLK.goal=""; TLK.end=!!A.end; TLK.st="say"; TLK.sugReady=false; tkDraw("end");
+    const am={role:"ai",es:L.es,en:"",enP:true,hid:tkHide(),tr:TLK.enOn,at:Date.now(),parts:L.parts||null}; TLK.msgs.push(am);
+    TLK.sug=[]; TLK.tryI=0; TLK.rev=false; TLK.tryOpen=!TLK.blind; TLK.goal=""; TLK.end=false; TLK.st="say"; TLK.sugReady=false; tkDraw("end");
     const ai=TLK.msgs.length-1;
+    metaP.then(m=>{ if(id!==TLK.id) return; TLK.end=!!m.end; if(hasU&&m.off){ lastU.off=m.off_en||"That didn’t answer what they asked."; lastU.offAt=Date.now(); TLK.offs++; haptic(18); tkDraw() } });
+    // translation + ideas load while the audio plays
     const help=tkPost("/talk/next",{...base,history:hist()},40000).then(j=>{
       if(id!==TLK.id) return; am.en=j.reply_en||""; am.enP=false;
       TLK.sug=(j.suggestions||[]).filter(x=>x&&x.es); TLK.goal=j.goal_en||""; (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
     }).catch(()=>{ am.enP=false });
-    // the idea for your answer appears only once the partner has finished speaking
-    const next=()=>help.then(()=>{ if(id!==TLK.id) return; if(!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now() } tkOpenDock(); if(TLK.st!=="rec") tkDraw("end") });
-    const speakReply=()=>{ if(id!==TLK.id) return; if(S.auto==="on") tkSpeak(A.reply.es,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,900) };
-    if(gp&&ST.talk.live&&S.auto==="on"){
+    // the microphone opens as soon as the partner has finished; the ideas appear when they are ready (never later than the partner's last word)
+    const next=()=>{ if(id!==TLK.id) return;
+      metaP.then(()=>{ if(id===TLK.id) tkOpenDock() });
+      help.then(()=>{ if(id!==TLK.id) return; if(!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now() } tkDraw(TLK.st==="rec"?undefined:"end") }) };
+    const speakReply=()=>{ if(id!==TLK.id) return; if(auto) tkSpeakLine(L.es,L.parts,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,400) };
+    if(gp&&liveOn){
       // live feedback: hear how you should have said it, then the partner answers
-      tkPrefetch(A.reply.es);
       Promise.race([gp,tkSleep(7000)]).then(()=>{
         if(id!==TLK.id) return; const g=lastU.grade;
         if(g&&g.verdict!=="great"&&g.corrected&&tkNz(g.corrected)!==tkNz(lastU.es)){
@@ -5765,7 +5816,7 @@ async function tkSend(blob,mime){
     if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
     if(!r.ok) throw new Error("stt "+r.status);
     const text=String((await r.json()).text||"").trim(); if(id!==TLK.id) return;
-    if(!text){ drop(); TLK.st="idle"; TLK.note="I didn’t catch anything. Try again."; tkDraw(); if(TLK.micOK&&!TLK.tyOn) setTimeout(()=>{ if(id===TLK.id&&TLK.st==="idle") tkMicStart() },400); return }
+    if(!text){ drop(); TLK.st="idle"; TLK.note="I didn’t catch anything. Try again."; tkDraw(); if(TLK.micOK&&!TLK.tyOn) setTimeout(()=>{ if(id===TLK.id&&TLK.st==="idle") tkMicStart() },150); return }
     m.pend=false; m.es=text; m.busy=true; m.at=Date.now(); tkTurn();
   }catch(e){
     if(id!==TLK.id) return;
@@ -5774,7 +5825,7 @@ async function tkSend(blob,mime){
 }
 // ---------- microphone (listens by itself once the partner has finished; the first time needs a tap)
 async function tkMicStart(){
-  if(TLK.st!=="idle"||tkRec) return;
+  if(TLK.st!=="idle"||tkRec) return; tkWarm();
   const id=TLK.id; let stream;
   try{ if(navigator.audioSession) navigator.audioSession.type="play-and-record" }catch(e){}
   try{ stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}) }
@@ -5810,9 +5861,15 @@ function tkMeter(rec){
   const loop=()=>{
     if(tkRec!==rec) return;
     let lv=0;
-    if(an){ an.getByteTimeDomainData(d); let s=0; for(let i=0;i<d.length;i++){ const x=(d[i]-128)/128; s+=x*x } lv=Math.min(1,Math.sqrt(s/d.length)*5); rec.flat=lv<.002?rec.flat+1:0 }
+    if(an){ an.getByteTimeDomainData(d); let s=0; for(let i=0;i<d.length;i++){ const x=(d[i]-128)/128; s+=x*x } rec.rms=Math.sqrt(s/d.length); lv=Math.min(1,rec.rms*5); rec.flat=lv<.002?rec.flat+1:0 }
     else rec.flat=999;
     rec.lv=rec.lv*.6+lv*.4;
+    if(an&&rec.rms!=null&&!rec.ending){
+      const now=Date.now(), el=now-rec.t0, dt=Math.min(100,now-(rec.lt||now)); rec.lt=now; rec.ema=(rec.ema||0)*.55+rec.rms*.45;
+      if(el<450){ (rec.cal=rec.cal||[]).push(rec.rms); if(el>=380&&rec.cal.length>3){ const a=rec.cal.slice().sort((x,y)=>x-y); rec.thr=Math.min(.035,Math.max(.014,(a[a.length>>1]||0)*2.6+.008)) } }
+      else{ if(rec.ema>(rec.thr||.02)){ rec.vms=(rec.vms||0)+dt; rec.lastLoud=now; if(rec.vms>=240) rec.sp=true } else if(!rec.sp) rec.vms=Math.max(0,(rec.vms||0)-dt/2);
+        const endMs=tkEndMs(); if(endMs&&rec.sp&&now-rec.lastLoud>=endMs&&el>900&&rec.vms>=400){ rec.ending=true; tkMicStop(true); return } }
+    }
     if(!rec.voiced){ rec.loud=rec.lv>.12?rec.loud+1:0; if(rec.loud>=3||rec.flat>90||(!an&&Date.now()-rec.t0>1200)){ rec.voiced=true; tkComposer() } }
     if(++tick%3===0){ rec.hist.push(rec.lv); rec.hist.shift(); tkPaintWave(rec) }
     const b=document.getElementById("tkMain"); if(b) b.style.setProperty("--lv",rec.lv.toFixed(3));
@@ -5960,7 +6017,7 @@ async function vcStart0(btn,onText,fail,opt){
     if(tkCtx.state!=="running") await Promise.race([tkCtx.resume(),tkSleep(300)]);
     if(tkCtx.state!=="running") throw new Error("no analyser");
     r.src=tkCtx.createMediaStreamSource(stream); const an=tkCtx.createAnalyser(); an.fftSize=1024; r.src.connect(an); const buf=new Uint8Array(an.fftSize);
-    const endSil=W>=9?2200:W>=5?1800:1400, need=Math.min(W*220,6500)*.5;
+    const endSil=W>=9?1800:W>=5?1400:1100, need=Math.min(W*220,6500)*.5;
     r.iv=setInterval(()=>{
       an.getByteTimeDomainData(buf); let s=0; for(const v of buf){ const d=(v-128)/128; s+=d*d }
       const rms=Math.sqrt(s/buf.length), now=Date.now(), el=now-r.t0, dt=Math.min(250,now-r.lt); r.lt=now;
