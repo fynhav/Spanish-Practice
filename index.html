@@ -5443,7 +5443,7 @@ const tkAudio=new Audio(); tkAudio.preload="auto"; const tkCache=new Map(); let 
 const TK_SIL="data:audio/wav;base64,"+(()=>{ const n=1600, b=new Uint8Array(44+n), v=new DataView(b.buffer), w=(o,t)=>{ for(let i=0;i<t.length;i++) b[o+i]=t.charCodeAt(i) };
   w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVEfmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true); v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true); b.fill(128,44);
   let t=""; for(const x of b) t+=String.fromCharCode(x); return btoa(t) })();
-function tkStopAudio(){ try{ tkAudio.pause() }catch(e){} if(tkSrc){ const x=tkSrc; tkSrc=null; x.onended=null; try{ x.stop() }catch(e){} } }
+function tkStopAudio(){ try{ tkAudio.pause() }catch(e){} tkPcmStop(); if(tkSrc){ const x=tkSrc; tkSrc=null; x.onended=null; try{ x.stop() }catch(e){} } }
 function tkSkip(){ if(TLK.st==="say"){ tkSeq++; tkStopAudio(); TLK.st="idle" } }
 const tkSleep=ms=>new Promise(r=>setTimeout(r,ms));
 const tkHide=()=>TLK.blind?1:+ST.talk.hide, tkSupN=()=>TLK.blind?2:ST.talk.sup;
@@ -5533,7 +5533,7 @@ function tkRepeat(target,id,after){
   R.skip=()=>{ if(!live()) return; R.gen++; tkSeq++; tkStopAudio(); finish(0) };
   TLK.st="rep"; tkComposer(); later(R.go,200);
 }
-const tkEndMs=()=>{ const v=ST.talk&&ST.talk.end; return v==null?1400:+v };   // how long you must be quiet (ms) before your answer is sent by itself (0 = only when you tap)
+const tkEndMs=()=>{ const v=ST.talk&&ST.talk.end; return v==null||+v===1400?1000:+v===2200?1800:+v };   // how long you must be quiet (ms) before your answer is sent by itself (0 = only when you tap)
 let tkWarmAt=0; function tkWarm(){ if(Date.now()-tkWarmAt<12000||!RL.code) return; tkWarmAt=Date.now(); try{ rfetch("/talk/ping",{ms:6000}).catch(()=>{}) }catch(e){} }
 // sentence chunks (same rule as the server): the first chunk can start playing while the rest is still being made
 function tkSplit(t){ const s=(String(t).replace(/\s+/g," ").trim().match(/[^.!?…]+(?:[.!?…]+|$)/g)||[]).map(x=>x.trim()).filter(Boolean), out=[], w=x=>x.split(" ").length;
@@ -5563,6 +5563,53 @@ function tkExpect(texts,voice){
   texts.forEach(t=>{ const k=tkK(t,voice); if(tkCache.has(k)||tkPend.has(k)) return; let r; const pr=new Promise(x=>r=x); D[k]={r,t:setTimeout(()=>fin(k),15000)}; tkPend.set(k,pr) });
   return { put:(t,b64)=>{ const k=tkK(t,voice); if(b64&&!tkCache.has(k)){ try{ const ab=tkB64(b64); tkCache.set(k,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} } fin(k) }, end:()=>Object.keys(D).forEach(fin) };
 }
+// ---- streamed voice: raw 24 kHz 16-bit audio is played while it is still arriving ----
+const tkPcmQ=[]; let tkPcmEnd=0;
+function tkPcmStop(){ tkPcmQ.splice(0).forEach(x=>{ try{ x.onended=null; x.stop() }catch(e){} }); tkPcmEnd=0 }
+function tkWav(parts){ let n=0; parts.forEach(p=>n+=p.length); const o=new Uint8Array(44+n), v=new DataView(o.buffer), w=(a,s)=>{ for(let i=0;i<s.length;i++) o[a+i]=s.charCodeAt(i) };
+  w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVEfmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true); v.setUint32(24,24000,true); v.setUint32(28,48000,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,"data"); v.setUint32(40,n,true);
+  let k=44; parts.forEach(p=>{ o.set(p,k); k+=p.length }); return o.buffer }
+// one partner line whose sentences are being voiced: collects the audio as it arrives, plays it on request
+function tkStreamNew(parts,voice){
+  const S=parts.map(t=>{ const x={t,k:tkK(t,voice),ch:[],last:false,fail:false,n:0,fin:null};
+    if(!tkCache.has(x.k)&&!tkPend.has(x.k)){ let r; const pr=new Promise(a=>r=a); x.fin=()=>{ if(x.f2) return; x.f2=1; clearTimeout(x.to); tkPend.delete(x.k); r() }; x.to=setTimeout(x.fin,20000); tkPend.set(x.k,pr) } return x });
+  const st={S,pcmMode:false,live:null};
+  const whole=x=>{ if(!x.fail&&x.ch.length&&!tkCache.has(x.k)){ try{ const ab=tkWav(x.ch); tkCache.set(x.k,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/wav"}))}) }catch(e){} } if(x.fin) x.fin() };
+  st.pcm=(i,b,last,fail)=>{ const x=S[i]; if(!x) return; st.pcmMode=true; if(b){ try{ x.ch.push(new Uint8Array(tkB64(b))) }catch(e){} } if(last){ x.last=true; x.fail=!!fail; whole(x) } if(st.live) st.live.pump() };
+  st.put=(t,b64)=>{ const x=S.find(y=>y.t===t&&!y.mp3); if(!x) return; x.mp3=1; if(b64&&!tkCache.has(x.k)){ try{ const ab=tkB64(b64); tkCache.set(x.k,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} } if(x.fin) x.fin() };
+  st.end=()=>{ S.forEach(x=>{ if(!x.last){ x.last=true; x.fail=true } if(x.fin) x.fin() }); if(st.live) st.live.pump() };
+  st.canStream=()=>st.pcmMode&&!!tkCtx&&tkCtx.state==="running";
+  st.play=(btn,done)=>tkPlayStream(st,btn,done);
+  return st;
+}
+function tkPlayStream(st,btn,done){
+  lastAct=Date.now(); tkStopAudio(); const mine=++tkSeq; let fin=false, cur=0, started=false, lastSrc=null, wd=0, all=false;
+  document.querySelectorAll(".tk .tk-on").forEach(b=>b.classList.remove("tk-on")); if(btn) btn.classList.add("tk-on");
+  const rate=S.rate==="slow"?.8:1;
+  const off=()=>{ clearTimeout(wd); if(btn) btn.classList.remove("tk-on"); if(!fin){ fin=true; if(st.live===L) st.live=null; if(done) done() } };
+  const schedule=bytes=>{ const n=bytes.length>>1; if(!n) return; const buf=tkCtx.createBuffer(1,n,24000), ch=buf.getChannelData(0), dv=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+    for(let j=0;j<n;j++) ch[j]=dv.getInt16(j*2,true)/32768;
+    const src=tkCtx.createBufferSource(); src.buffer=buf; src.playbackRate.value=rate; src.connect(tkCtx.destination);
+    const at=Math.max(tkPcmEnd,tkCtx.currentTime+0.03); src.start(at); tkPcmEnd=at+buf.duration/rate; tkPcmQ.push(src); lastSrc=src };
+  const finish=()=>{ if(fin) return;
+    if(!lastSrc){ fin=true; if(st.live===L) st.live=null; if(btn) btn.classList.remove("tk-on"); tkSpeakLine(st.S.map(x=>x.t).join(" "),st.S.map(x=>x.t),btn,done); return }
+    const rem=tkPcmEnd-tkCtx.currentTime; if(rem<=0.03){ off(); return } lastSrc.onended=()=>{ if(mine===tkSeq) off() }; wd=setTimeout(()=>{ if(mine===tkSeq) off() },rem*1000+800) };
+  const L={pump(){
+    if(fin||mine!==tkSeq) return;
+    while(cur<st.S.length){ const x=st.S[cur];
+      if(!started){ let have=0; x.ch.forEach(c=>have+=c.length); if(have<14400&&!x.last) return }   // wait for ~0.3 s of audio before the first sound
+      while(x.n<x.ch.length){ schedule(x.ch[x.n++]); started=true }
+      if(x.last){ cur++; continue } return }
+    if(!all){ all=true; finish() } }};
+  st.live=L; L.pump();
+  setTimeout(()=>{ if(!fin&&mine===tkSeq){ st.S.forEach(x=>{ x.last=true }); L.pump() } },30000);
+}
+// look-ahead: ask the server to prepare the replies to the answers you are most likely to give
+function tkWarmScenes(){ if(!RL.code) return; const lv=tkLevel(); if(tkWarmScenes.done&&tkWarmScenes.done[lv]) return; (tkWarmScenes.done=tkWarmScenes.done||{})[lv]=1;
+  const all=TALK_SC.map(sc=>({scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:lv,focus:sc.focus||""}));
+  for(let i=0;i<all.length;i+=8) rfetch("/talk/warm",{method:"POST",body:JSON.stringify({items:all.slice(i,i+8)}),ms:10000}).catch(()=>{}) }
+const tkSpecSt=(rec)=>{ try{ const blob=new Blob(rec.chunks,{type:rec.mt}); if(blob.size<4000) return; const at=Date.now();
+  const p=rfetch("/talk/stt",{method:"POST",body:blob,headers:{"content-type":rec.mt},ms:25000}).then(async r=>{ if(!r.ok) throw new Error("stt "+r.status); return String((await r.json()).text||"").trim() }); p.catch(()=>{}); rec.spec={at,p} }catch(e){} };
 async function tkSpeak(text,btn,done,voice){
   lastAct=Date.now(); tkStopAudio(); const mine=++tkSeq;
   document.querySelectorAll(".tk .tk-on").forEach(b=>b.classList.remove("tk-on"));
@@ -5599,7 +5646,7 @@ async function tkSpeak(text,btn,done,voice){
 // ---------- home
 function renderTalk(){
   screen="talk"; setRoot(renderTalk,"Talk"); course=null; drillOn=false; $("fb").hidden=true; tkLeave(); chrome();
-  const T=ST.talk, lv=tkLevel();
+  const T=ST.talk, lv=tkLevel(); tkWarmScenes();
   const seg=(id,opts,cur)=>`<div class="tk-seg" id="${id}">${opts.map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${String(cur)===String(v)}">${l}</button>`).join("")}</div>`;
   const group=L=>`<div><p class="label" style="margin-bottom:8px">${L}${L===lv?" · your level":""}</p><div class="tk-list">${TALK_SC.filter(s=>s.lv===L).map(s=>{const b=T.best[s.id]||0;
     return `<button type="button" class="tk-card" data-sc="${s.id}"><span class="tk-ic" aria-hidden="true">${tki("sc_"+s.id)}</span><span class="tk-tx"><b>${s.t}</b><small>${s.en}</small></span>${b?`<span class="tk-star" aria-label="${b} of 3 stars">${"★".repeat(b)}${"☆".repeat(3-b)}</span>`:""}<span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>`}).join("")}</div></div>`;
@@ -5612,7 +5659,7 @@ function renderTalk(){
       <div class="tk-row"><span>Ideas for what to say</span>${seg("tkSup",[[0,"Full"],[1,"Half hidden"],[2,"Hidden"]],T.sup)}</div>
       <div class="tk-row"><span>Partner’s text</span>${seg("tkHide",[[0,"Shown"],[1,"Hidden"]],T.hide)}</div>
       <div class="tk-row"><span>Instant check when I repeat a sentence</span>${seg("tkDict",[[1,"On"],[0,"Off"]],T.dict==null?1:T.dict)}</div>
-      <div class="tk-row"><span>Send my answer after I stop talking</span>${seg("tkEnd",[[1000,"Quick"],[1400,"Normal"],[2200,"Patient"],[0,"Tap only"]],T.end==null?1400:T.end)}</div>
+      <div class="tk-row"><span>Send my answer after I stop talking</span>${seg("tkEnd",[[650,"Quick"],[1000,"Normal"],[1800,"Patient"],[0,"Tap only"]],tkEndMs())}</div>
     </div>
     <button type="button" class="tk-card tk-blind" id="tkBlind"><span class="tk-ic" aria-hidden="true">${tki("eyeoff")}</span><span class="tk-tx"><b>Blind session</b><small>No text, no ideas. A surprise scene with the odd curveball question.</small></span><span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>
     ${["A1","A2","B1"].map(group).join("")}
@@ -5783,6 +5830,9 @@ async function tkTurn(){
   const hist=()=>TLK.msgs.filter(m=>m.es&&!m.pend).map(m=>({role:m.role,es:m.es}));
   const lastU=TLK.msgs[TLK.msgs.length-1], hasU=!!(lastU&&lastU.role==="user"), t0=Date.now();
   const auto=S.auto==="on", liveOn=!!(hasU&&ST.talk.live&&auto);
+  // did they say (nearly) one of the suggested answers? then the reply to it may already be prepared
+  let likeSug=""; if(hasU&&!TLK.blind&&TLK.specSug){ const T=tkNz(lastU.es).split(" ").filter(Boolean), TS=new Set(T); let best=0; TLK.specSug.forEach(sg=>{ const U=tkNz(sg).split(" ").filter(Boolean); if(!U.length||!T.length) return; const US=new Set(U), a=U.filter(w=>TS.has(w)).length/U.length, b2=T.filter(w=>US.has(w)).length/T.length, sc=Math.min(a,b2); if(sc>best&&sc>=.85){ best=sc; likeSug=sg } }) }
+  TLK.specSug=null;
   try{
     // 1) the grade of your last line runs in parallel; with live feedback the spoken correction comes in the same request
     let gx=null, gDone; const gp=hasU?new Promise(r=>gDone=r):null;
@@ -5797,9 +5847,10 @@ async function tkTurn(){
       finally{ if(gx) gx.end(); gDone() } })();
     // 2) the partner's line and its voice come as one stream: text after the first sentence is written, audio as each sentence is made
     let esR,esJ,metaR; const esP=new Promise((a,b)=>{ esR=a; esJ=b }), metaP=new Promise(r=>metaR=r); let meta={end:false,off:false,off_en:""}, rx=null;
-    tkNd("/talk/turn",{...base,history:hist(),tts:auto},l=>{
-      if(l.k==="es"){ rx=tkExpect(l.parts||[l.es]); esR(l) }
+    tkNd("/talk/turn",{...base,history:hist(),tts:auto,pcm:!!(window.AudioContext||window.webkitAudioContext),like:likeSug},l=>{
+      if(l.k==="es"){ rx=tkStreamNew(l.parts||[l.es]); rx.pcmMode=!!l.pcm; esR(l) }
       else if(l.k==="au"){ if(rx) rx.put(l.t,l.b) }
+      else if(l.k==="pcm"){ if(rx) rx.pcm(l.i,l.b,!!l.last,!!l.fail) }
       else if(l.k==="meta"){ meta=l; metaR(l) }
       else if(l.k==="err") esJ(new Error(l.msg)) },35000)
       .then(()=>{ if(rx) rx.end(); metaR(meta); esJ(new Error("no line")) }).catch(e=>{ if(rx) rx.end(); metaR(meta); esJ(e) });
@@ -5816,13 +5867,14 @@ async function tkTurn(){
     // translation + ideas load while the audio plays
     const help=tkPost("/talk/next",{...base,history:hist()},40000).then(j=>{
       if(id!==TLK.id) return; am.en=j.reply_en||""; am.enP=false;
-      TLK.sug=(j.suggestions||[]).filter(x=>x&&x.es); TLK.goal=j.goal_en||""; (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
+      TLK.sug=(j.suggestions||[]).filter(x=>x&&x.es); TLK.goal=j.goal_en||"";
+      if(auto&&!TLK.blind&&!TLK.end&&TLK.sug.length){ TLK.specSug=TLK.sug.slice(0,2).map(x=>x.es); tkPost("/talk/spec",{...base,history:hist(),lines:TLK.specSug},15000).catch(()=>{}) } (j.new_words||[]).forEach(w=>{ if(w&&w.es) TLK.words[w.es]=w.en||"" });
     }).catch(()=>{ am.enP=false });
     // the microphone opens as soon as the partner has finished; the ideas appear when they are ready (never later than the partner's last word)
     const next=()=>{ if(id!==TLK.id) return;
       metaP.then(()=>{ if(id===TLK.id) tkOpenDock() });
       help.then(()=>{ if(id!==TLK.id) return; if(!TLK.sugReady){ TLK.sugReady=true; TLK.sugAt=Date.now() } tkDraw(TLK.st==="rec"?undefined:"end") }) };
-    const speakReply=()=>{ if(id!==TLK.id) return; if(auto) tkSpeakLine(L.es,L.parts,document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`),next); else setTimeout(next,400) };
+    const speakReply=()=>{ if(id!==TLK.id) return; if(auto){ const bt=document.querySelector(`#tkLog [data-a="say"][data-i="${ai}"]`); if(rx&&rx.canStream()) rx.play(bt,next); else tkSpeakLine(L.es,L.parts,bt,next) } else setTimeout(next,400) };
     if(gp&&liveOn){
       // live feedback: hear how you should have said it, then the partner answers
       Promise.race([gp,tkSleep(7000)]).then(()=>{
@@ -5845,14 +5897,17 @@ function tkOpenDock(){
   if(TLK.sc&&TLK.end){ TLK.st="end"; tkDraw(); return }
   TLK.st="idle"; tkDraw(); if(TLK.micOK&&!TLK.tyOn) tkMicStart();
 }
-async function tkSend(blob,mime){
+async function tkSend(blob,mime,pre){
   const id=TLK.id; TLK.st="stt"; TLK.err=null; TLK.sug=[]; const m={role:"user",es:"",pend:true,at:Date.now()}; TLK.msgs.push(m); tkDraw("end"); lastAct=Date.now();
   const drop=()=>{ const k=TLK.msgs.indexOf(m); if(k>=0) TLK.msgs.splice(k,1) };
   try{
-    const r=await rfetch("/talk/stt",{method:"POST",body:blob,headers:{"content-type":mime},ms:40000});
-    if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
-    if(!r.ok) throw new Error("stt "+r.status);
-    const text=String((await r.json()).text||"").trim(); if(id!==TLK.id) return;
+    let text=null; if(pre){ try{ text=await pre }catch(e){ text=null } }
+    if(text==null){
+      const r=await rfetch("/talk/stt",{method:"POST",body:blob,headers:{"content-type":mime},ms:40000});
+      if(r.status===429) throw Object.assign(new Error("limit"),{limit:true});
+      if(!r.ok) throw new Error("stt "+r.status);
+      text=String((await r.json()).text||"").trim() }
+    if(id!==TLK.id) return;
     if(!text){ drop(); TLK.st="idle"; TLK.note="I didn’t catch anything. Try again."; tkDraw(); if(TLK.micOK&&!TLK.tyOn) setTimeout(()=>{ if(id===TLK.id&&TLK.st==="idle") tkMicStart() },150); return }
     m.pend=false; m.es=text; m.busy=true; m.at=Date.now(); tkTurn();
   }catch(e){
@@ -5871,14 +5926,14 @@ async function tkMicStart(){
   const mt=["audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||"";
   let mr; try{ mr=new MediaRecorder(stream,mt?{mimeType:mt}:undefined) }catch(e){ stream.getTracks().forEach(t=>t.stop()); tkAmbient(); TLK.note="Recording isn’t supported here. Tap the keyboard to type."; tkComposer(); return }
   TLK.micOK=true;
-  const chunks=[], rec={mr,stream,send:false,id,t0:Date.now(),mt:mr.mimeType||mt||"audio/mp4",voiced:false,hist:new Array(44).fill(0),lv:0,loud:0,flat:0};
+  const chunks=[], rec={chunks,mr,stream,send:false,id,t0:Date.now(),mt:mr.mimeType||mt||"audio/mp4",voiced:false,hist:new Array(44).fill(0),lv:0,loud:0,flat:0};
   mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data) };
   mr.onstop=()=>{
     tkStopRec(rec); if(rec.id!==TLK.id) return; if(tkRec===rec) tkRec=null;
     if(!rec.send){ if(TLK.st==="rec"||TLK.st==="stt"){ TLK.st="idle"; tkComposer() } return }
     const blob=new Blob(chunks,{type:rec.mt});
     if(Date.now()-rec.t0<700||blob.size<1500){ TLK.st="idle"; TLK.note="That was too short. Try again."; tkComposer(); return }
-    tkSend(blob,rec.mt);
+    tkSend(blob,rec.mt,rec.spec&&rec.lastLoud<=rec.spec.at?rec.spec.p:null);
   };
   tkRec=rec; mr.start(250); TLK.st="rec"; TLK.note=""; tkComposer(); tkMeter(rec); haptic(8);
   rec.auto=setTimeout(()=>tkMicStop(rec.voiced),45000);
@@ -5905,7 +5960,9 @@ function tkMeter(rec){
       const now=Date.now(), el=now-rec.t0, dt=Math.min(100,now-(rec.lt||now)); rec.lt=now; rec.ema=(rec.ema||0)*.55+rec.rms*.45;
       if(el<450){ (rec.cal=rec.cal||[]).push(rec.rms); if(el>=380&&rec.cal.length>3){ const a=rec.cal.slice().sort((x,y)=>x-y); rec.thr=Math.min(.035,Math.max(.014,(a[a.length>>1]||0)*2.6+.008)) } }
       else{ if(rec.ema>(rec.thr||.02)){ rec.vms=(rec.vms||0)+dt; rec.lastLoud=now; if(rec.vms>=240) rec.sp=true } else if(!rec.sp) rec.vms=Math.max(0,(rec.vms||0)-dt/2);
-        const endMs=rec.hold?0:tkEndMs(); if(endMs&&rec.sp&&now-rec.lastLoud>=endMs&&el>900&&rec.vms>=400){ rec.ending=true; tkMicStop(true); return } }
+        const endMs=rec.hold?0:tkEndMs();
+        if(rec.spec&&rec.lastLoud>rec.spec.at) rec.spec=null; else if(endMs&&!rec.spec&&rec.sp&&now-rec.lastLoud>=450&&el>1100&&rec.vms>=400) tkSpecSt(rec);
+        if(endMs&&rec.sp&&now-rec.lastLoud>=endMs&&el>900&&rec.vms>=400){ rec.ending=true; tkMicStop(true); return } }
     }
     if(!rec.voiced){ rec.loud=rec.lv>.12?rec.loud+1:0; if(rec.loud>=3||rec.flat>90||(!an&&Date.now()-rec.t0>1200)){ rec.voiced=true; tkComposer() } }
     if(++tick%3===0){ rec.hist.push(rec.lv); rec.hist.shift(); tkPaintWave(rec) }
