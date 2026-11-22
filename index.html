@@ -5693,7 +5693,7 @@ function tkMsgHTML(m,i){
   if(m.pend) return `<div class="tk-m tk-me tk-ub">${tkDots("tk-me"+tkEnter(m.at))}</div>`;
   const g=m.grade, v=g?g.verdict:"", good=v==="great";
   const badge=m.busy?`<span class="tk-badge tk-spin" aria-label="Checking"></span>`:g?`<span class="tk-badge ${good?"tk-ok":"tk-fix"}${m.pop&&Date.now()-m.pop<900?" tk-pop":""}" aria-label="${good?"Great":"Has a correction"}">${good?"✓":tki("chat")}</span>`:`<span class="tk-badge"></span>`;
-  const fix=g&&!good?`<div class="tk-card2${tkEnter(m.fixAt)}"><p class="tk-cl"><span>✓</span> Correct Answer</p><p class="tk-es tk-bold">${esc(g.corrected||m.es)}</p>${g.note_en?`<hr><p class="tk-en">${esc(g.note_en)}</p>`:""}</div>`:"";
+  const fix=g&&!good?`<div class="tk-card2${tkEnter(m.fixAt)}"><p class="tk-cl"><span>✓</span> Your sentence, corrected</p><p class="tk-es tk-bold">${esc(g.corrected||m.es)}</p>${g.note_en?`<hr><p class="tk-en">${esc(g.note_en)}</p>`:""}</div>`:"";
   const off=m.off?`<div class="tk-card2 tk-off${tkEnter(m.offAt)}"><p class="tk-cl"><span>!</span> That didn’t fit</p><p class="tk-en">${esc(m.off)}</p></div>`:"";
   return `<div class="tk-m tk-me tk-ub${tkEnter(m.at)}"><div class="tk-ur">${badge}<button type="button" class="tk-more" data-a="tutor" data-i="${i}" aria-label="Explain this line">${tki("dots")}</button><div class="tk-b tk-me"><p class="tk-es">${esc(m.es)}</p></div></div>
     <div class="tk-bt tk-me">${tkBtn("say","play","Hear it",i,null,m.busy)}</div>${off}${fix}${m.tp?tkTutHTML(m,i):""}</div>`;
