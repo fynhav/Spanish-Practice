@@ -716,6 +716,7 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
   box-shadow:0 0 0 calc(var(--lv)*10px) rgba(27,135,148,.18),0 0 calc(8px + var(--lv)*30px) rgba(27,135,148,.45),0 4px 14px rgba(27,135,148,.28);transition:box-shadow .08s}
 .tk-main svg{width:32px;height:32px}.tk-main:not(.tk-send) svg{width:26px;height:26px}
 .tk-circ{width:44px;height:44px;border-radius:50%;padding:0;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--ink);flex:none}
+.tk-circ.tk-hold{width:38px;height:38px;color:var(--muted)}.tk-circ.tk-hold svg{width:20px;height:20px}.tk-circ.tk-hold.on{background:var(--tk);border-color:var(--tk);color:#fff}.tk-holdnote{color:var(--tk-d)}
 .tk-circ.tk-bin{color:#B5524A;border-color:#E3B5B0;background:#FBEDEA;width:38px;height:38px}.tk-circ.tk-bin svg{width:17px;height:17px}
 .tk-circ.tk-go{background:var(--tk);border-color:var(--tk);color:#fff}.tk-circ.tk-sm{width:36px;height:36px}.tk-circ svg{width:20px;height:20px}
 .tk-time{position:absolute;opacity:0;pointer-events:none}
@@ -3130,7 +3131,6 @@ function chrome(){
   setCourseColour(course);
   if(screen==="talk"||screen==="tchat"||screen==="tsum"||screen==="tpre") tkChrome();
   if(/^sc[a-z]$/.test(screen)) scChrome();
-  if(screen!=="tchat"&&$("tkLive")) $("tkLive").hidden=true;
 }
 $("backBtn").onclick=()=>{drillOn=false; if(/^sc[a-z]$/.test(screen)){scBack();return} if(screen==="tchat"){talkQuit();return} if(screen==="tpre"){renderTalk();return} if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
 $("quit").onclick=()=>{if(screen==="tchat"){talkQuit();return} if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
@@ -5402,6 +5402,7 @@ const TALK_SC=[
  {id:"opin",e:"🗣️",t:"Dar tu opinión",en:"Sharing opinions",lv:"B1",you:"a friend with opinions",w:"a friend who disagrees politely",at:"a dinner with friends",goal:"agreeing, disagreeing and giving reasons",focus:"subjunctive and connectors"}
 ];
 const TKI={
+  hold:'<circle cx="6" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18" cy="12" r="1.6" fill="currentColor"/>',
  live:'<path d="M4 5h16v11H11l-4 4v-4H4zM8.8 10.6l2.2 2.2 4.2-4.4"/>',
  sc_intro:'<path d="M6 21V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21M3.5 21h17M14.5 12v.01"/>',
  sc_cafe:'<path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8.5 3.5v2M12 3.5v2"/>',
@@ -5470,6 +5471,9 @@ function tkLiveDraw(){ const b=$("tkLive"); if(!b) return; const on=!!ST.talk.li
 $("tkLive").onclick=()=>{ ST.talk.live=!ST.talk.live; saveLocal(); tkLiveDraw(); vcToast(ST.talk.live?"Live feedback on. After each answer you’ll hear how to say it.":"Live feedback off.",2800) };
 const tkNz=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim();
 // After the spoken correction the learner says it back. Listening starts by itself; Skip is always there.
+let tkLiveOn=false, tkLiveBad=false, tkLiveAutoBad=false;
+const tkSR=()=>window.SpeechRecognition||window.webkitSpeechRecognition;
+const tkLiveOK=()=>!!tkSR()&&!(ST.talk&&ST.talk.dict===0);
 function tkRepeat(target,id,after){
   if(id!==TLK.id) return;
   const R=TLK.rep={target,tries:0,state:"listen",heard:"",id,timers:[],gen:0}; let ended=false;
@@ -5477,23 +5481,55 @@ function tkRepeat(target,id,after){
   const later=(fn,ms)=>{ const t=setTimeout(()=>{ R.timers=R.timers.filter(x=>x!==t); if(live()) fn() },ms); R.timers.push(t); return t };
   const clear=()=>{ R.timers.forEach(clearTimeout); R.timers=[] };
   const draw=st=>{ R.state=st; tkComposer() };
-  const finish=(delay)=>{ if(ended) return; ended=true; clear(); R.gen++; if(vcRec) vcStop(false); setTimeout(()=>{ if(id!==TLK.id||TLK.rep!==R) return; TLK.rep=null; TLK.st="say"; tkAmbient(); tkComposer(); after() },delay) };
+  const finish=(delay)=>{ if(ended) return; ended=true; clear(); R.gen++; R.liveStop&&R.liveStop(); if(vcRec) vcStop(false); setTimeout(()=>{ if(id!==TLK.id||TLK.rep!==R) return; TLK.rep=null; TLK.st="say"; tkAmbient(); tkComposer(); after() },delay) };
   R.finish=finish;
   const T=tkNz(target).split(" ").filter(Boolean), need=T.length<=3?1:T.length<=6?.8:.65;
-  R.go=()=>{
+  const score=txt=>{ const H=new Set(tkNz(txt).split(" ")); return T.length?T.filter(t=>H.has(t)).length/T.length:1 };
+  const W=T.length, endQuiet=W>=9?1800:W>=5?1500:1200, hardMs=Math.min(28000,Math.max(9000,4000+W*750));
+  let L=null, miss=0;
+  const liveStop=()=>{ const l=L; if(!l) return; L=null; tkLiveOn=false; l.dead=true; clearInterval(l.iv); try{ l.sr.onresult=l.sr.onerror=l.sr.onend=null; l.sr.abort() }catch(e){} };
+  R.liveStop=liveStop;
+  // judge what was heard (same rule whether it came from live recognition or from a recording)
+  R.judge=txt=>{
+    if(!live()) return; R.tries++; R.heard=txt;
+    if(score(txt)>=need){ haptic(14); const u=TLK.msgs.filter(m=>m.role==="user").pop(); if(u) u.rep=true; draw("ok"); finish(650) }
+    else if(R.tries>=3){ haptic(8); draw("giveup"); finish(1300) }
+    else { haptic(22); draw("again"); const g=++R.gen; tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,200) },TK_FB_VOICE) }
+  };
+  const setHeard=txt=>{ R.heard=txt; const el=document.querySelector(".tk-rh"); if(el) el.textContent="Heard: "+txt; else tkComposer() };
+  const liveGo=manual=>{
+    const SR=tkSR(); let sr; try{ sr=new SR() }catch(e){ tkLiveBad=true; return R.goRec() }
+    const l={sr,txt:"",t0:Date.now(),last:0,dead:false,done:false}; L=l;
+    sr.lang="es-MX"; sr.interimResults=true; sr.continuous=true; sr.maxAlternatives=1;
+    const fin=()=>{ if(l.dead||l.done) return; l.done=true; const txt=l.txt; liveStop(); if(!live()) return;
+      if(txt){ miss=0; R.judge(txt) } else if(++miss>=2){ miss=0; R.goRec() } else draw("idle") };
+    sr.onresult=e=>{
+      if(l.dead||!live()) return; let all=""; for(let i=0;i<e.results.length;i++) all+=" "+e.results[i][0].transcript;
+      all=all.replace(/\s+/g," ").trim(); if(!all) return; l.txt=all; l.last=Date.now(); setHeard(all);
+      if(score(all)>=need){ l.done=true; liveStop(); R.judge(all) } };
+    sr.onerror=e=>{ if(l.dead) return; const c=e&&e.error; if(c==="no-speech"||c==="aborted") return;
+      l.done=true; liveStop(); if(!live()) return;
+      if(c==="not-allowed"||c==="service-not-allowed"||c==="language-not-supported"){ if(manual) tkLiveBad=true; else tkLiveAutoBad=true }
+      R.goRec() };
+    sr.onend=()=>{ fin() };
+    l.iv=setInterval(()=>{ if(!live()){ liveStop(); return } const now=Date.now();
+      if(l.txt&&now-l.last>=endQuiet) fin(); else if(!l.txt&&now-l.t0>7000) fin(); else if(now-l.t0>hardMs) fin() },200);
+    try{ try{ if(navigator.audioSession) navigator.audioSession.type="play-and-record" }catch(e){} sr.start(); tkLiveOn=true; haptic(8) }catch(e){ liveStop(); if(manual) tkLiveBad=true; else tkLiveAutoBad=true; R.goRec() }
+  };
+  R.goRec=()=>{
     if(!live()||vcRec||vcStarting||vcThinking) return; clear(); tkStopAudio(); draw("listen");
-    vcStart($("tkRepMic"),txt=>{
-      if(!live()) return; R.tries++; R.heard=txt;
-      const H=new Set(tkNz(txt).split(" ")), hit=T.length?T.filter(t=>H.has(t)).length/T.length:1;
-      if(hit>=need){ haptic(14); const u=TLK.msgs.filter(m=>m.role==="user").pop(); if(u) u.rep=true; draw("ok"); finish(650) }
-      else if(R.tries>=3){ haptic(8); draw("giveup"); finish(1300) }
-      else { haptic(22); draw("again"); const g=++R.gen; tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,200) },TK_FB_VOICE) }
-    },()=>{ if(live()&&(R.state==="listen"||R.state==="think")) draw("idle") },{auto:true,words:T.length,onThink:()=>{ if(live()) draw("think") }})
+    vcStart($("tkRepMic"),txt=>{ R.judge(txt) },()=>{ if(live()&&(R.state==="listen"||R.state==="think")) draw("idle") },{auto:true,words:T.length,onThink:()=>{ if(live()) draw("think") }})
       .then(started=>{ if(!started&&live()&&!vcRec&&!vcStarting&&!vcThinking&&R.state==="listen") draw("idle") });
   };
+  R.go=manual=>{
+    if(!live()||vcRec||vcStarting||vcThinking||L) return; clear(); tkStopAudio();
+    if(tkLiveOK()&&!tkLiveBad&&(manual===true||!tkLiveAutoBad)){ draw("listen"); R.heard=""; liveGo(manual===true) } else R.goRec();
+  };
   // the three buttons under the sentence
-  R.tap=()=>{ if(!live()) return; if(vcRec){ if(Date.now()-vcRec.t0>700){ vcRec.manual=true; vcStop(true) } return } if(vcStarting||vcThinking) return; R.gen++; clear(); tkSeq++; tkStopAudio(); R.go() };
-  R.hear=()=>{ if(!live()) return; clear(); const g=++R.gen; if(vcRec) vcStop(false); draw("hear"); tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,200) },TK_FB_VOICE) };
+  R.tap=()=>{ if(!live()) return;
+    if(L){ if(Date.now()-L.t0>700){ const t=L.txt; L.done=true; liveStop(); if(t) R.judge(t); else draw("idle") } return }
+    if(vcRec){ if(Date.now()-vcRec.t0>700){ vcRec.manual=true; vcStop(true) } return } if(vcStarting||vcThinking) return; R.gen++; clear(); tkSeq++; tkStopAudio(); R.go(true) };
+  R.hear=()=>{ if(!live()) return; clear(); const g=++R.gen; liveStop(); if(vcRec) vcStop(false); draw("hear"); tkSpeak(R.target,null,()=>{ if(g===R.gen) later(R.go,200) },TK_FB_VOICE) };
   R.skip=()=>{ if(!live()) return; R.gen++; tkSeq++; tkStopAudio(); finish(0) };
   TLK.st="rep"; tkComposer(); later(R.go,200);
 }
@@ -5575,6 +5611,7 @@ function renderTalk(){
       <div class="tk-row"><span>Your level</span>${seg("tkLv",[["","Auto · "+lv],["A1","A1"],["A2","A2"],["B1","B1"]],T.lv)}</div>
       <div class="tk-row"><span>Ideas for what to say</span>${seg("tkSup",[[0,"Full"],[1,"Half hidden"],[2,"Hidden"]],T.sup)}</div>
       <div class="tk-row"><span>Partner’s text</span>${seg("tkHide",[[0,"Shown"],[1,"Hidden"]],T.hide)}</div>
+      <div class="tk-row"><span>Instant check when I repeat a sentence</span>${seg("tkDict",[[1,"On"],[0,"Off"]],T.dict==null?1:T.dict)}</div>
       <div class="tk-row"><span>Send my answer after I stop talking</span>${seg("tkEnd",[[1000,"Quick"],[1400,"Normal"],[2200,"Patient"],[0,"Tap only"]],T.end==null?1400:T.end)}</div>
     </div>
     <button type="button" class="tk-card tk-blind" id="tkBlind"><span class="tk-ic" aria-hidden="true">${tki("eyeoff")}</span><span class="tk-tx"><b>Blind session</b><small>No text, no ideas. A surprise scene with the odd curveball question.</small></span><span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>
@@ -5584,7 +5621,7 @@ function renderTalk(){
       <button type="button" class="grow" id="tkCustGo" style="width:100%;margin-top:8px">Start this scene</button></div>
     <p class="syncline"></p></div>`;
   $("actions").innerHTML="";
-  [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"],["tkEnd","end"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
+  [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"],["tkEnd","end"],["tkDict","dict"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
   $("drill").querySelectorAll(".tk-card").forEach(b=>b.onclick=()=>{ if(!tkReady()) return; renderTalkPre(TALK_SC.find(s=>s.id===b.dataset.sc)) });
   $("tkScn").onclick=renderScn; $("tkBlind").onclick=()=>{ if(!tkReady()) return; const pool=TALK_SC.filter(x=>x.lv===lv), last=TLK.lastBlind; const c=pool.filter(x=>x.id!==last), sc=(c.length?c:pool)[Math.floor(Math.random()*(c.length?c.length:pool.length))]; TLK.lastBlind=sc.id; tkStart(sc,{blind:true}) };
   $("tkCustGo").onclick=()=>{ const v=$("tkCust").value.trim(); if(v.length<8){$("tkCust").focus(); return} if(!tkReady()) return;
@@ -5868,7 +5905,7 @@ function tkMeter(rec){
       const now=Date.now(), el=now-rec.t0, dt=Math.min(100,now-(rec.lt||now)); rec.lt=now; rec.ema=(rec.ema||0)*.55+rec.rms*.45;
       if(el<450){ (rec.cal=rec.cal||[]).push(rec.rms); if(el>=380&&rec.cal.length>3){ const a=rec.cal.slice().sort((x,y)=>x-y); rec.thr=Math.min(.035,Math.max(.014,(a[a.length>>1]||0)*2.6+.008)) } }
       else{ if(rec.ema>(rec.thr||.02)){ rec.vms=(rec.vms||0)+dt; rec.lastLoud=now; if(rec.vms>=240) rec.sp=true } else if(!rec.sp) rec.vms=Math.max(0,(rec.vms||0)-dt/2);
-        const endMs=tkEndMs(); if(endMs&&rec.sp&&now-rec.lastLoud>=endMs&&el>900&&rec.vms>=400){ rec.ending=true; tkMicStop(true); return } }
+        const endMs=rec.hold?0:tkEndMs(); if(endMs&&rec.sp&&now-rec.lastLoud>=endMs&&el>900&&rec.vms>=400){ rec.ending=true; tkMicStop(true); return } }
     }
     if(!rec.voiced){ rec.loud=rec.lv>.12?rec.loud+1:0; if(rec.loud>=3||rec.flat>90||(!an&&Date.now()-rec.t0>1200)){ rec.voiced=true; tkComposer() } }
     if(++tick%3===0){ rec.hist.push(rec.lv); rec.hist.shift(); tkPaintWave(rec) }
@@ -5901,13 +5938,13 @@ function tkComposer(){
     <div class="tk-mrow"><button type="button" class="tk-circ" data-a="rephear" aria-label="Hear it again">${tki("play")}</button><button type="button" class="tk-main${R.state==="listen"?" tk-rl-on":""}" id="tkRepMic" data-a="repmic" aria-label="Say it">${tki("mic")}</button><button type="button" class="tk-circ tk-skip" data-a="repskip" aria-label="Skip">Skip</button></div></div>` }
   else if(busy&&!TLK.err){ h+="" }
   else if(!TLK.err||(TLK.err.kind==="stt"&&!TLK.err.stop)){
-    const hint=TLK.note?`<p class="tk-goal warn">${esc(TLK.note)}</p>`:TLK.goal&&!TLK.blind?`<p class="tk-goal">${esc(TLK.goal)}</p>`:"";
+    const hint=st==="rec"&&r&&r.hold?`<p class="tk-goal tk-holdnote">Holding. Take your time, then tap the arrow to send.</p>`:TLK.note?`<p class="tk-goal warn">${esc(TLK.note)}</p>`:TLK.goal&&!TLK.blind?`<p class="tk-goal">${esc(TLK.goal)}</p>`:"";
     if(TLK.tyOn) h+=`${hint}<form class="tk-form" id="tkForm"><button type="button" class="tk-circ" data-a="typetoggle" aria-label="Use the microphone">${tki("mic")}</button><input id="tkIn" name="t" lang="es" maxlength="300" autocomplete="off" autocapitalize="sentences" placeholder="Escribe en español…" aria-label="Type your answer in Spanish"><button type="submit" class="tk-circ tk-go" aria-label="Send">${tki("up")}</button></form>`;
     else if(st==="rec"&&r) h+=`${hint}<div class="tk-wv" id="tkWv" aria-hidden="true">${r.hist.map(()=>"<i></i>").join("")}</div>
-      <div class="tk-mrow"><span class="tk-side"></span><button type="button" class="tk-main${r.voiced?" tk-send":""}" id="tkMain" data-a="${r.voiced?"send":"pause"}" aria-label="${r.voiced?"Send your answer":"Stop listening"}">${tki(r.voiced?"up":"pause")}</button><button type="button" class="tk-circ tk-bin" data-a="cancel" aria-label="Discard this recording">${tki("trash")}</button></div><span class="tk-time" id="tkTime" aria-hidden="true">0:00</span>`;
+      <div class="tk-mrow"><button type="button" class="tk-circ tk-hold${r.hold?" on":""}" data-a="hold" aria-pressed="${r.hold?"true":"false"}" aria-label="${r.hold?"Resume: send automatically when I stop":"I’m still thinking: don’t send yet"}">${tki("hold")}</button><button type="button" class="tk-main${r.voiced?" tk-send":""}" id="tkMain" data-a="${r.voiced?"send":"pause"}" aria-label="${r.voiced?"Send your answer":"Stop listening"}">${tki(r.voiced?"up":"pause")}</button><button type="button" class="tk-circ tk-bin" data-a="cancel" aria-label="Discard this recording">${tki("trash")}</button></div><span class="tk-time" id="tkTime" aria-hidden="true">0:00</span>`;
     else h+=`${hint}<div class="tk-wv tk-idle" aria-hidden="true">${"<i></i>".repeat(44)}</div><div class="tk-mrow"><button type="button" class="tk-circ" data-a="typetoggle" aria-label="Type instead">${tki("kbd")}</button><button type="button" class="tk-main" id="tkMain" data-a="mic" aria-label="Record your answer">${tki("mic")}</button><span class="tk-side"></span></div>`;
   }
-  const dk=st+"|"+(r&&r.voiced)+"|"+TLK.tyOn+"|"+(TLK.err?1:0)+"|"+TLK.msgs.length, fade=dk!==TLK.dk; TLK.dk=dk;
+  const dk=st+"|"+(r&&r.voiced)+"|"+(r&&r.hold?1:0)+"|"+TLK.tyOn+"|"+(TLK.err?1:0)+"|"+TLK.msgs.length, fade=dk!==TLK.dk; TLK.dk=dk;
   if(TLK.lastH===h&&a.firstElementChild&&a.firstElementChild.classList.contains("tk-comp")){ if(st==="rec"&&r) tkPaintWave(r); return }
   TLK.lastH=h;
   a.innerHTML=`<div class="tk-comp${fade?" tk-fade":""}">${h}</div>`;
@@ -5921,6 +5958,7 @@ function tkCompClick(e){
   else if(a==="repmic"&&TLK.rep) TLK.rep.tap()
   else if(a==="rephear"&&TLK.rep) TLK.rep.hear()
   else if(a==="repskip"&&TLK.rep) TLK.rep.skip()
+  else if(a==="hold"&&tkRec){ const r=tkRec; r.hold=!r.hold; r.lastLoud=Date.now(); clearTimeout(r.auto); r.auto=setTimeout(()=>tkMicStop(r.voiced),r.hold?100000:45000); haptic(8); tkComposer() }
   else if(a==="send") tkMicStop(true);
   else if(a==="pause"||a==="cancel") tkMicStop(false);
   else if(a==="typetoggle"){ tkSkip(); if(tkRec) tkMicStop(false); TLK.tyOn=!TLK.tyOn; TLK.note=""; tkComposer(); if(TLK.tyOn&&$("tkIn")) $("tkIn").focus() }
@@ -5962,7 +6000,7 @@ function renderTalkSum(){
 }
 
 // ---------- answer by voice (pronoun + verb drills) ----------
-let vcRec=null; setInterval(()=>{ const on=!!(vcRec||(typeof tkRec!=="undefined"&&tkRec)); if(document.body.classList.contains("mic-live")!==on) document.body.classList.toggle("mic-live",on) },100);
+let vcRec=null; setInterval(()=>{ const on=!!(vcRec||tkLiveOn||(typeof tkRec!=="undefined"&&tkRec)); if(document.body.classList.contains("mic-live")!==on) document.body.classList.toggle("mic-live",on) },100);
 function vcToast(msg,ms){ let t=$("vcToast"); if(!t){ t=document.createElement("div"); t.id="vcToast"; t.className="vc-toast"; document.body.appendChild(t) }
   t.textContent=msg; t.classList.add("on"); clearTimeout(t._h); if(ms!==0) t._h=setTimeout(()=>t.classList.remove("on"),ms||2600) }
 function vcStop(send){ const r=vcRec; if(!r) return; r.send=send; try{ r.mr.stop() }catch(e){ vcRelease(r) } }
