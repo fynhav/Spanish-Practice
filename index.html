@@ -516,6 +516,27 @@ button.vrow{border:0;background:none;width:100%;text-align:left;font:inherit;fon
 .wr-bulk button[aria-pressed=true]{background:var(--cc,var(--both));border-color:transparent;color:#fff}
 .wr-msg{margin-top:8px;padding:9px 12px;border-radius:12px;background:var(--ok-soft);color:var(--ink);font-size:.86rem;display:flex;gap:10px;align-items:center;justify-content:space-between}.wr-msg[hidden]{display:none}.wr-msg button{border:0;background:none;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;padding:4px 2px;cursor:pointer}
 .wr-row.st{outline:2px solid var(--both)}
+.ncheat summary{cursor:pointer;font-weight:600;min-height:28px;display:flex;align-items:center}
+.ncl{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px}
+.ncl>div{display:flex;align-items:center;gap:6px;font-size:.92rem;min-width:0}.ncl b{font-variant-numeric:tabular-nums;min-width:4.6em;white-space:nowrap}.ncl span{color:var(--muted);flex:1;min-width:0}
+@media(max-width:440px){.ncl{grid-template-columns:1fr}}
+.nq{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2.4vh,18px);text-align:center}.nq .meta{align-self:stretch;justify-content:center}
+.nplayrow{display:flex;align-items:center;gap:16px;justify-content:center}
+.nplay{width:clamp(76px,12vh,96px);height:clamp(76px,12vh,96px);border-radius:50%;border:0;background:var(--cc);color:#fff;display:grid;place-items:center;padding:0}.nplay svg{width:42%;height:42%}.nplay.on{box-shadow:0 0 0 6px var(--cc-soft)}
+.nslow{background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:20px;padding:8px 14px;font-size:.9rem}
+.nbig{font-family:var(--f-display);font-size:clamp(2.4rem,8vh,3.4rem);line-height:1.2;min-width:3ch;padding:2px 18px 4px;border-bottom:3px solid var(--cc);font-variant-numeric:tabular-nums;word-break:keep-all}
+.nbig.empty{color:var(--line)}.nbig.ok{color:var(--ok);border-color:var(--ok)}.nbig.bad{color:var(--bad);border-color:var(--bad);text-decoration:line-through}
+.nq .vopts{align-self:stretch}.nq .vopt{font-size:1.5rem;font-variant-numeric:tabular-nums}
+#nFb{align-self:stretch;width:100%}.ncheat summary::after{content:"›";margin-left:auto;font-size:1.4rem;color:var(--muted);transition:transform .15s}.ncheat[open] summary::after{transform:rotate(90deg)}
+.nfb{align-self:stretch;border-radius:14px;padding:12px 14px;text-align:left;background:var(--card);border:1.5px solid var(--line)}
+.nfb.ok{background:var(--ok-soft);border-color:var(--ok)}.nfb.bad{background:var(--bad-soft);border-color:var(--bad)}
+.nfb .verdict{font-size:1.1rem}.nfb.ok .verdict{color:var(--ok)}.nfb.bad .verdict{color:var(--bad)}
+.nans{font-family:var(--f-display);font-size:1.9rem;line-height:1.15;font-variant-numeric:tabular-nums}
+.nwords{display:flex;align-items:center;gap:6px;font-size:1.1rem;font-weight:600;flex-wrap:wrap}.nfb .note{margin:6px 0 0}
+.npad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.npad button{padding:0;min-height:clamp(44px,6.8vh,56px);font-size:1.45rem;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-bottom-width:3px;border-radius:14px;font-variant-numeric:tabular-nums}
+.npad button:active{transform:translateY(1px)}.npad button.go{background:var(--cc);border-color:var(--cc);color:#fff}
+.actions:has(.npad){padding-block:8px 10px}
 
 .xp-hero{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
 .xp-lv{width:46px;height:46px;border-radius:50%;background:var(--both);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-size:1.4rem;flex:none}
@@ -2893,6 +2914,7 @@ function docData(k){
   if(k==="verbs") return {m:ST.verbs.m,log:ST.verbs.log,updatedAt:Date.now()};
   if(k==="time") return {log:ST.time.log,shown:ST.time.shown,updatedAt:Date.now()};
   if(k==="talk") return {best:ST.talk.best,log:ST.talk.log,updatedAt:Date.now()};
+  if(k==="num") return {best:ST.num.best,miss:ST.num.miss,log:ST.num.log,updatedAt:Date.now()};
   if(k==="scn") return {w:ST.scn.w,p:ST.scn.p,log:ST.scn.log,updatedAt:Date.now()};
   const [t,c]=k.split("-");
   if(t==="prog") return {done:ST[c].done,log:ST[c].log,updatedAt:Date.now()};
@@ -2911,6 +2933,7 @@ function mergeDoc(id,v){
   else if(id==="words"&&ST.words){const W=ST.words; for(const [k2,x] of Object.entries(v.c||{})){const l=W.c[k2]; if(!l||cardStamp(x)>cardStamp(l)) W.c[k2]=x} mx(W.log,v.log); mx(W.nlog,v.nlog); mx(W.xtra,v.xtra); mx(W.gone,v.gone); for(const [k2,g] of Object.entries(W.gone)){const l=W.c[k2]; if(l&&cardStamp(l)<=g) delete W.c[k2]}}
   else if(id==="verbs"&&ST.verbs){const V2=ST.verbs; for(const [tk,mm] of Object.entries(v.m||{})){const T=V2.m[tk]=V2.m[tk]||{}; for(const [inf,x] of Object.entries(mm||{})){const l=T[inf]; if(!l||(x.t||0)>(l.t||0)) T[inf]=x}} mx(V2.log,v.log)}
   else if(id==="talk"&&ST.talk){mx(ST.talk.best,v.best); mx(ST.talk.log,v.log)}
+  else if(id==="num"&&ST.num){mx(ST.num.best,v.best); mx(ST.num.log,v.log); for(const [k2,x] of Object.entries(v.miss||{})){const l=ST.num.miss[k2]; if(!l||(x.t||0)>(l.t||0)) ST.num.miss[k2]=x}}
   else if(id==="scn"&&ST.scn){ for(const [k2,x] of Object.entries(v.w||{})){const l=ST.scn.w[k2]; if(!l||(x.u||0)>(l.u||0)) ST.scn.w[k2]=x} for(const [k2,x] of Object.entries(v.p||{})){const l=ST.scn.p[k2]||(ST.scn.p[k2]={ph:{},dlg:0,talk:0}); Object.assign(l.ph,x.ph||{}); l.dlg=Math.max(l.dlg||0,x.dlg||0); l.talk=Math.max(l.talk||0,x.talk||0)} mx(ST.scn.log,v.log) }
   else if(id==="time"&&ST.time){mx(ST.time.log,v.log); for(const k2 of Object.keys(v.shown||{})) ST.time.shown[k2]=true}
   else if(id.startsWith("day-")&&v.date){ST.pron.log[v.date]=Math.max(ST.pron.log[v.date]||0,v.best||0)}
@@ -2927,6 +2950,7 @@ function replaceDoc(id,v){
   else if(id==="verbs"){ST.verbs.m=v.m||{}; ST.verbs.log=v.log||{}}
   else if(id==="time"){ST.time.log=v.log||{}; ST.time.shown=v.shown||{}}
   else if(id==="talk"){ST.talk.best=v.best||{}; ST.talk.log=v.log||{}}
+  else if(id==="num"){ST.num.best=v.best||{}; ST.num.miss=v.miss||{}; ST.num.log=v.log||{}}
   else if(id==="scn"){ST.scn.w=v.w||{}; ST.scn.p=v.p||{}; ST.scn.log=v.log||{}}
 }
 let dbCol=null, syncing=false, dbState="connecting";
@@ -2980,7 +3004,7 @@ function updateSync(){
 }
 // ================= cloud copy on Railway (optional; one pairing code per person) =================
 const RAIL_URL="https://practica-sync-production.up.railway.app", RK="pd-rail";
-const RDOCS=[...COURSE_IDS.flatMap(c=>["prog-"+c,"session-"+c]),"drill","stories","xp","words","verbs","time","talk","scn"];
+const RDOCS=[...COURSE_IDS.flatMap(c=>["prog-"+c,"session-"+c]),"drill","stories","xp","words","verbs","time","talk","scn","num"];
 let RL={code:"",revs:{},hash:{},pulled:0}; try{Object.assign(RL,JSON.parse(localStorage.getItem(RK)||"{}"))}catch(e){}
 const rSave=()=>{try{localStorage.setItem(RK,JSON.stringify(RL))}catch(e){}};
 let rState=RL.code?"connecting":"off", rBusy=false, rTimer=0, rAgain=false;
@@ -3105,7 +3129,7 @@ function streak(has){
 const isDrill=()=>screen==="dsetup"||screen==="dq"||screen==="dsum";
 const isStory=()=>screen==="slist"||screen==="story"||screen==="easy";
 function setCourseColour(c){
-  const k=/^(wr|talk|tchat|tsum|tpre)/.test(screen)?"both":isV()?(screen==="vlearn"&&V.ln?VTK[V.ln.tk].cc:screen==="vq"&&V.q[V.i]?VTK[V.q[V.i].tk].cc:(VTK[V.tense]||{cc:"mix"}).cc):isStory()?(storyKind==="pron"?"both":"pret"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
+  const k=isN()?"pres":/^(wr|talk|tchat|tsum|tpre)/.test(screen)?"both":isV()?(screen==="vlearn"&&V.ln?VTK[V.ln.tk].cc:screen==="vq"&&V.q[V.i]?VTK[V.q[V.i].tk].cc:(VTK[V.tense]||{cc:"mix"}).cc):isStory()?(storyKind==="pron"?"both":"pret"):isDrill()?"io":c?COURSES[c].cc:"do", s=$("app").style;
   s.setProperty("--cc",`var(--${k})`); s.setProperty("--cc-soft",`var(--${k}-soft)`);
 }
 function chrome(){
@@ -3116,12 +3140,13 @@ function chrome(){
   const inS=screen==="q"||screen==="intro";
   $("accents").hidden=true;
   const tb=tabOf(); $("tabbar").hidden=!tb; if(tb) tabDraw(tb);
-  $("backBtn").hidden=!!tb||!(screen==="vhome"||screen==="prog"||screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm"&&screen!=="wr")); $("quit").hidden=!(inS||screen==="dq"||screen==="vq"||screen==="vm"||screen==="wr");
-  $("backBtn").textContent=screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":screen==="wrlist"?"‹ Words":"‹ "+rootName;
-  $("title").textContent=/^(talk|tchat|tsum|tpre)$/.test(screen)?"Talk":screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":/^sc[a-z]$/.test(screen)?"Scenarios":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
-  $("progress").hidden=!(inS||screen==="vq"||screen==="vm"||screen==="wr"); $("openRules").hidden=$("openSettings").hidden=screen==="vq"||screen==="vm"||screen==="wr";
-  $("score").textContent=screen==="wr"?`${WR.fin} / ${WR.total}`:screen==="vq"||screen==="vm"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
+  $("backBtn").hidden=!!tb||!(screen==="nhome"||screen==="nsum"||screen==="vhome"||screen==="prog"||screen==="course"||screen==="dsetup"||screen==="dsum"||isStory()||(isV()&&screen!=="vq"&&screen!=="vm"&&screen!=="wr")); $("quit").hidden=!(inS||screen==="nq"||screen==="dq"||screen==="vq"||screen==="vm"||screen==="wr");
+  $("backBtn").textContent=screen==="nsum"?"‹ Numbers":screen==="story"||screen==="easy"?"‹ Stories":screen==="vverb"?"‹ Verbs":screen==="vlearn"?"‹ Back":screen==="wrlist"?"‹ Words":"‹ "+rootName;
+  $("title").textContent=isN()?"Numbers":/^(talk|tchat|tsum|tpre)$/.test(screen)?"Talk":screen==="vhome"?"Verb trainer":screen==="prog"?"Level and XP":screen==="ctab"?"Courses":screen==="all"?"Everything":isV()?vTitle():isStory()?"Stories":isDrill()?"Endless drill":/^sc[a-z]$/.test(screen)?"Scenarios":screen==="menu"?"Práctica diaria":(inS?`${COURSES[course].short} · Day ${day}`:COURSES[course].name);
+  $("progress").hidden=!(inS||screen==="nq"||screen==="vq"||screen==="vm"||screen==="wr"); $("openRules").hidden=$("openSettings").hidden=screen==="nq"||screen==="vq"||screen==="vm"||screen==="wr";
+  $("score").textContent=screen==="wr"?`${WR.fin} / ${WR.total}`:screen==="nq"?`✓ ${NQ.score}`:screen==="vq"||screen==="vm"?`✓ ${V.score}`:inS?`${Object.values(scores).reduce((a,b)=>a+b,0)} / ${TOTAL(course)}`:screen==="dq"?`${drill.points.toLocaleString()} pts`:"";
   if(screen==="wr") $("progress").innerHTML=`<span class="p-v" style="flex:1"><i style="width:${WR.total?Math.min(100,WR.fin/WR.total*100):0}%"></i></span>`;
+  else if(screen==="nq") $("progress").innerHTML=NQ.q.map((_,i)=>`<span class="p-v" style="flex:1"><i style="width:${i<NQ.i||(i===NQ.i&&NQ.answered)?100:0}%"></i></span>`).join("");
   else if(screen==="vq"||screen==="vm") $("progress").innerHTML=V.q.map((_,i)=>`<span class="p-v" style="flex:1"><i style="width:${i<V.i||(i===V.i&&V.answered)?100:0}%"></i></span>`).join("");
   if(inS){
     let start=0;
@@ -3132,8 +3157,8 @@ function chrome(){
   if(screen==="talk"||screen==="tchat"||screen==="tsum"||screen==="tpre") tkChrome();
   if(/^sc[a-z]$/.test(screen)) scChrome();
 }
-$("backBtn").onclick=()=>{drillOn=false; if(/^sc[a-z]$/.test(screen)){scBack();return} if(screen==="tchat"){talkQuit();return} if(screen==="tpre"){renderTalk();return} if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
-$("quit").onclick=()=>{if(screen==="tchat"){talkQuit();return} if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
+$("backBtn").onclick=()=>{drillOn=false; if(screen==="nsum"){renderNumHome();return} if(/^sc[a-z]$/.test(screen)){scBack();return} if(screen==="tchat"){talkQuit();return} if(screen==="tpre"){renderTalk();return} if(screen==="story"||screen==="easy") renderStoryList(); else if(screen==="vverb") renderVList(true); else if(screen==="wrlist") renderWrSet(); else if(screen==="vlearn") (V.ln.from==="verb"?renderVVerb(V.ln.vi):renderVSetup()); else rootRet()};
+$("quit").onclick=()=>{if(screen==="nq"){nEnd();return} if(screen==="tchat"){talkQuit();return} if(screen==="dq"){endDrill();return} if(screen==="vq"){vEnd();return} if(screen==="vm"){vmEnd();return} if(screen==="wr"){wrEnd();return} justDone=null;renderCourse(course)};
 function vTitle(){return screen==="wrset"||screen==="wr"?"Word review":screen==="wrsum"?"Session done":screen==="wrlist"?WORDS.length+" words":screen==="vmset"||screen==="vm"?"Verb meanings":screen==="vmsum"?"Round done":screen==="vlist"?VB.length+" verbs":screen==="vverb"?VBX[V.verb].inf:screen==="vlearn"?"Learn":screen==="vsum"?"Round done":screen==="vq"?VTK[V.q[V.i].tk].n:(VTK[V.tense]?VTK[V.tense].n:"Mix · all tenses")}
 // swipe right from the far-left edge = back (closes settings, or goes up one level, like the ‹ button)
 (function(){
@@ -3168,8 +3193,8 @@ function weekHTML(ringFor){
   return `<div class="week">${weekDays().map((d,i)=>{const k=dkey(d),isT=k===tk,fut=k>tk,x=ringFor(k);
     return `<div class="day${isT?" is-today":""}"><span class="dl">${LBL[i]}</span><span class="ring${x.cls}${isT?" today":""}${fut?" future":""}" aria-label="${LBL[i]}: ${esc(x.label)}">${x.html}</span></div>`}).join("")}</div>`;
 }
-const homeHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
-const homeRing=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=COURSE_IDS.some(c=>c!=="pron"&&c!=="past"&&ST[c].log[k]!=null)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
+const homeHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0||((ST.num&&ST.num.log[k])||0)>0;
+const homeRing=k=>{const a=ST.pron.log[k]!=null,b=ST.past.log[k]!=null,c=COURSE_IDS.some(c=>c!=="pron"&&c!=="past"&&ST[c].log[k]!=null)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0||((ST.num&&ST.num.log[k])||0)>0;
   return {cls:a||b||c?" any":"",label:[a&&"object pronouns",b&&"past tense",c&&"drill, stories or verbs"].filter(Boolean).join(", ")||"nothing yet",html:`<span class="dd"><i class="${a?"a":""}"></i><i class="${b?"b":""}"></i><i class="${c?"c":""}"></i></span>`}};
 function courseCardsHTML(lvl){
   const tk=todayKey();
@@ -3220,11 +3245,12 @@ function renderMenu(){
 }
 function renderCoursesTab(){
   screen="ctab"; setRoot(renderCoursesTab,"Courses"); course=null; drillOn=false; $("fb").hidden=true; chrome();
-  $("drill").innerHTML=`<p class="label" style="margin:0">A1 courses</p>${courseCardsHTML("A1")}
+  $("drill").innerHTML=`<p class="label" style="margin:0">A1 courses</p>${nCardHTML()}${courseCardsHTML("A1")}
     <p class="label" style="margin:6px 0 0">A2 courses</p>${courseCardsHTML("A2")}
     <p class="label" style="margin:6px 0 0">B1 courses</p>${courseCardsHTML("B1")}${soonRows()?`<div class="all-s">${soonRows()}</div>`:""}<p class="syncline"></p>`;
   $("actions").innerHTML="";
   document.querySelectorAll(".course[data-c]").forEach(b=>b.onclick=()=>{justDone=null;renderCourse(b.dataset.c)});
+  $("nCard").onclick=renderNumHome;
   updateSync();
 }
 function renderVHome(){
@@ -3241,7 +3267,7 @@ function renderAll(){
   $("drill").innerHTML=`
     <div><p class="label" style="margin:0 0 6px 2px">Practise</p><div class="all-grid">
       ${tile("aWr","both","Word review",st.todo?`${st.due} due · ${st.nw} new`:"All done today ✓")}${tile("aVb","pres","Verb trainer","A1–B1 tenses")}${tile("aSt","io","Stories",`A2 · ${sd} of ${ids.size}`)}${tile("aDr","io","Endless drill",`best ${(ST.drill.best||0).toLocaleString()} pts`)}</div></div>
-    ${sec("Courses · A1",Object.keys(COURSES).filter(c=>COURSE_LV[c]==="A1").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${dN(c)} / ${daysOf(c)} days · ${dN(c)>=daysOf(c)?"Complete ✓":"Day "+nextDay(c)+" ready"}`)).join(""))}
+    ${sec("Courses · A1",row("aNm","pres","Numbers",`${NSTAGES.filter(x=>(ST.num.best[x.id]||0)>=8).length} / ${NSTAGES.length} stages passed`)+Object.keys(COURSES).filter(c=>COURSE_LV[c]==="A1").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${dN(c)} / ${daysOf(c)} days · ${dN(c)>=daysOf(c)?"Complete ✓":"Day "+nextDay(c)+" ready"}`)).join(""))}
     ${sec("Courses · A2",Object.keys(COURSES).filter(c=>COURSE_LV[c]==="A2").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${dN(c)} / ${daysOf(c)} days · ${dN(c)>=daysOf(c)?"Complete ✓":"Day "+nextDay(c)+" ready"}`)).join(""))}
     ${sec("Courses · B1",Object.keys(COURSES).filter(c=>COURSE_LV[c]==="B1").map(c=>row("ac-"+c,COURSES[c].cc,COURSES[c].name,`${dN(c)} / ${daysOf(c)} days · ${dN(c)>=daysOf(c)?"Complete ✓":"Day "+nextDay(c)+" ready"}`)).join("")+soonRows())}
     ${sec("Words",row("aWl","both",`All ${WORDS.length.toLocaleString()} words`,"tick the ones you know")+row("aWk","both","Known list",`${st.known} known well`))}
@@ -3249,7 +3275,7 @@ function renderAll(){
     <p class="syncline"></p>`;
   $("actions").innerHTML="";
   Object.keys(COURSES).forEach(c=>{ if(dN(c)>=daysOf(c)&&$("ac-"+c)) $("ac-"+c).classList.add("fin") });
-  $("aWr").onclick=renderWrSet; $("aVb").onclick=renderVHome; $("aSt").onclick=()=>renderStoryList(); $("aDr").onclick=renderDrillSetup;
+  $("aNm").onclick=renderNumHome; $("aWr").onclick=renderWrSet; $("aVb").onclick=renderVHome; $("aSt").onclick=()=>renderStoryList(); $("aDr").onclick=renderDrillSetup;
   Object.keys(COURSES).forEach(c=>$("ac-"+c).onclick=()=>{justDone=null;renderCourse(c)});
   $("aWl").onclick=()=>{renderWrList()}; $("aWk").onclick=()=>{try{WR.list.f="known"}catch(e){} renderWrList()};
   $("aLv").onclick=$("aDy").onclick=renderProg; $("aSe").onclick=()=>$("openSettings").click(); $("aHe").onclick=()=>$("openRules").click();
@@ -5272,7 +5298,7 @@ const XP_TITLES=[[1,"Principiante"],[5,"Aprendiz"],[10,"Estudiante"],[15,"Conver
 const xpAt=L=>100*(L-1)+10*(L-1)*(L-2);
 const xpTotal=()=>ST.xp.seed+Object.values(ST.xp.log).reduce((a,b)=>a+b,0);
 function xpInfo(t){let L=1; while(xpAt(L+1)<=t) L++; const a=xpAt(L), b=xpAt(L+1); let ti=XP_TITLES[0][1]; XP_TITLES.forEach(([n,x])=>{if(L>=n) ti=x}); return {L,into:t-a,need:b-a,frac:(t-a)/(b-a),title:ti,total:t}}
-const dayHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
+const dayHas=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0||((ST.num&&ST.num.log[k])||0)>0;
 const xpQuestDefs=()=>{const tk=todayKey(); return [
   {id:"day",label:"Finish a grammar day",cur:courseLog(tk)?1:0,goal:1,xp:20},
   {id:"words",label:"Review 10 words",cur:Math.min(10,ST.words.log[tk]||0),goal:10,xp:20},
@@ -5461,10 +5487,11 @@ function tkLeave(){
   if(tkRec){ const r=tkRec; r.send=false; tkRec=null; tkStopRec(r); try{r.mr.stop()}catch(e){} }
   tkSeq++; tkStopAudio();
 }
-const tkPend=new Map(), TK_FB_VOICE="onyx", tkK=(t,v)=>(v||"")+"|"+t;   // feedback is spoken by a different voice from the partner
+const TK_SPDS=[0.85,1,1.25,1.5], tkSpd=()=>{ const n=+(ST.talk&&ST.talk.spd); return TK_SPDS.includes(n)?n:1.25 };
+const tkPend=new Map(), TK_FB_VOICE="onyx", tkK=(t,v)=>(v||"")+"|"+tkSpd()+"|"+t;   // feedback is spoken by a different voice from the partner
 function tkPrefetch(text,voice){
   const K=tkK(text,voice); if(!text||tkCache.has(K)||tkPend.has(K)) return;
-  const pr=(async()=>{ try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify(voice?{text,voice}:{text}),ms:25000}); if(!r.ok) return; const ab=await r.arrayBuffer(); if(!tkCache.has(K)) tkCache.set(K,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} tkPend.delete(K) })();
+  const pr=(async()=>{ try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify(voice?{text,voice,speed:tkSpd()}:{text,speed:tkSpd()}),ms:25000}); if(!r.ok) return; const ab=await r.arrayBuffer(); if(!tkCache.has(K)) tkCache.set(K,{ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}) }catch(e){} tkPend.delete(K) })();
   tkPend.set(K,pr);
 }
 function tkLiveDraw(){ const b=$("tkLive"); if(!b) return; const on=!!ST.talk.live; b.setAttribute("aria-pressed",String(on)); b.classList.toggle("on",on); b.innerHTML=tki("live"); b.setAttribute("aria-label","Live feedback "+(on?"on":"off")) }
@@ -5605,9 +5632,9 @@ function tkPlayStream(st,btn,done){
   setTimeout(()=>{ if(!fin&&mine===tkSeq){ st.S.forEach(x=>{ x.last=true }); L.pump() } },30000);
 }
 // look-ahead: ask the server to prepare the replies to the answers you are most likely to give
-function tkWarmScenes(){ if(!RL.code) return; const lv=tkLevel(); if(tkWarmScenes.done&&tkWarmScenes.done[lv]) return; (tkWarmScenes.done=tkWarmScenes.done||{})[lv]=1;
+function tkWarmScenes(){ if(!RL.code) return; const lv=tkLevel(); if(tkWarmScenes.done&&tkWarmScenes.done[lv+"|"+tkSpd()]) return; (tkWarmScenes.done=tkWarmScenes.done||{})[lv+"|"+tkSpd()]=1;
   const all=TALK_SC.map(sc=>({scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:lv,focus:sc.focus||""}));
-  for(let i=0;i<all.length;i+=8) rfetch("/talk/warm",{method:"POST",body:JSON.stringify({items:all.slice(i,i+8)}),ms:10000}).catch(()=>{}) }
+  for(let i=0;i<all.length;i+=8) rfetch("/talk/warm",{method:"POST",body:JSON.stringify({items:all.slice(i,i+8),speed:tkSpd()}),ms:10000}).catch(()=>{}) }
 const tkSpecSt=(rec)=>{ try{ const blob=new Blob(rec.chunks,{type:rec.mt}); if(blob.size<4000) return; const at=Date.now();
   const p=rfetch("/talk/stt",{method:"POST",body:blob,headers:{"content-type":rec.mt},ms:25000}).then(async r=>{ if(!r.ok) throw new Error("stt "+r.status); return String((await r.json()).text||"").trim() }); p.catch(()=>{}); rec.spec={at,p} }catch(e){} };
 async function tkSpeak(text,btn,done,voice){
@@ -5617,7 +5644,7 @@ async function tkSpeak(text,btn,done,voice){
   let fin=false, wd=0; const off=()=>{ clearTimeout(wd); if(btn) btn.classList.remove("tk-on"); if(!fin){ fin=true; if(done) done() } };
   const rate=S.rate==="slow"?.8:1; const K=tkK(text,voice); if(tkPend.has(K)) await tkPend.get(K); let c=tkCache.get(K);
   if(!c){
-    try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify(voice?{text,voice}:{text}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); const ab=await r.arrayBuffer(); c={ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}; tkCache.set(K,c) }
+    try{ const r=await rfetch("/talk/tts",{method:"POST",body:JSON.stringify(voice?{text,voice,speed:tkSpd()}:{text,speed:tkSpd()}),ms:25000}); if(!r.ok) throw new Error("tts "+r.status); const ab=await r.arrayBuffer(); c={ab,u:URL.createObjectURL(new Blob([ab],{type:"audio/mpeg"}))}; tkCache.set(K,c) }
     catch(e){ if(mine===tkSeq){ try{ speak(text,btn) }catch(x){} setTimeout(off,Math.max(1200,text.length*65)) } else off(); return }
   }
   if(mine!==tkSeq){ off(); return }
@@ -5659,6 +5686,7 @@ function renderTalk(){
       <div class="tk-row"><span>Ideas for what to say</span>${seg("tkSup",[[0,"Full"],[1,"Half hidden"],[2,"Hidden"]],T.sup)}</div>
       <div class="tk-row"><span>Partner’s text</span>${seg("tkHide",[[0,"Shown"],[1,"Hidden"]],T.hide)}</div>
       <div class="tk-row"><span>Instant check when I repeat a sentence</span>${seg("tkDict",[[1,"On"],[0,"Off"]],T.dict==null?1:T.dict)}</div>
+      <div class="tk-row"><span>Partner’s voice speed</span>${seg("tkSpd",[[0.85,"Slow"],[1,"Normal"],[1.25,"Brisk"],[1.5,"Fast"]],tkSpd())}</div>
       <div class="tk-row"><span>Send my answer after I stop talking</span>${seg("tkEnd",[[650,"Quick"],[1000,"Normal"],[1800,"Patient"],[0,"Tap only"]],tkEndMs())}</div>
     </div>
     <button type="button" class="tk-card tk-blind" id="tkBlind"><span class="tk-ic" aria-hidden="true">${tki("eyeoff")}</span><span class="tk-tx"><b>Blind session</b><small>No text, no ideas. A surprise scene with the odd curveball question.</small></span><span class="tk-go" aria-hidden="true">${tki("sc_chev")}</span></button>
@@ -5668,7 +5696,7 @@ function renderTalk(){
       <button type="button" class="grow" id="tkCustGo" style="width:100%;margin-top:8px">Start this scene</button></div>
     <p class="syncline"></p></div>`;
   $("actions").innerHTML="";
-  [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"],["tkEnd","end"],["tkDict","dict"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
+  [["tkLv","lv"],["tkSup","sup"],["tkHide","hide"],["tkEnd","end"],["tkDict","dict"],["tkSpd","spd"]].forEach(([id,key])=>$(id).onclick=e=>{const b=e.target.closest("button"); if(!b) return; T[key]=key==="lv"?b.dataset.v:+b.dataset.v; saveLocal(); const y=$("drill").scrollTop; renderTalk(); $("drill").scrollTop=y});
   $("drill").querySelectorAll(".tk-card").forEach(b=>b.onclick=()=>{ if(!tkReady()) return; renderTalkPre(TALK_SC.find(s=>s.id===b.dataset.sc)) });
   $("tkScn").onclick=renderScn; $("tkBlind").onclick=()=>{ if(!tkReady()) return; const pool=TALK_SC.filter(x=>x.lv===lv), last=TLK.lastBlind; const c=pool.filter(x=>x.id!==last), sc=(c.length?c:pool)[Math.floor(Math.random()*(c.length?c.length:pool.length))]; TLK.lastBlind=sc.id; tkStart(sc,{blind:true}) };
   $("tkCustGo").onclick=()=>{ const v=$("tkCust").value.trim(); if(v.length<8){$("tkCust").focus(); return} if(!tkReady()) return;
@@ -5826,7 +5854,7 @@ async function tkPost(path,body,ms,again){
 // the grade of your last line runs in parallel, and the translation + ideas load while the audio plays.
 async function tkTurn(){
   const id=TLK.id; TLK.st="ai"; TLK.err=null; TLK.note=""; TLK.sug=[]; TLK.sugReady=false; tkDraw(TLK.msgs.length?"end":"top"); lastAct=Date.now(); tkWarm();
-  const sc=TLK.sc, base={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),blind:!!TLK.blind};
+  const sc=TLK.sc, base={scenario:{title:sc.t+" ("+sc.en+")",setup:tkSetup(sc),role:sc.w},level:TLK.lv,focus:sc.focus||"",maxTurns:tkMax(sc),blind:!!TLK.blind,speed:tkSpd()};
   const hist=()=>TLK.msgs.filter(m=>m.es&&!m.pend).map(m=>({role:m.role,es:m.es}));
   const lastU=TLK.msgs[TLK.msgs.length-1], hasU=!!(lastU&&lastU.role==="user"), t0=Date.now();
   const auto=S.auto==="on", liveOn=!!(hasU&&ST.talk.live&&auto);
@@ -6546,12 +6574,219 @@ function scUsedHTML(){
   return `<div class="vcard"><p class="label" style="margin-bottom:6px">Scenario words you used</p><p class="sc-nt">${used.length?esc(used.join(" · ")):"None yet. Try working a few of the picture words into your answers."}</p></div>`;
 }
 
+// ---------- Numbers course: listen to a number, type or pick it ----------
+ST.num=ST.num||{}; ST.num.best=ST.num.best||{}; ST.num.miss=ST.num.miss||{}; ST.num.log=ST.num.log||{}; if(ST.num.slow==null) ST.num.slow=0;
+let NQ=null;
+function isN(){ return screen==="nhome"||screen==="nq"||screen==="nsum" }
+const NU=["cero","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez","once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho","diecinueve","veinte","veintiuno","veintidós","veintitrés","veinticuatro","veinticinco","veintiséis","veintisiete","veintiocho","veintinueve"];
+const NT=["","","","treinta","cuarenta","cincuenta","sesenta","setenta","ochenta","noventa"];
+const NH=["","ciento","doscientos","trescientos","cuatrocientos","quinientos","seiscientos","setecientos","ochocientos","novecientos"];
+// 1–999 as words; apoc = shorten "uno" to "un" (before mil / millones)
+function nBelow(n,apoc){
+  if(n===100) return "cien";
+  const h=Math.floor(n/100), r=n%100, p=[];
+  if(h) p.push(NH[h]);
+  if(r){
+    if(r<30){ let w=NU[r]; if(apoc&&r===1) w="un"; if(apoc&&r===21) w="veintiún"; p.push(w) }
+    else { const u=r%10; p.push(NT[Math.floor(r/10)]+(u?" y "+(apoc&&u===1?"un":NU[u]):"")) }
+  }
+  return p.join(" ");
+}
+function numEs(n){
+  n=Math.round(n); if(n===0) return "cero";
+  const M=Math.floor(n/1e6), K=Math.floor(n%1e6/1000), R=n%1000, p=[];
+  if(M) p.push(M===1?"un millón":nBelow(M,true)+" millones");
+  if(K) p.push(K===1?"mil":nBelow(K,true)+" mil");
+  if(R) p.push(nBelow(R,false));
+  return p.join(" ");
+}
+const nFmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");
+const nRnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), nPick=a=>a[Math.floor(Math.random()*a.length)];
+const nShuf=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a };
+const NIRR=[11,12,13,14,15,16,17,18,19,21,22,23,26,29,100,101,110,115,121,200,500,501,515,550,700,715,750,900,919,999,1000,1001,1100,1500,1700,1900,2000,5000,5500,7000,9000,10000,15000,21000,31000,51000,100000,101000,115000,500000,700000,900000,1000000,1100000,1500000,2000000,5000000,21000000,100000000];
+const NSTAGES=[
+  {id:"n1",name:"10 to 30",en:"Teens and the twenties",lo:10,hi:30,pick:.5},
+  {id:"n2",name:"30 to 100",en:"Tens with “y”, and cien",lo:30,hi:100,pick:.45},
+  {id:"n3",name:"100 to 999",en:"Hundreds · 500, 700, 900",lo:100,hi:999,pick:.35},
+  {id:"n4",name:"1,000 to 9,999",en:"mil, never “un mil”",lo:1000,hi:9999,pick:.25},
+  {id:"n5",name:"10,000 to 999,999",en:"Thousands · cien mil, veintiún mil",lo:10000,hi:999999,pick:.25},
+  {id:"n6",name:"Millions",en:"un millón, dos millones…",lo:1e6,hi:999999999,pick:.25},
+  {id:"nx",name:"Tricky numbers",en:"Only the irregular ones, all sizes",irr:true,pick:.4}];
+const NGEN={
+  n1(){ const r=Math.random(); return r<.4?nRnd(11,15):r<.6?nRnd(16,19):r<.9?nRnd(21,29):nPick([10,20,30]) },
+  n2(){ const r=Math.random(); if(r<.3) return nPick([30,40,50,60,70,80,90,100]); return nRnd(3,9)*10+nRnd(1,9) },
+  n3(){ const r=Math.random(), h=nPick([1,2,3,4,5,5,6,7,7,8,9,9]);
+    if(r<.28) return h*100; if(r<.48) return h*100+nRnd(1,9)*10; if(r<.68) return h*100+nRnd(1,29); return nRnd(100,999) },
+  n4(){ const r=Math.random(), k=nRnd(1,9);
+    if(r<.25) return k*1000; if(r<.45) return k*1000+nRnd(1,9)*100; if(r<.6) return k*1000+nRnd(1,99); return nRnd(1000,9999) },
+  n5(){ const r=Math.random();
+    if(r<.22) return nPick([10,11,12,15,20,21,30,31,50,100,101,200,500,700,900,nRnd(10,999)])*1000;
+    if(r<.45) return nRnd(10,99)*1000+500; if(r<.7) return nRnd(10,99)*1000+nRnd(100,999); return nRnd(10000,999999) },
+  n6(){ const r=Math.random();
+    if(r<.35) return nPick([1,2,3,5,10,15,20,21,31,50,100,500,700,900])*1e6;
+    if(r<.7) return nRnd(1,20)*1e6+nPick([100,250,500,750])*1000; return nRnd(1,999)*1e6+nRnd(1,999)*1000+(Math.random()<.5?nRnd(1,999):0) },
+  nx(){ return nPick(NIRR) }
+};
+const nIn=(st,n)=>st.irr?NIRR.includes(n):n>=st.lo&&n<=st.hi;
+// three wrong answers that sound like the right one (15 ↔ 50, swapped digits, a neighbour, the wrong size)
+function nDistract(n){
+  const s=String(n), out=[], seen=new Set([n]);
+  const add=x=>{ x=Math.round(x); if(x>0&&x<=999999999&&!seen.has(x)&&String(x).length>=Math.max(1,s.length-1)){ seen.add(x); out.push(x) } };
+  const l2=n%100; const base=n-l2;
+  if(l2>=13&&l2<=19) add(base+(l2-10)*10);
+  if(l2>=30&&l2<=90&&l2%10===0) add(base+l2/10+10);
+  if(s.length>=2){ const a=s.split(""), i=a.length-1; [a[i],a[i-1]]=[a[i-1],a[i]]; add(+a.join("")) }
+  if(n>=100&&n%100===0){ add(n+100); add(n-100) }
+  if(n>=1000&&n%1000===0){ add(n+1000); add(n-1000) }
+  if(n%10===0) { add(n+10); add(n-10) } else { add(n+1); add(n-1) }
+  if(n>=100&&n%10===0) add(n/10); if(n<1e8) add(n*10);
+  let g=0; while(out.length<5&&g++<40) add(n+nPick([-20,-10,-2,2,10,20,100,-100,1000,-1000]));
+  return out.slice(0,3);
+}
+function nBuild(st){
+  const used=new Set(), q=[], miss=Object.keys(ST.num.miss).map(Number).filter(n=>nIn(st,n)&&ST.num.miss[n].m>ST.num.miss[n].ok);
+  let g=0;
+  while(q.length<10&&g++<400){
+    let n=miss.length&&Math.random()<.3?nPick(miss):NGEN[st.id]();
+    if(used.has(n)) continue; used.add(n);
+    const t=Math.random()<st.pick?"pick":"type", it={n,t};
+    if(t==="pick"){ const d=nDistract(n); if(d.length<3) it.t="type"; else it.opts=nShuf([n,...d]) }
+    q.push(it);
+  }
+  return q;
+}
+// one or two short reminders about why this number is spelled the way it is
+function nNote(n){
+  const r=[], l2=n%100, M=Math.floor(n/1e6), K=Math.floor(n%1e6/1000), R=n%1000;
+  const groups=[M,K,R].filter(x=>x>0), hd=groups.map(x=>Math.floor(x/100));
+  if(l2>=11&&l2<=15) r.push(`<b>${NU[l2]}</b> is a word of its own. 11–15 (once, doce, trece, catorce, quince) have no pattern.`);
+  else if(l2>=16&&l2<=19) r.push(`<b>${NU[l2]}</b>: 16–19 are <i>diez y …</i> squeezed into one word (dieci-).`);
+  else if(l2>=21&&l2<=29) r.push(`<b>${NU[l2]}</b>: the twenties are one word (veinti-). Accents on veintidós, veintitrés, veintiséis.`);
+  else if(l2>=31&&l2%10) r.push(`From 31 on it is tens + <b>y</b> + units: ${NT[Math.floor(l2/10)]} y ${NU[l2%10]}.`);
+  else if(l2>=30&&l2%10===0) r.push(`<b>${NT[l2/10]}</b>: 30, 40, 50… are tens. Careful with 13/30, 14/40, 15/50: the stress moves.`);
+  if(hd.includes(5)) r.push(`500 is <b>quinientos</b>, not “cincocientos”.`);
+  else if(hd.includes(7)) r.push(`700 is <b>setecientos</b>, not “sietecientos”.`);
+  else if(hd.includes(9)) r.push(`900 is <b>novecientos</b>, not “nuevecientos”.`);
+  else if(groups.some(x=>x===100)) r.push(`100 alone is <b>cien</b>. With more it becomes <b>ciento</b> (ciento uno).`);
+  else if(groups.some(x=>x>100&&x<200)) r.push(`101–199 start with <b>ciento</b>, not cien.`);
+  if(r.length<2){
+    if(K===1) r.push(`1,000 is <b>mil</b>, never “un mil”. 1,500 = mil quinientos.`);
+    else if(K>0&&K%10===1&&K%100!==11) r.push(`Before <b>mil</b>, uno becomes <b>un</b> (veintiún mil, treinta y un mil).`);
+    else if(M===1) r.push(`1,000,000 is <b>un millón</b>; from 2 on it is <b>millones</b>. With a noun: un millón <i>de</i> personas.`);
+    else if(M>1) r.push(`Millions are plural: <b>dos millones</b>, tres millones…`);
+    else if(n>=200&&n<1000&&n%100===0) r.push(`Hundreds end in -ientos and agree with a noun: doscientas personas.`);
+  }
+  return r.slice(0,2);
+}
+function nSay(slow){
+  const q=NQ&&NQ.q[NQ.i]; if(!q) return; const old=S.rate;
+  if(slow||ST.num.slow) S.rate="slow";
+  try{ speak(numEs(q.n),$("nPlay")) }finally{ S.rate=old }
+}
+function nCardHTML(){
+  const done=NSTAGES.filter(s=>(ST.num.best[s.id]||0)>=8).length;
+  return `<button type="button" class="course" id="nCard" style="--cc:var(--pres);--cc-soft:var(--pres-soft)">
+    <span><span class="cn">Numbers</span><br><span class="cs">Listen and type · 10 up to the millions</span></span><span class="chev" aria-hidden="true">›</span>
+    <span class="cs"><span class="now">${done} / ${NSTAGES.length}</span> stages passed</span>
+    <span class="segs">${NSTAGES.map(s=>`<i class="${(ST.num.best[s.id]||0)>=8?"on":""}"></i>`).join("")}</span></button>`;
+}
+function renderNumHome(){
+  screen="nhome"; course=null; drillOn=false; NQ=null; $("fb").hidden=true; chrome();
+  const rows=[[11,12,13,14,15],[16,19],[21,22,23,26],[30,31],[100,101],[200,300,400],[500,600,700,800,900],[1000,2000,21000,100000],[1000000,2000000]];
+  const cheat=`<details class="vcard ncheat"><summary>Cheat sheet · the irregular ones</summary>
+    <div class="ncl">${[11,12,13,14,15,16,19,21,22,23,26,31,100,101,200,500,700,900,1000,21000,100000,1000000,2000000].map(n=>`<div><b>${nFmt(n)}</b><span>${numEs(n)}</span>${spkBtn(numEs(n),"sm")}</div>`).join("")}</div>
+    <p class="hint" style="margin-top:8px">Tap the speaker to hear each one.</p></details>`;
+  const card=s=>{ const b=ST.num.best[s.id]; return `<button type="button" class="course${b>=8?" fin":""}" data-n="${s.id}" style="--cc:var(--pres);--cc-soft:var(--pres-soft)">
+    <span><span class="cn">${s.name}</span><br><span class="cs">${s.en}</span></span><span class="chev" aria-hidden="true">›</span>
+    <span class="cs">${b!=null?`<span class="now">Best ${b} / 10${b>=8?" ✓":""}</span>`:"Not tried yet"}</span></button>` };
+  $("drill").innerHTML=`<div class="vsec">
+    <div><p class="sub" style="margin:0">You hear a number, then type it (or pick it). 10 questions a round. Anything you miss comes back at the end, and again in later rounds.</p></div>
+    ${cheat}
+    <div class="setting"><p class="label" style="margin:0">Voice speed</p><div class="seg" id="nSeg"><button type="button" data-v="0" aria-pressed="${!ST.num.slow}">Normal</button><button type="button" data-v="1" aria-pressed="${!!ST.num.slow}">Slower</button></div></div>
+    ${NSTAGES.map(card).join("")}<p class="syncline"></p></div>`;
+  $("actions").innerHTML="";
+  document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>nStart(b.dataset.n));
+  $("nSeg").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; ST.num.slow=+b.dataset.v; saveLocal(); renderNumHome() };
+  try{ updateSync() }catch(e){}
+}
+function nStart(id){
+  const st=NSTAGES.find(s=>s.id===id); if(!st) return;
+  NQ={st,q:nBuild(st),i:0,score:0,miss:[],answered:false,typed:"",xp:null,retries:0,asked:0};
+  renderNQ();
+}
+function renderNQ(){
+  screen="nq"; $("fb").hidden=true; NQ.answered=false; NQ.typed=""; chrome();
+  const q=NQ.q[NQ.i];
+  const body=q.t==="pick"
+    ?`<div class="vopts" id="nOpts">${q.opts.map(o=>`<button type="button" class="vopt" data-o="${o}">${nFmt(o)}</button>`).join("")}</div>`
+    :`<div class="nbig empty" id="nBig" aria-live="polite">?</div>`;
+  $("drill").innerHTML=`<div class="nq">
+    <div class="meta"><span class="pill pres">${NQ.st.name}</span><span class="label" style="margin:0">${q.t==="pick"?"Listen, then choose":"Listen, then type the number"}${q.retry?" · second try":""}</span></div>
+    <div class="nplayrow"><button type="button" class="nplay" id="nPlay" aria-label="Play again">${SPK_SVG}</button><button type="button" class="nslow" id="nSlow">🐢 Slower</button></div>
+    ${body}<div id="nFb"></div></div>`;
+  $("nPlay").onclick=()=>nSay(false); $("nSlow").onclick=()=>nSay(true);
+  if(q.t==="pick") document.querySelectorAll("#nOpts .vopt").forEach(b=>b.onclick=()=>nAnswer(+b.dataset.o));
+  $("actions").innerHTML=q.t==="pick"?"":`<div class="npad">${[1,2,3,4,5,6,7,8,9].map(d=>`<button type="button" data-k="${d}">${d}</button>`).join("")}<button type="button" data-k="del" aria-label="Delete">⌫</button><button type="button" data-k="0">0</button><button type="button" class="go" data-k="go" aria-label="Check">✓</button></div>`;
+  document.querySelectorAll(".npad button").forEach(b=>b.onclick=()=>nKey(b.dataset.k));
+  setTimeout(()=>{ if(screen==="nq"&&NQ&&NQ.q[NQ.i]===q&&!NQ.answered) nSay(false) },280);
+}
+function nKey(k){
+  if(screen!=="nq"||!NQ||NQ.answered) return;
+  if(k==="go"){ if(NQ.typed) nAnswer(+NQ.typed); return }
+  if(k==="del") NQ.typed=NQ.typed.slice(0,-1); else if(NQ.typed.length<9&&!(NQ.typed===""&&k==="0")) NQ.typed+=k;
+  const big=$("nBig"); if(big){ big.textContent=NQ.typed?nFmt(NQ.typed):"?"; big.classList.toggle("empty",!NQ.typed) }
+}
+document.addEventListener("keydown",e=>{
+  if(screen!=="nq"||!NQ) return; const a=document.activeElement; if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA)$/.test(a.tagName))) return;
+  if(/^[0-9]$/.test(e.key)){ nKey(e.key); e.preventDefault() }
+  else if(e.key==="Backspace"){ nKey("del"); e.preventDefault() }
+  else if(e.key==="Enter"){ if(NQ.answered){ nNext() } else nKey("go"); e.preventDefault() }
+});
+function nAnswer(v){
+  if(!NQ||NQ.answered) return; NQ.answered=true;
+  const q=NQ.q[NQ.i], ok=v===q.n, m=ST.num.miss[q.n]||(ST.num.miss[q.n]={m:0,ok:0,t:0}); NQ.asked++;
+  if(ok){ m.ok++; if(!q.retry) NQ.score++ }
+  else{ if(!q.retry){ m.m++; NQ.miss.push(q.n); if(NQ.retries<3){ NQ.retries++; NQ.q.push({n:q.n,t:q.t,opts:q.t==='pick'?nShuf(q.opts):undefined,retry:true}) } } }
+  m.t=Date.now();
+  const big=$("nBig"); if(big){ big.textContent=nFmt(v); big.classList.remove("empty"); big.classList.add(ok?"ok":"bad") }
+  document.querySelectorAll("#nOpts .vopt").forEach(b=>{ const o=+b.dataset.o; b.disabled=true; if(o===q.n) b.classList.add("ok"); else if(o===v) b.classList.add("bad"); else b.classList.add("dim") });
+  const last=NQ.i>=NQ.q.length-1, w=numEs(q.n), notes=nNote(q.n);
+  $("nFb").innerHTML=`<div class="nfb ${ok?"ok":"bad"}"><div class="verdict">${ok?"Correct":"Not quite"}</div>
+    <div class="nans">${nFmt(q.n)}</div><div class="nwords">${w} ${spkBtn(w,"sm")}</div>
+    ${!ok?`<p class="note">You ${q.t==="pick"?"chose":"typed"} <b class="bad-t">${nFmt(v)}</b> = ${numEs(v)}</p>`:""}
+    ${notes.map(x=>`<p class="note">${x}</p>`).join("")}</div>`;
+  $("actions").innerHTML=`<button type="button" class="grow" id="nNext">${last?"See results":"Next"}</button>`;
+  $("nNext").onclick=nNext; chrome();
+  setTimeout(()=>{ const f=$("nFb"); if(f) f.scrollIntoView({block:"nearest",behavior:"smooth"}) },60);
+}
+function nNext(){ if(!NQ||!NQ.answered) return; NQ.i++; if(NQ.i>=NQ.q.length) nFinish(); else renderNQ() }
+function nCommit(){
+  if(!NQ||!NQ.asked) return; const tk=todayKey(); ST.num.log[tk]=(ST.num.log[tk]||0)+NQ.asked; NQ.asked=0;
+  commit("num");
+}
+function nEnd(){ nCommit(); NQ=null; renderNumHome() }
+function nFinish(){
+  screen="nsum"; $("fb").hidden=true; const n=10, s=NQ.score;
+  ST.num.best[NQ.st.id]=Math.max(ST.num.best[NQ.st.id]||0,s);
+  if(!NQ.xp&&n>=3) NQ.xp=xpAward([["Correct answers",s*3],["Round complete",10]]);
+  nCommit(); chrome();
+  const miss=[...new Set(NQ.miss)];
+  $("drill").innerHTML=`<div class="vsum">
+    <div><p class="label">${NQ.st.name}</p><div class="bigpts">${s} / ${n}</div><p class="sub">${s>=9?"Excellent ear.":s>=8?"Stage passed.":s>=6?"Getting there. Run it again.":"Keep going: a couple more rounds will fix it."}</p></div>
+    ${xpStrip(NQ.xp)}
+    ${miss.length?`<div><p class="label">To remember</p><div class="vmist">${miss.map(x=>`<div><div><b>${nFmt(x)}</b> · ${numEs(x)}<small>${nNote(x)[0]?nNote(x)[0].replace(/<[^>]+>/g,""):""}</small></div>${spkBtn(numEs(x),"sm")}</div>`).join("")}</div></div>`:`<div class="banner"><b>No mistakes.</b> Try the next stage.</div>`}
+    <p class="syncline"></p></div>`;
+  $("actions").innerHTML=`<button type="button" class="ghost" id="nAll">All stages</button><button type="button" class="grow" id="nAgain">Another round</button>`;
+  const id=NQ.st.id; $("nAll").onclick=()=>{ NQ=null; renderNumHome() }; $("nAgain").onclick=()=>nStart(id);
+  try{ updateSync() }catch(e){}
+}
+
 renderMenu();
 // ================= opening screen: progress at a glance while the app loads =================
 (function splash(){
   const sp=$("splash"); if(!sp) return;
   const tk=todayKey(), wk=weekDays().map(dkey);
-  const has=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0;
+  const has=k=>courseLog(k)||(ST.drill.log[k]||0)>0||(ST.stories.log[k]||0)>0||((ST.verbs&&ST.verbs.log[k])||0)>0||((ST.words&&ST.words.log[k])||0)>0||((ST.talk&&ST.talk.log[k])||0)>0||((ST.scn&&ST.scn.log[k])||0)>0||((ST.num&&ST.num.log[k])||0)>0;
   const str=streak(has);
   $("spStreak").innerHTML=str?`<b>${str}</b>day streak${has(tk)?" · done today":" · keep it going today"}`:(has(tk)?"Nice work today":"Ready for today’s practice");
   $("spWeek").innerHTML=wk.map((k,i)=>`<span><i class="${has(k)?"on":""}${k===tk?" today":""}" style="animation-delay:${.08*i}s"></i>${LBL[i].slice(0,1)}</span>`).join("");
@@ -6580,7 +6815,6 @@ renderMenu();
   sp.addEventListener("click",close);
 })();
 </script>
-
 <script>
 /* update check: look for a new version when the app opens and whenever you come back to it, then refresh, only while you are on the main menu */
 if("serviceWorker" in navigator){
